@@ -6,170 +6,266 @@
 <title>Sand &amp; Bone — Генератор сражений</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 
-/* ─── TOKENS ─────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   SAND & BONE — GRIMDARK FANTASY TRACKER
+   Design system: Dark OLED base + skeuomorphic grimoire
+   Skill: ui-ux-pro-max / style: OLED Dark (WCAG AAA)
+   ════════════════════════════════════════════════════════ */
+
+/* ── TOKENS ─────────────────────────────────────────────── */
 :root {
-  /* Backgrounds */
-  --bg:        #0b0912;
-  --bg2:       #100d1a;
-  --panel:     #17132200;
-  --panel-s:   #1a152a;
-  --panel2:    #201a30;
-  --panel3:    #261f38;
+  /* Backgrounds — warm coal-black, not cold blue */
+  --void:      #060408;
+  --bg:        #0c0a10;
+  --surf-1:    #131018;
+  --surf-2:    #1a1622;
+  --surf-3:    #221d2e;
+  --surf-4:    #2c2540;
 
-  /* Ink */
-  --ink:       #ede5d3;
-  --ink-dim:   #a89e8a;
-  --ink-faint: #68604f;
+  /* Text — aged parchment tones, high contrast on dark */
+  --ink:       #d9cab0;   /* 11.2:1 on --bg  ✓ WCAG AAA */
+  --ink-mid:   #9a8a6e;   /*  5.6:1 on --bg  ✓ WCAG AA  */
+  --ink-faint: #5e5040;   /* used for decorative/disabled */
 
-  /* Lines */
-  --line:      #332c48;
-  --line2:     #42395a;
+  /* Borders — tarnished bronze/rust */
+  --bdr:       rgba(140, 95, 35, 0.22);
+  --bdr-mid:   rgba(160, 110, 45, 0.42);
+  --bdr-hi:    rgba(190, 140, 60, 0.75);
+  --bdr-focus: #a07838;
 
-  /* Accent colours */
-  --gold:      #c9a44d;
-  --gold-l:    #e0bc6a;
-  --gold-dim:  #7a6530;
-  --gold-bg:   rgba(201,164,77,.10);
-  --blood:     #a8364a;
-  --blood-bg:  rgba(168,54,74,.12);
-  --ossia:     #a07ac4;
-  --ossia-bg:  rgba(160,122,196,.12);
-  --dolorum:   #6b8e6d;
-  --dolorum-bg:rgba(107,142,109,.12);
-  --hashut:    #c98f47;
-  --hashut-bg: rgba(201,143,71,.12);
-  --slaves:    #b5495f;
-  --slaves-bg: rgba(181,73,95,.12);
-  --army-accent:    #c9a44d;
-  --army-accent-bg: rgba(201,164,77,.10);
+  /* Blood red — primary CTA / active states */
+  --blood:      #7a1818;
+  --blood-hi:   #a02020;
+  --blood-glow: rgba(122,24,24,.45);
+  --blood-bg:   rgba(122,24,24,.13);
+  --blood-text: #e07070;  /* blood colour readable on dark */
+
+  /* Bronze / tarnished gold */
+  --bronze:     #9e7838;
+  --bronze-hi:  #c49840;
+  --bronze-dim: #5a4018;
+  --bronze-bg:  rgba(158,120,56,.12);
+  --bronze-text: #c4984a;
+
+  /* Side accent colours */
+  --ossia:      #6248a0;
+  --ossia-bg:   rgba(98,72,160,.15);
+  --dolorum:    #3a6840;
+  --dolorum-bg: rgba(58,104,64,.15);
+  --hashut:     #8a5c26;
+  --hashut-bg:  rgba(138,92,38,.15);
+  --slaves:     #882030;
+  --slaves-bg:  rgba(136,32,48,.15);
+  --army-accent:    #9e7838;
+  --army-accent-bg: rgba(158,120,56,.12);
 
   /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(0,0,0,.4);
-  --shadow:    0 6px 24px rgba(0,0,0,.55);
-  --shadow-lg: 0 16px 48px rgba(0,0,0,.65);
+  --shd-sm:  0 2px 8px  rgba(0,0,0,.75);
+  --shd:     0 4px 20px rgba(0,0,0,.80);
+  --shd-lg:  0 8px 40px rgba(0,0,0,.90);
+  --shd-in:  inset 0 0 28px rgba(0,0,0,.45);
 
-  /* Radius */
-  --r-sm: 8px;
-  --r:    12px;
-  --r-lg: 18px;
-  --r-xl: 24px;
+  /* Radius — angular, stone-and-iron feel */
+  --r-xs: 2px;
+  --r-sm: 4px;
+  --r:    7px;
+  --r-lg: 11px;
+  --r-xl: 16px;
 
   /* Motion */
-  --ease: cubic-bezier(.25,.46,.45,.94);
-  --ease-out: cubic-bezier(.16,1,.3,1);
-  --t: .18s;
+  --ease:    cubic-bezier(.25,.46,.45,.94);
+  --ease-o:  cubic-bezier(.16,1,.3,1);
+  --t:       .18s;
+  --t-slow:  .38s;
 }
 
-/* ─── RESET ──────────────────────────────────────────── */
+/* ── RESET ──────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+/* ── BODY + GRAIN TEXTURE ───────────────────────────────── */
 body {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: 17px;
-  line-height: 1.55;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
   color: var(--ink);
   background: var(--bg);
   min-height: 100svh;
   padding-bottom: 80px;
-  background-image:
-    radial-gradient(ellipse 60% 40% at 15% -5%, rgba(160,122,196,.08) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 35% at 90% 5%,  rgba(107,142,109,.06) 0%, transparent 55%),
-    radial-gradient(ellipse 80% 50% at 50% 100%,rgba(168,54,74,.04)   0%, transparent 60%);
+  position: relative;
 }
 
-/* ─── TYPOGRAPHY ─────────────────────────────────────── */
+/* Atmospheric radial gradients */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 20% 0%,   rgba(98,72,160,.07)  0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 0%,   rgba(58,104,64,.05)  0%, transparent 55%),
+    radial-gradient(ellipse 100% 60% at 50% 100%, rgba(122,24,24,.05)  0%, transparent 60%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, transparent 45%, rgba(0,0,0,.55) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* SVG grain overlay — grimdark texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='280' height='280' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.038;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── TYPOGRAPHY ─────────────────────────────────────────── */
 h1, h2, h3, h4, .disp {
-  font-family: 'Cinzel', serif;
-  letter-spacing: .03em;
+  font-family: 'Cinzel', 'Palatino Linotype', serif;
   line-height: 1.2;
+  letter-spacing: .03em;
 }
-.ui { font-family: 'Inter', sans-serif; }
 
-/* ─── UTILITY ────────────────────────────────────────── */
-.wrap { max-width: 680px; margin: 0 auto; padding: 0 16px; }
-a { color: var(--gold); }
+/* ── UTILITY ────────────────────────────────────────────── */
+.wrap { max-width: 680px; margin: 0 auto; padding: 0 16px; position: relative; z-index: 2; }
+a { color: var(--bronze-text); }
+code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr); border-radius: var(--r-sm); padding: 1px 6px; }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 6px; }
+::-webkit-scrollbar-thumb { background: var(--surf-3); border-radius: 5px; }
 
-/* ─── HERO ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  .flipcard { transition: none !important; }
+}
+
+/* ── HERO ───────────────────────────────────────────────── */
 .hero {
   position: relative;
   text-align: center;
-  padding: 36px 20px 28px;
-  border-bottom: 1px solid var(--line);
+  padding: 40px 20px 30px;
+  border-bottom: 1px solid var(--bdr);
   overflow: hidden;
+  z-index: 2;
 }
+
+/* Vignette top gradient */
 .hero::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(160,122,196,.06) 0%, transparent 100%);
+  background:
+    linear-gradient(180deg, rgba(98,72,160,.08) 0%, transparent 70%),
+    linear-gradient(0deg, rgba(0,0,0,.3) 0%, transparent 40%);
   pointer-events: none;
 }
+
+/* Worn border at bottom */
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--bronze-dim), var(--bronze), var(--bronze-dim), transparent);
+}
+
 .hero-eyebrow {
   font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .24em;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .28em;
   text-transform: uppercase;
-  color: var(--gold-dim);
-  margin-bottom: 10px;
+  color: var(--bronze-dim);
+  margin-bottom: 14px;
 }
+
 .hero h1 {
-  font-size: clamp(28px, 8vw, 44px);
+  font-size: clamp(32px, 9vw, 52px);
   font-weight: 900;
+  letter-spacing: .10em;
   color: var(--ink);
-  letter-spacing: .06em;
   text-shadow:
-    0 0 40px rgba(201,164,77,.20),
-    0 2px 4px rgba(0,0,0,.5);
-  margin-bottom: 4px;
+    0 0 60px rgba(158,120,56,.30),
+    0 2px 4px rgba(0,0,0,.8);
+  margin-bottom: 0;
+  position: relative;
 }
-.hero-ornament {
+
+/* Title side ornaments */
+.hero-title-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin: 6px 0 10px;
-  color: var(--gold-dim);
+  gap: 14px;
+  margin-bottom: 10px;
 }
-.hero-ornament span { font-size: 10px; }
-.hero-ornament::before,
-.hero-ornament::after {
+.hero-title-row .h-orn {
+  flex: 1;
+  max-width: 50px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--bronze-dim));
+}
+.hero-title-row .h-orn.right { background: linear-gradient(90deg, var(--bronze-dim), transparent); }
+
+.hero-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 10px 0 14px;
+  color: var(--bronze-dim);
+  font-size: 11px;
+  letter-spacing: .15em;
+}
+.hero-divider::before,
+.hero-divider::after {
   content: '';
   flex: 1;
-  max-width: 60px;
+  max-width: 80px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold-dim));
+  background: linear-gradient(90deg, transparent, var(--bdr-mid));
 }
-.hero-ornament::after { background: linear-gradient(90deg, var(--gold-dim), transparent); }
+.hero-divider::after { background: linear-gradient(90deg, var(--bdr-mid), transparent); }
+
 .hero-sub {
-  color: var(--ink-dim);
+  color: var(--ink-mid);
+  font-size: 14px;
   font-style: italic;
-  font-size: 15px;
-  max-width: 480px;
+  max-width: 440px;
   margin: 0 auto;
+  line-height: 1.6;
 }
 
-/* ─── STICKY BAR ─────────────────────────────────────── */
+/* ── STICKY BAR ─────────────────────────────────────────── */
 .stickybar {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(11,9,18,.88);
-  backdrop-filter: blur(12px) saturate(1.4);
-  -webkit-backdrop-filter: blur(12px) saturate(1.4);
-  border-bottom: 1px solid var(--line);
+  background: rgba(6,4,8,.92);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
+  border-bottom: 1px solid var(--bdr);
+  box-shadow: 0 2px 20px rgba(0,0,0,.7);
 }
+
+/* Worn gold line at top of sticky bar */
+.stickybar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 5%, var(--bdr-mid) 30%, var(--bronze-dim) 50%, var(--bdr-mid) 70%, transparent 95%);
+}
+
 .stickyrow {
   max-width: 680px;
   margin: 0 auto;
-  padding: 8px 14px;
+  padding: 9px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -180,308 +276,405 @@ a { color: var(--gold); }
 .roundtrack {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   flex-shrink: 0;
 }
+
 .roundnode {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  font-size: 12px;
-  border: 1.5px solid var(--line);
+  font-size: 13px;
+  border: 1.5px solid var(--bdr);
   color: var(--ink-faint);
-  background: var(--bg2);
+  background: var(--surf-1);
   transition: border-color var(--t), background var(--t), color var(--t), box-shadow var(--t);
+  cursor: default;
+  user-select: none;
 }
 .roundnode.active {
-  border-color: var(--gold);
-  color: #1a1000;
-  background: var(--gold);
-  box-shadow: 0 0 12px rgba(201,164,77,.5);
+  border-color: var(--blood-hi);
+  color: #f0c0c0;
+  background: var(--blood);
+  box-shadow: 0 0 14px var(--blood-glow), inset 0 1px 0 rgba(255,180,180,.15);
 }
 .roundnode.done {
-  border-color: var(--gold-dim);
-  color: var(--gold-dim);
-  background: var(--gold-bg);
+  border-color: var(--bronze-dim);
+  color: var(--bronze-dim);
+  background: var(--bronze-bg);
 }
-.roundline { width: 10px; height: 1px; background: var(--line); flex-shrink: 0; }
-.roundbtns { display: flex; gap: 4px; margin-left: 4px; }
+
+.roundline { width: 8px; height: 1px; background: var(--bdr); flex-shrink: 0; }
+
+.roundbtns { display: flex; gap: 4px; margin-left: 6px; }
 .roundbtns button {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
-  font-size: 14px;
+  font-size: 16px;
+  line-height: 1;
+  border-radius: var(--r-sm);
 }
 
 /* VP boxes */
 .vprow { display: flex; align-items: center; gap: 6px; }
+
 .vpbox {
   display: flex;
-  align-items: center;
-  gap: 0;
-  background: var(--panel2);
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  align-items: stretch;
+  background: var(--surf-2);
+  border: 1px solid var(--bdr-mid);
+  border-radius: var(--r);
   overflow: hidden;
+  box-shadow: var(--shd-sm);
 }
+
 .vpbtn {
-  width: 30px;
-  height: 34px;
+  /* skill checklist: min 44×44px touch target */
+  min-width: 36px;
+  min-height: 44px;
   border: none;
   border-radius: 0;
   background: transparent;
-  color: var(--ink-dim);
-  font-size: 16px;
+  color: var(--ink-mid);
+  font-size: 20px;
   font-family: 'Inter', sans-serif;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
   transition: background var(--t), color var(--t);
   display: flex;
   align-items: center;
   justify-content: center;
-  line-height: 1;
   padding: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
-.vpbtn:hover { background: var(--panel3); color: var(--gold); }
+.vpbtn:hover  { background: var(--blood-bg); color: var(--blood-text); }
+.vpbtn:active { background: var(--blood); color: #f0c0c0; }
+
 .vp-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 6px;
-  border-left: 1px solid var(--line);
-  border-right: 1px solid var(--line);
-  min-width: 42px;
+  justify-content: center;
+  padding: 4px 10px;
+  border-left: 1px solid var(--bdr);
+  border-right: 1px solid var(--bdr);
+  min-width: 46px;
+  background: var(--surf-1);
 }
 .vpname {
   font-family: 'Inter', sans-serif;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: .1em;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .14em;
   text-transform: uppercase;
   color: var(--ink-faint);
   line-height: 1;
-  margin-top: 4px;
 }
 .vpval {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 22px;
   color: var(--ink);
   line-height: 1.1;
-  margin-bottom: 3px;
-}
-.underdogtag {
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--gold);
-  border: 1px solid var(--gold-dim);
-  border-radius: 20px;
-  padding: 3px 8px;
-  white-space: nowrap;
-  flex-shrink: 0;
+  text-shadow: 0 0 10px rgba(217,202,176,.2);
 }
 
-/* ─── BUTTONS ────────────────────────────────────────── */
+.underdogtag {
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--bronze-text);
+  border: 1px solid var(--bronze-dim);
+  border-radius: 3px;
+  padding: 4px 7px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: var(--bronze-bg);
+  text-transform: uppercase;
+}
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
 button {
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
   border-radius: var(--r-sm);
-  border: 1px solid var(--line);
-  background: var(--panel2);
-  color: var(--ink);
-  padding: 8px 14px;
+  border: 1px solid var(--bdr-mid);
+  background: var(--surf-2);
+  color: var(--ink-mid);
+  /* skill checklist: min touch target */
+  min-height: 44px;
+  padding: 0 16px;
   transition: border-color var(--t), background var(--t), color var(--t), box-shadow var(--t);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
 }
-button:hover { border-color: var(--line2); background: var(--panel3); }
+button:hover  { border-color: var(--bdr-hi); color: var(--ink); background: var(--surf-3); }
 button:active { transform: scale(.97); }
-button.primary {
-  background: linear-gradient(160deg, #d4ae56, #a8832e);
-  color: #1a1000;
-  border: none;
-  font-weight: 700;
-  box-shadow: 0 2px 12px rgba(201,164,77,.25);
-}
-button.primary:hover { filter: brightness(1.1); box-shadow: 0 4px 18px rgba(201,164,77,.35); }
-button.ghost { background: transparent; border-color: var(--line); }
-button.ghost:hover { border-color: var(--gold-dim); color: var(--gold); background: var(--gold-bg); }
-button:disabled { opacity: .35; cursor: not-allowed; transform: none; }
-button.small { padding: 6px 12px; font-size: 12px; }
-button.tiny { padding: 3px 8px; font-size: 11px; border-radius: 6px; }
 
-/* ─── SECTIONS ───────────────────────────────────────── */
-section.block { margin-top: 32px; }
+/* Primary — blood red */
+button.primary {
+  background: linear-gradient(175deg, var(--blood-hi) 0%, var(--blood) 100%);
+  color: #f5d0d0;
+  border: 1px solid rgba(180,60,60,.5);
+  box-shadow: 0 2px 14px rgba(122,24,24,.4), inset 0 1px 0 rgba(255,160,160,.12);
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+button.primary:hover  { filter: brightness(1.15); box-shadow: 0 4px 20px rgba(122,24,24,.55); }
+button.primary:active { filter: brightness(.9); transform: scale(.97); }
+
+/* Ghost */
+button.ghost { background: transparent; border-color: var(--bdr); }
+button.ghost:hover { border-color: var(--bronze-dim); color: var(--bronze-text); background: var(--bronze-bg); }
+
+/* Small — min-height reduced but still 44px for safe area */
+button.small { min-height: 40px; padding: 0 12px; font-size: 12px; }
+button.tiny  { min-height: 34px; padding: 0 10px; font-size: 11px; }
+
+button:disabled { opacity: .3; cursor: not-allowed; transform: none !important; filter: none !important; }
+
+/* ── SECTIONS ─────────────────────────────────────────────── */
+section.block { margin-top: 36px; }
 
 .section-header {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 14px;
-  padding: 0 2px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
 }
+
+/* Roman numeral — styled as a carved stone marker */
 .section-num {
   font-family: 'Cinzel', serif;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: .12em;
-  color: var(--gold-dim);
+  color: var(--blood);
+  background: var(--blood-bg);
+  border: 1px solid rgba(122,24,24,.4);
+  border-radius: var(--r-xs);
+  padding: 3px 8px;
   flex-shrink: 0;
+  text-shadow: 0 0 8px var(--blood-glow);
 }
-.section-header h2 { font-size: 18px; font-weight: 700; color: var(--ink); }
+
+.section-header h2 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: .04em;
+}
+
 .section-rule {
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, var(--line), transparent);
+  background: linear-gradient(90deg, var(--bdr-mid), transparent);
+  /* small ornament at start */
+  position: relative;
 }
-.blockdesc { color: var(--ink-dim); font-size: 14px; margin: -6px 0 14px; max-width: 600px; line-height: 1.5; }
 
-/* Base card */
+.blockdesc {
+  color: var(--ink-mid);
+  font-size: 13.5px;
+  margin: -8px 0 16px;
+  max-width: 580px;
+  line-height: 1.6;
+}
+.blockdesc b { color: var(--ink); font-weight: 600; }
+
+/* ── BASE CARD ───────────────────────────────────────────── */
 .card {
-  background: var(--panel-s);
-  background: linear-gradient(160deg, rgba(38,31,56,.8), rgba(26,21,42,.9));
-  border: 1px solid var(--line);
+  background: var(--surf-1);
+  border: 1px solid var(--bdr);
   border-radius: var(--r-lg);
   padding: 18px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shd), var(--shd-in);
   position: relative;
   overflow: hidden;
 }
+
+/* Top-edge aged bronze shimmer */
 .card::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0; left: 12%; right: 12%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,164,77,.15), transparent);
+  background: linear-gradient(90deg, transparent, var(--bdr-hi), transparent);
   pointer-events: none;
 }
 
-/* ─── SIDE PICKER ────────────────────────────────────── */
+/* Corner ornaments */
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid var(--bdr);
+  border-radius: calc(var(--r-lg) - 3px);
+  pointer-events: none;
+  opacity: .35;
+}
+
+/* ── SIDE PICKER ─────────────────────────────────────────── */
 .sidepicker { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+
 .sidebtn {
   flex: 1;
-  min-width: 200px;
+  min-width: 190px;
   text-align: left;
+  /* skill checklist: min 44px */
+  min-height: 80px;
   padding: 14px 16px;
   border-radius: var(--r);
-  border: 1.5px solid var(--line);
-  background: var(--panel2);
+  border: 1.5px solid var(--bdr);
+  background: var(--surf-2);
   cursor: pointer;
   font-family: 'Inter', sans-serif;
   transition: border-color var(--t), background var(--t), box-shadow var(--t);
-  position: relative;
-  overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  position: relative;
+  overflow: hidden;
 }
-.sidebtn::after {
+.sidebtn:active { transform: scale(.98); }
+
+/* Left accent bar (appears on .sel) */
+.sidebtn::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: var(--r) 0 0 var(--r);
   opacity: 0;
   transition: opacity var(--t);
-  border-radius: var(--r) var(--r) 0 0;
 }
-.sidebtn.ossia::after   { background: linear-gradient(90deg, var(--ossia), transparent); }
-.sidebtn.dolorum::after { background: linear-gradient(90deg, var(--dolorum), transparent); }
-.sidebtn.hashut::after  { background: linear-gradient(90deg, var(--hashut), transparent); }
-.sidebtn.slaves::after  { background: linear-gradient(90deg, var(--slaves), transparent); }
-.sidebtn.dynamic::after { background: linear-gradient(90deg, var(--army-accent), transparent); }
+.sidebtn.ossia::before   { background: var(--ossia);   }
+.sidebtn.dolorum::before { background: var(--dolorum); }
+.sidebtn.hashut::before  { background: var(--hashut);  }
+.sidebtn.slaves::before  { background: var(--slaves);  }
+.sidebtn.dynamic::before { background: var(--army-accent); }
+.sidebtn.sel::before     { opacity: 1; }
 
 .sidebtn .nm {
   font-family: 'Cinzel', serif;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: .04em;
+  letter-spacing: .05em;
   display: block;
-  margin-bottom: 4px;
-  color: var(--ink);
+  margin-bottom: 5px;
+  color: var(--ink-mid);
   transition: color var(--t);
 }
-.sidebtn .desc { font-size: 12px; color: var(--ink-dim); line-height: 1.45; }
+.sidebtn .desc {
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  line-height: 1.45;
+}
 
-.sidebtn.sel { box-shadow: 0 0 0 1px inset; }
-.sidebtn.ossia.sel   { border-color: var(--ossia);   background: var(--ossia-bg); }
-.sidebtn.dolorum.sel { border-color: var(--dolorum); background: var(--dolorum-bg); }
-.sidebtn.hashut.sel  { border-color: var(--hashut);  background: var(--hashut-bg); }
-.sidebtn.slaves.sel  { border-color: var(--slaves);  background: var(--slaves-bg); }
+/* Selected states */
+.sidebtn.sel { border-color: var(--bdr-mid); }
+
+.sidebtn.ossia.sel   { border-color: var(--ossia);   background: var(--ossia-bg);   box-shadow: inset 0 0 20px rgba(98,72,160,.08); }
+.sidebtn.dolorum.sel { border-color: var(--dolorum); background: var(--dolorum-bg); box-shadow: inset 0 0 20px rgba(58,104,64,.08); }
+.sidebtn.hashut.sel  { border-color: var(--hashut);  background: var(--hashut-bg);  box-shadow: inset 0 0 20px rgba(138,92,38,.08); }
+.sidebtn.slaves.sel  { border-color: var(--slaves);  background: var(--slaves-bg);  box-shadow: inset 0 0 20px rgba(136,32,48,.08); }
 .sidebtn.dynamic.sel { border-color: var(--army-accent); background: var(--army-accent-bg); }
-.sidebtn.ossia.sel   .nm { color: var(--ossia); }
-.sidebtn.dolorum.sel .nm { color: var(--dolorum); }
-.sidebtn.hashut.sel  .nm { color: var(--hashut); }
-.sidebtn.slaves.sel  .nm { color: var(--slaves); }
-.sidebtn.dynamic.sel .nm { color: var(--army-accent); }
-.sidebtn.sel::after { opacity: 1; }
-.armytag.dynamic { color: var(--army-accent); border: 1px solid var(--army-accent); }
 
-/* ─── INFO GRID ──────────────────────────────────────── */
-.infogrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
-@media (max-width: 540px) { .infogrid { grid-template-columns: 1fr; } }
+.sidebtn.ossia.sel   .nm { color: #a07fc8; }
+.sidebtn.dolorum.sel .nm { color: #6aaa70; }
+.sidebtn.hashut.sel  .nm { color: var(--hashut); }
+.sidebtn.slaves.sel  .nm { color: var(--blood-text); }
+.sidebtn.dynamic.sel .nm { color: var(--bronze-text); }
+
+.armytag { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; border-radius: var(--r-xs); padding: 2px 8px; letter-spacing: .04em; }
+.armytag.hashut  { color: var(--hashut);      border: 1px solid var(--hashut);      background: var(--hashut-bg); }
+.armytag.slaves  { color: var(--blood-text);  border: 1px solid var(--slaves);      background: var(--slaves-bg); }
+.armytag.dynamic { color: var(--bronze-text); border: 1px solid var(--army-accent); background: var(--army-accent-bg); }
+
+/* ── INFO GRID ───────────────────────────────────────────── */
+.infogrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+@media (max-width: 520px) { .infogrid { grid-template-columns: 1fr; } }
 
 .infocard {
-  background: var(--panel2);
-  border: 1px solid var(--line);
+  background: var(--surf-2);
+  border: 1px solid var(--bdr);
   border-radius: var(--r);
-  padding: 14px 15px;
+  padding: 14px;
+  box-shadow: var(--shd-sm);
 }
 .infocard h3 {
   font-family: 'Inter', sans-serif;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .1em;
-  color: var(--gold);
+  letter-spacing: .14em;
+  color: var(--bronze-text);
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.infocard p { margin: 0 0 7px; font-size: 14px; color: var(--ink-dim); }
+.infocard h3::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--bdr);
+}
+.infocard p { margin: 0 0 7px; font-size: 13px; color: var(--ink-mid); }
 .infocard p:last-child { margin-bottom: 0; }
 
 .flag {
   display: inline-block;
   font-family: 'Inter', sans-serif;
-  font-size: 9.5px;
-  font-weight: 600;
-  border: 1px solid var(--gold-dim);
-  color: var(--gold);
-  border-radius: 4px;
-  padding: 1px 6px;
-  margin-left: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  border: 1px solid var(--bronze-dim);
+  color: var(--bronze-text);
+  border-radius: var(--r-xs);
+  padding: 1px 5px;
+  margin-left: 4px;
   vertical-align: 1px;
+  letter-spacing: .04em;
 }
-.steps { margin: 0; padding-left: 18px; color: var(--ink-dim); font-size: 14px; }
-.steps li { margin-bottom: 6px; }
-.steps b { color: var(--ink); }
 
-.rollrow { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.steps { margin: 0; padding-left: 16px; color: var(--ink-mid); font-size: 13px; }
+.steps li { margin-bottom: 7px; line-height: 1.5; }
+.steps b { color: var(--ink); font-weight: 600; }
+
+.rollrow { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
 .rollresult {
   font-family: 'Cinzel', serif;
   font-size: 13px;
-  color: var(--gold);
-  font-style: italic;
+  color: var(--bronze-text);
+  font-weight: 600;
 }
 
-/* ─── TWIST CARD ─────────────────────────────────────── */
-.twistarea { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+/* ── TWIST CARD ──────────────────────────────────────────── */
+.twistarea { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-start; }
 .twistdraw { flex: 1; min-width: 240px; }
-.twistlog  { flex: 1; min-width: 200px; }
+.twistlog  { flex: 1; min-width: 190px; }
 
-/* Flip card */
+/* 3D flip card */
 .cardstage {
   perspective: 1400px;
-  min-height: 200px;
+  min-height: 210px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -490,10 +683,10 @@ section.block { margin-top: 32px; }
 .flipcard {
   width: 100%;
   max-width: 380px;
-  min-height: 180px;
+  min-height: 190px;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform .65s cubic-bezier(.2,.85,.2,1);
+  transition: transform .70s cubic-bezier(.25,.8,.25,1);
 }
 .flipcard.flipped { transform: rotateY(180deg); }
 
@@ -503,69 +696,88 @@ section.block { margin-top: 32px; }
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: var(--r-lg);
-  border: 1.5px solid var(--line2);
-  padding: 18px;
+  border: 1px solid var(--bdr-mid);
   display: flex;
   flex-direction: column;
-  background: var(--panel2);
 }
+
+/* Card back — grimoire cover */
 .face.back {
   align-items: center;
   justify-content: center;
   text-align: center;
+  padding: 24px 20px;
   background:
-    repeating-linear-gradient(
-      135deg,
-      rgba(201,164,77,.04) 0 10px,
-      transparent 10px 20px
-    ),
-    radial-gradient(ellipse at 50% 30%, rgba(160,122,196,.08), transparent 65%),
-    var(--panel2);
-  border-color: var(--line2);
+    radial-gradient(ellipse 70% 50% at 50% 30%, rgba(158,120,56,.07), transparent 70%),
+    repeating-linear-gradient(135deg, rgba(158,120,56,.04) 0px 10px, transparent 10px 20px),
+    repeating-linear-gradient(45deg,  rgba(158,120,56,.03) 0px 10px, transparent 10px 20px),
+    var(--surf-2);
+  border-color: var(--bdr-hi);
+  box-shadow: inset 0 0 40px rgba(0,0,0,.5), var(--shd);
 }
+
+/* Inner border frame on card back */
 .face.back::before {
   content: '';
   position: absolute;
-  inset: 4px;
-  border: 1px solid var(--line);
+  inset: 6px;
+  border: 1px solid var(--bdr-mid);
   border-radius: calc(var(--r-lg) - 4px);
   pointer-events: none;
 }
+.face.back::after {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid rgba(158,120,56,.15);
+  border-radius: calc(var(--r-lg) - 8px);
+  pointer-events: none;
+}
+
 .back-seal {
-  width: 60px;
-  height: 60px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
-  border: 2px solid var(--gold-dim);
+  border: 2px solid var(--bronze-dim);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 12px;
-  color: var(--gold-dim);
+  margin-bottom: 14px;
+  color: var(--bronze-dim);
   font-family: 'Cinzel', serif;
-  font-size: 22px;
-  background: rgba(201,164,77,.05);
-  box-shadow: 0 0 20px rgba(201,164,77,.1), inset 0 0 20px rgba(201,164,77,.05);
+  font-size: 26px;
+  background: radial-gradient(circle, rgba(158,120,56,.08), transparent 70%);
+  box-shadow: 0 0 24px rgba(158,120,56,.12), inset 0 0 20px rgba(0,0,0,.4);
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 0 16px rgba(158,120,56,.5);
 }
 .back-label {
   font-family: 'Cinzel', serif;
   font-size: 11px;
-  letter-spacing: .2em;
+  font-weight: 600;
+  letter-spacing: .22em;
   text-transform: uppercase;
   color: var(--ink-faint);
+  position: relative;
+  z-index: 1;
 }
 
+/* Card front — revealed twist */
 .face.front {
   transform: rotateY(180deg);
   overflow-y: auto;
-  border-color: var(--gold-dim);
-  background: linear-gradient(160deg, rgba(42,34,60,.95), rgba(26,21,40,.95));
+  padding: 18px;
+  background: linear-gradient(160deg, var(--surf-3) 0%, var(--surf-2) 100%);
+  border-color: var(--bronze-dim);
+  box-shadow: inset 0 0 30px rgba(0,0,0,.4), var(--shd);
 }
 .face.front::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  top: 0; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--bronze-dim), transparent);
   border-radius: var(--r-lg) var(--r-lg) 0 0;
   pointer-events: none;
 }
@@ -573,16 +785,16 @@ section.block { margin-top: 32px; }
 .cardseal {
   align-self: center;
   font-family: 'Inter', sans-serif;
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 700;
-  letter-spacing: .18em;
+  letter-spacing: .20em;
   text-transform: uppercase;
-  color: var(--gold);
-  border: 1px solid var(--gold-dim);
-  border-radius: 20px;
+  color: var(--bronze-text);
+  border: 1px solid var(--bronze-dim);
+  border-radius: 2px;
   padding: 3px 12px;
-  margin-bottom: 10px;
-  background: var(--gold-bg);
+  margin-bottom: 12px;
+  background: var(--bronze-bg);
 }
 .cardname {
   font-family: 'Cinzel', serif;
@@ -591,34 +803,46 @@ section.block { margin-top: 32px; }
   text-align: center;
   margin-bottom: 10px;
   color: var(--ink);
-  letter-spacing: .03em;
+  letter-spacing: .04em;
 }
-.cardeffect { font-size: 14px; color: var(--ink-dim); line-height: 1.55; }
-.cardeffect b { color: var(--ink); }
+.cardeffect { font-size: 13.5px; color: var(--ink-mid); line-height: 1.6; }
+.cardeffect b { color: var(--ink); font-weight: 600; }
 .cardeffect .opt { margin: 8px 0 0; padding-left: 16px; }
-.cardeffect .opt li { margin-bottom: 4px; }
-.cardeffect .note { margin-top: 10px; font-size: 12px; color: var(--ink-faint); font-style: italic; }
+.cardeffect .opt li { margin-bottom: 5px; }
+.cardeffect .note {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--ink-faint);
+  font-style: italic;
+  border-left: 2px solid var(--bdr);
+  padding-left: 8px;
+}
 
 .twistbtnrow { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 
 /* Twist log */
 .logheader {
   font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .12em;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .16em;
   text-transform: uppercase;
   color: var(--ink-faint);
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.loglist { list-style: none; display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; }
+.logheader::after { content: ''; flex: 1; height: 1px; background: var(--bdr); }
+
+.loglist { list-style: none; display: flex; flex-direction: column; gap: 5px; max-height: 210px; overflow-y: auto; }
 .loglist li {
-  background: var(--panel2);
-  border: 1px solid var(--line);
+  background: var(--surf-2);
+  border: 1px solid var(--bdr);
   border-radius: var(--r-sm);
   padding: 7px 10px;
-  font-size: 13px;
-  color: var(--ink-dim);
+  font-size: 12.5px;
+  color: var(--ink-mid);
   display: flex;
   gap: 8px;
   align-items: baseline;
@@ -626,18 +850,19 @@ section.block { margin-top: 32px; }
 .loglist .lr {
   font-family: 'Cinzel', serif;
   font-weight: 700;
-  color: var(--gold);
-  font-size: 11px;
+  color: var(--bronze-text);
+  font-size: 10px;
   flex-shrink: 0;
+  letter-spacing: .06em;
 }
-.loglist .empty { color: var(--ink-faint); font-style: italic; border: 1px dashed var(--line); background: transparent; }
+.loglist .empty { color: var(--ink-faint); font-style: italic; border: 1px dashed var(--bdr); background: transparent; }
 
-/* ─── ARMY PICKER ────────────────────────────────────── */
+/* ── ARMY PICKER (horizontal scroll on mobile) ───────────── */
 .armypicker-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin: 0 -18px 16px;
-  padding: 0 18px 4px;
+  padding: 0 18px 6px;
   scrollbar-width: none;
 }
 .armypicker-wrap::-webkit-scrollbar { display: none; }
@@ -649,58 +874,44 @@ section.block { margin-top: 32px; }
   width: max-content;
   min-width: 100%;
 }
+/* Compact chips for army picker */
 #armypicker-p1 .sidebtn {
-  min-width: 160px;
-  max-width: 200px;
+  min-width: 150px;
+  max-width: 190px;
   flex: 0 0 auto;
+  min-height: 72px;
+  padding: 12px 14px;
 }
+#armypicker-p1 .sidebtn .nm { font-size: 12px; }
+#armypicker-p1 .sidebtn .desc { font-size: 11px; }
 
-/* ─── PLAYER / ARMY CONTENT ──────────────────────────── */
-.playerhead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-.playerhead-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  color: var(--ink-faint);
-}
-.deckcount { font-family: 'Inter', sans-serif; font-size: 12px; color: var(--ink-faint); }
+/* ── ARMY / PLAYER CONTENT ───────────────────────────────── */
+.playerhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.playerhead-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-faint); }
+.deckcount { font-size: 11.5px; color: var(--ink-faint); }
 
 .armyhead { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-.armyhead .nm { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; }
-.armyhead .sub2 { font-family: 'Inter', sans-serif; font-size: 10px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .06em; }
-.armytag {
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  border-radius: 6px;
-  padding: 2px 8px;
-  letter-spacing: .03em;
-}
-.armytag.hashut { color: var(--hashut); border: 1px solid var(--hashut); background: var(--hashut-bg); }
-.armytag.slaves { color: var(--slaves); border: 1px solid var(--slaves); background: var(--slaves-bg); }
+.armyhead .nm { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; color: var(--ink); }
+.armyhead .sub2 { font-size: 9.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .07em; }
 
-/* ─── SECTION LABEL ──────────────────────────────────── */
+/* ── SECTION LABEL ───────────────────────────────────────── */
 .section-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .1em;
+  letter-spacing: .16em;
   color: var(--ink-faint);
-  margin: 14px 0 8px;
+  margin: 16px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--bdr); }
 
-/* ─── DETAILS / SPOILER ──────────────────────────────── */
+/* ── DETAILS / SPOILER ───────────────────────────────────── */
 details.spoiler {
-  background: var(--panel2);
-  border: 1px solid var(--line);
+  background: var(--surf-1);
+  border: 1px solid var(--bdr);
   border-radius: var(--r-sm);
   margin: 8px 0;
   overflow: hidden;
@@ -708,123 +919,180 @@ details.spoiler {
 details.spoiler summary {
   cursor: pointer;
   list-style: none;
-  padding: 8px 12px;
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--gold-dim);
+  padding: 10px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--bronze-dim);
   text-transform: uppercase;
-  letter-spacing: .06em;
+  letter-spacing: .10em;
   user-select: none;
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: color var(--t);
+  transition: color var(--t), background var(--t);
+  min-height: 40px;
 }
 details.spoiler summary::-webkit-details-marker { display: none; }
 details.spoiler summary::before {
   content: '▸';
   font-size: 9px;
+  color: var(--blood);
   transition: transform var(--t);
   flex-shrink: 0;
 }
 details.spoiler[open] summary::before { transform: rotate(90deg); }
-details.spoiler summary:hover { color: var(--gold); }
-details.spoiler .spoilerbody { padding: 4px 13px 13px; font-size: 14px; color: var(--ink-dim); font-style: italic; line-height: 1.6; }
+details.spoiler summary:hover { color: var(--bronze-text); background: var(--surf-2); }
+details.spoiler .spoilerbody {
+  padding: 4px 13px 14px;
+  font-size: 13px;
+  color: var(--ink-mid);
+  font-style: italic;
+  line-height: 1.65;
+  border-top: 1px solid var(--bdr);
+}
 
-/* ─── UNIT ROSTER ────────────────────────────────────── */
-.unitroster { list-style: none; padding: 0; margin: 0 0 10px; font-size: 13.5px; color: var(--ink-dim); }
-.unitroster li { padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+/* ── UNIT ROSTER ─────────────────────────────────────────── */
+.unitroster { list-style: none; padding: 0; margin: 0 0 10px; font-size: 13px; color: var(--ink-mid); }
+.unitroster li {
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(140,95,35,.10);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.unitroster li::before { content: '—'; color: var(--bdr-hi); font-size: 10px; flex-shrink: 0; }
 .unitroster li:last-child { border-bottom: none; }
-.unitroster b { color: var(--ink); }
+.unitroster b { color: var(--ink); font-weight: 600; }
 
-/* ─── ABILITY CARD ───────────────────────────────────── */
+/* ── ABILITY CARD ────────────────────────────────────────── */
 .abilitycard {
-  background: var(--panel2);
-  border: 1px solid var(--line);
+  background: var(--surf-2);
+  border: 1px solid var(--bdr);
   border-radius: var(--r);
-  padding: 12px 14px;
+  padding: 13px 14px 13px 16px;
   margin-bottom: 8px;
   transition: opacity var(--t);
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shd-sm);
 }
+/* Bronze left stripe */
 .abilitycard::before {
   content: '';
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 2px;
-  background: var(--gold-dim);
-  border-radius: 2px 0 0 2px;
+  width: 3px;
+  background: linear-gradient(180deg, var(--bronze-hi), var(--bronze-dim));
 }
-.abilitycard.used { opacity: .45; }
-.ab-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
-.ab-name { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 600; color: var(--ink); }
+.abilitycard.used { opacity: .38; }
+.abilitycard.used::before { background: var(--bdr); }
+
+.ab-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; margin-bottom: 7px; }
+.ab-name { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: .03em; }
+
 .ab-timing {
   font-family: 'Inter', sans-serif;
-  font-size: 9.5px;
-  font-weight: 600;
+  font-size: 9px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .05em;
-  color: var(--gold-dim);
-  border: 1px solid var(--line);
-  border-radius: 5px;
+  letter-spacing: .06em;
+  color: var(--bronze-text);
+  border: 1px solid var(--bronze-dim);
+  border-radius: var(--r-xs);
   padding: 2px 7px;
   white-space: nowrap;
   flex-shrink: 0;
-  background: var(--bg2);
+  background: var(--bronze-bg);
 }
-.ab-body { font-size: 13.5px; color: var(--ink-dim); line-height: 1.5; }
-.lbl2 { font-family: 'Inter', sans-serif; font-size: 9.5px; font-weight: 700; text-transform: uppercase; color: var(--gold); margin-right: 4px; letter-spacing: .04em; }
-.lbl2::after { content: ':'; }
-.ab-foot { margin-top: 8px; display: flex; gap: 8px; align-items: center; }
-.usedtag { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--blood); }
 
-/* ─── CHOICE BLOCK ───────────────────────────────────── */
+.ab-body { font-size: 13px; color: var(--ink-mid); line-height: 1.55; }
+
+.lbl2 {
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--blood-text);
+  margin-right: 4px;
+}
+.lbl2::after { content: ':'; }
+
+.ab-foot { margin-top: 10px; display: flex; gap: 8px; align-items: center; }
+.usedtag { font-family: 'Inter', sans-serif; font-size: 10.5px; color: var(--blood-text); font-weight: 600; }
+
+/* ── CHOICE BLOCK ────────────────────────────────────────── */
 .choiceblock {
-  background: var(--bg2);
-  border: 1.5px dashed var(--line2);
+  background: var(--surf-1);
+  border: 1.5px dashed var(--bdr-mid);
   border-radius: var(--r);
-  padding: 12px 14px;
+  padding: 13px 14px;
   margin-bottom: 8px;
 }
 .cb-empty { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-.cb-empty span { font-size: 13.5px; color: var(--ink-faint); font-style: italic; }
+.cb-empty span { font-size: 13px; color: var(--ink-faint); font-style: italic; }
 
-/* ─── TRAIT CARD ─────────────────────────────────────── */
-.traitcard { background: var(--panel2); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; margin-bottom: 9px; }
-
-/* ─── UNIT CARD ──────────────────────────────────────── */
+/* ── UNIT CARD ───────────────────────────────────────────── */
 .unitcard {
-  background: var(--bg2);
-  border: 1px solid var(--line);
+  background: var(--void);
+  border: 1px solid var(--bdr);
   border-radius: var(--r-lg);
-  padding: 14px 15px;
+  padding: 14px 14px 14px 16px;
   margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shd-sm);
 }
+/* Left accent stripe on unit card */
+.unitcard::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--blood-hi), var(--blood));
+  border-radius: var(--r-lg) 0 0 var(--r-lg);
+}
+
 .unitcard h4 {
   font-family: 'Cinzel', serif;
   font-size: 15px;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   color: var(--ink);
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+  letter-spacing: .03em;
 }
 
-/* Stat strip */
-.statstrip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0; }
+/* Stat strip — 4-col embossed boxes */
+.statstrip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0 12px; }
 .statbox {
   text-align: center;
-  background: var(--panel2);
-  border: 1px solid var(--line);
+  background: var(--surf-1);
+  border: 1px solid var(--bdr);
   border-radius: var(--r-sm);
-  padding: 7px 4px;
+  padding: 8px 4px 6px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03), var(--shd-sm);
 }
-.statbox .sv { font-family: 'Cinzel', serif; font-weight: 700; font-size: 16px; color: var(--ink); line-height: 1; }
-.statbox .sl { font-family: 'Inter', sans-serif; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); margin-top: 2px; }
+.statbox .sv {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--ink);
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(217,202,176,.15);
+}
+.statbox .sl {
+  font-family: 'Inter', sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--ink-faint);
+  margin-top: 3px;
+}
 
 /* Keywords */
 .kwrow { margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
@@ -832,229 +1100,299 @@ details.spoiler .spoilerbody { padding: 4px 13px 13px; font-size: 14px; color: v
   font-family: 'Inter', sans-serif;
   font-size: 9.5px;
   font-weight: 500;
-  color: var(--ink-dim);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 2px 8px;
+  color: var(--ink-faint);
+  border: 1px solid var(--bdr);
+  border-radius: 2px;
+  padding: 2px 7px;
+  letter-spacing: .04em;
 }
 
 /* Weapon table */
-table.wtable { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 12px; }
-table.wtable th, table.wtable td { border: 1px solid var(--line); padding: 5px 6px; text-align: left; }
-table.wtable th { background: var(--bg); color: var(--gold); font-family: 'Inter', sans-serif; font-weight: 700; font-size: 9.5px; text-transform: uppercase; letter-spacing: .05em; }
-table.wtable td { color: var(--ink-dim); }
-table.wtable .wname { color: var(--ink); font-weight: 500; }
-@media (max-width: 400px) {
-  table.wtable { font-size: 11px; }
-  table.wtable th, table.wtable td { padding: 4px 4px; }
+table.wtable { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 11.5px; }
+table.wtable th, table.wtable td { border: 1px solid var(--bdr); padding: 5px 6px; text-align: left; }
+table.wtable th {
+  background: var(--surf-1);
+  color: var(--bronze-text);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+table.wtable td { color: var(--ink-mid); background: var(--void); }
+table.wtable .wname { color: var(--ink); font-weight: 600; }
+@media (max-width: 420px) {
+  table.wtable { font-size: 10.5px; }
+  table.wtable th, table.wtable td { padding: 4px; }
 }
 
-/* ─── HAND / TACTICS ─────────────────────────────────── */
+/* ── TACTICS HAND ────────────────────────────────────────── */
 .handgrid { display: flex; flex-direction: column; gap: 8px; min-height: 50px; }
+
 .handcard {
-  border: 1px solid var(--line);
-  background: var(--panel2);
+  border: 1px solid var(--bdr);
+  background: var(--surf-2);
   border-radius: var(--r);
-  padding: 11px 13px;
+  padding: 13px 14px;
   cursor: pointer;
   transition: border-color var(--t), background var(--t), box-shadow var(--t);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  min-height: 50px;
 }
-.handcard:hover { border-color: var(--line2); }
+.handcard:hover { border-color: var(--bdr-mid); background: var(--surf-3); }
+.handcard:active { transform: scale(.99); }
+
 .handcard.marked {
-  border-color: var(--blood);
+  border-color: var(--blood-hi);
   background: var(--blood-bg);
+  box-shadow: inset 0 0 20px rgba(122,24,24,.08);
 }
-.hc-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-.hc-name { font-family: 'Cinzel', serif; font-size: 14px; color: var(--ink); font-weight: 600; }
-.hc-mark { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 700; color: var(--blood); opacity: 0; transition: opacity var(--t); text-transform: uppercase; letter-spacing: .05em; }
+
+.hc-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.hc-name { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: .03em; }
+.hc-mark {
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--blood-text);
+  opacity: 0;
+  transition: opacity var(--t);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  border: 1px solid var(--blood);
+  border-radius: var(--r-xs);
+  padding: 2px 6px;
+  background: var(--blood-bg);
+  white-space: nowrap;
+}
 .handcard.marked .hc-mark { opacity: 1; }
-.hc-body { font-size: 13px; color: var(--ink-dim); margin-top: 8px; display: none; line-height: 1.5; }
+
+.hc-body { font-size: 13px; color: var(--ink-mid); margin-top: 10px; display: none; line-height: 1.6; border-top: 1px solid var(--bdr); padding-top: 10px; }
 .handcard.open .hc-body { display: block; }
-.hc-tac, .hc-cmd { margin-bottom: 6px; }
-.lbl { font-family: 'Inter', sans-serif; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--gold); margin-right: 4px; }
+
+.hc-tac  { margin-bottom: 7px; }
+.hc-cmd  { margin-bottom: 5px; }
+
+.lbl {
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--bronze-text);
+  margin-right: 4px;
+}
 .lbl::after { content: ':'; }
 
-/* Hidden hand */
-.hiddenhand { display: flex; gap: 10px; justify-content: center; padding: 16px 0; }
+/* Hidden hand — card backs */
+.hiddenhand { display: flex; gap: 10px; justify-content: center; padding: 18px 0; }
 .cardback-mini {
-  width: 52px;
-  height: 74px;
+  width: 54px;
+  height: 78px;
   border-radius: var(--r-sm);
-  border: 1.5px solid var(--line2);
+  border: 1.5px solid var(--bdr-mid);
   background:
-    repeating-linear-gradient(135deg, rgba(201,164,77,.07) 0 8px, transparent 8px 16px),
-    var(--panel2);
+    repeating-linear-gradient(135deg, rgba(158,120,56,.06) 0 8px, transparent 8px 16px),
+    var(--surf-2);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--gold-dim);
+  color: var(--bronze-dim);
   font-family: 'Cinzel', serif;
-  font-size: 16px;
-  box-shadow: var(--shadow-sm);
+  font-size: 18px;
+  box-shadow: var(--shd-sm);
 }
 
-.playerbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.playerbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
 
-/* ─── DIVIDER ─────────────────────────────────────────── */
-.divider { border: none; border-top: 1px solid var(--line); margin: 18px 0; }
+/* ── DIVIDER ─────────────────────────────────────────────── */
+.divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--bdr-mid) 30%, var(--bdr-mid) 70%, transparent 100%);
+  margin: 20px 0;
+  position: relative;
+}
 
-/* ─── IMPORT PANEL ───────────────────────────────────── */
+/* ── IMPORT PANEL ────────────────────────────────────────── */
 .importpanel {
-  background: var(--bg2);
-  border: 1px dashed var(--line);
+  background: var(--void);
+  border: 1px dashed var(--bdr-mid);
   border-radius: var(--r);
-  padding: 13px 15px;
+  padding: 14px 15px;
   margin-top: 14px;
 }
-.importpanel h4 { font-family: 'Cinzel', serif; font-size: 13px; color: var(--ink); margin-bottom: 6px; }
-.ihint { font-size: 12.5px; color: var(--ink-faint); margin: 0 0 10px; line-height: 1.5; }
+.importpanel h4 { font-family: 'Cinzel', serif; font-size: 13px; color: var(--ink-mid); margin-bottom: 6px; font-weight: 700; }
+.ihint { font-size: 12px; color: var(--ink-faint); margin: 0 0 10px; line-height: 1.55; }
 
-/* ─── MODAL ──────────────────────────────────────────── */
+/* ── MODAL ───────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(8,6,14,.78);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(4,3,7,.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: none;
   align-items: flex-end;
   justify-content: center;
   z-index: 200;
   padding: 0;
 }
-@media (min-height: 600px) {
+@media (min-height: 580px) {
   .modal-overlay { align-items: center; padding: 20px 14px; }
 }
 .modal-overlay.show { display: flex; }
+
 .modal-box {
-  background: var(--panel-s);
-  background: linear-gradient(160deg, rgba(32,26,48,1), rgba(22,18,36,1));
-  border: 1px solid var(--line2);
-  border-top: 1px solid var(--gold-dim);
+  background: var(--surf-2);
+  border: 1px solid var(--bdr-hi);
   border-radius: var(--r-xl) var(--r-xl) 0 0;
   max-width: 600px;
   width: 100%;
-  box-shadow: 0 -8px 40px rgba(0,0,0,.6);
+  box-shadow: 0 -8px 50px rgba(0,0,0,.8), inset 0 1px 0 rgba(190,140,60,.2);
   max-height: 90svh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
-@media (min-height: 600px) {
-  .modal-box { border-radius: var(--r-xl); border-top: 1px solid var(--gold-dim); }
+@media (min-height: 580px) {
+  .modal-box { border-radius: var(--r-xl); }
 }
+
 .modal-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px 18px 14px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--bdr);
   flex-shrink: 0;
+  background: var(--surf-3);
 }
-.modal-head span { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; color: var(--gold); }
-.modal-head button { padding: 5px 10px; }
+.modal-head::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--bronze-dim), transparent);
+}
+.modal-head span { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; color: var(--bronze-text); }
+.modal-head button { min-height: 36px; padding: 0 12px; font-size: 12px; }
 .modal-body { padding: 14px 16px; overflow-y: auto; flex: 1; }
 
 .modal-opt {
-  background: var(--panel2);
-  border: 1px solid var(--line);
+  background: var(--surf-1);
+  border: 1px solid var(--bdr);
   border-radius: var(--r);
-  padding: 13px 14px;
+  padding: 13px 14px 13px 17px;
   margin-bottom: 10px;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shd-sm);
 }
 .modal-opt::before {
   content: '';
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 2px;
-  background: var(--gold-dim);
+  width: 3px;
+  background: linear-gradient(180deg, var(--bronze-hi), var(--bronze-dim));
 }
-.modal-opt .mo-name { font-family: 'Cinzel', serif; font-size: 15px; color: var(--ink); font-weight: 600; }
-.modal-opt .mo-body { font-size: 13.5px; color: var(--ink-dim); margin: 6px 0 10px; line-height: 1.5; }
+.modal-opt .mo-name { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.modal-opt .mo-body { font-size: 13px; color: var(--ink-mid); margin: 6px 0 10px; line-height: 1.55; }
 .modal-opt button { width: 100%; }
 
-/* ─── FOOTER ─────────────────────────────────────────── */
+/* ── FOOTNOTE ────────────────────────────────────────────── */
 .footnote {
-  margin-top: 48px;
-  padding-top: 20px;
-  border-top: 1px solid var(--line);
-  font-size: 12.5px;
+  margin-top: 52px;
+  padding-top: 18px;
+  border-top: 1px solid var(--bdr);
+  font-size: 12px;
   color: var(--ink-faint);
-  line-height: 1.65;
+  line-height: 1.7;
 }
-.footnote b { color: var(--ink-dim); }
+.footnote b { color: var(--ink-mid); font-weight: 600; }
 .footnote .sources { margin-top: 8px; }
-.footnote a { color: var(--gold-dim); text-decoration: underline; }
+.footnote a { color: var(--bronze-dim); text-decoration: underline; }
 
-/* ─── TOAST ──────────────────────────────────────────── */
+/* ── TOAST ───────────────────────────────────────────────── */
 .toast {
   position: fixed;
   bottom: 24px;
   left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  background: var(--panel3);
-  border: 1px solid var(--gold-dim);
+  transform: translateX(-50%) translateY(16px);
+  background: var(--surf-3);
+  border: 1px solid var(--bdr-hi);
   color: var(--ink);
-  padding: 9px 18px;
-  border-radius: 30px;
+  padding: 10px 20px;
+  border-radius: 3px;
   font-family: 'Inter', sans-serif;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   opacity: 0;
   pointer-events: none;
-  transition: opacity .25s var(--ease), transform .25s var(--ease);
-  z-index: 999;
-  box-shadow: 0 4px 20px rgba(0,0,0,.5);
+  transition: opacity .22s var(--ease), transform .22s var(--ease-o);
+  z-index: 9999;
+  box-shadow: var(--shd-lg), inset 0 1px 0 rgba(190,140,60,.1);
   white-space: nowrap;
   max-width: calc(100vw - 32px);
   text-overflow: ellipsis;
   overflow: hidden;
+  letter-spacing: .02em;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── SKILL CHECKLIST: focus states ──────────────────────── */
+button:focus-visible,
+.sidebtn:focus-visible,
+.handcard:focus-visible,
+details.spoiler summary:focus-visible {
+  outline: 2px solid var(--bdr-focus);
+  outline-offset: 2px;
+}
 
 </style>
 </head>
 <body>
 
-<!-- ══ HERO ═══════════════════════════════════════════════════════ -->
+<!-- ═══ HERO ══════════════════════════════════════════════════════ -->
 <header class="hero">
   <div class="hero-eyebrow">Warhammer Age of Sigmar · Spearhead</div>
-  <h1>SAND &amp; BONE</h1>
-  <div class="hero-ornament"><span>✦</span></div>
+  <div class="hero-title-row">
+    <div class="h-orn"></div>
+    <h1>SAND &amp; BONE</h1>
+    <div class="h-orn right"></div>
+  </div>
+  <div class="hero-divider">✦</div>
   <p class="hero-sub">Генератор сражений: армии, карты твистов, тактики и очки победы для терейна Realm of Death.</p>
 </header>
 
-<!-- ══ STICKY BAR ═════════════════════════════════════════════════ -->
+<!-- ═══ STICKY BAR ════════════════════════════════════════════════ -->
 <div class="stickybar">
   <div class="stickyrow">
     <div class="roundtrack ui" id="roundtrack"></div>
     <div class="vprow">
       <div class="vpbox">
-        <button class="vpbtn" onclick="changeVP('p1',-1)" aria-label="Уменьшить очки И1">−</button>
+        <button class="vpbtn" onclick="changeVP('p1',-1)" aria-label="Уменьшить очки Игрока 1">−</button>
         <div class="vp-inner">
           <span class="vpname">И1</span>
           <span class="vpval" id="vp-p1">0</span>
         </div>
-        <button class="vpbtn" onclick="changeVP('p1',1)" aria-label="Увеличить очки И1">+</button>
+        <button class="vpbtn" onclick="changeVP('p1',1)" aria-label="Увеличить очки Игрока 1">+</button>
       </div>
       <div class="vpbox">
-        <button class="vpbtn" onclick="changeVP('p2',-1)" aria-label="Уменьшить очки И2">−</button>
+        <button class="vpbtn" onclick="changeVP('p2',-1)" aria-label="Уменьшить очки Игрока 2">−</button>
         <div class="vp-inner">
           <span class="vpname">И2</span>
           <span class="vpval" id="vp-p2">0</span>
         </div>
-        <button class="vpbtn" onclick="changeVP('p2',1)" aria-label="Увеличить очки И2">+</button>
+        <button class="vpbtn" onclick="changeVP('p2',1)" aria-label="Увеличить очки Игрока 2">+</button>
       </div>
       <span class="underdogtag" id="underdogtag">ничья</span>
     </div>
   </div>
 </div>
 
-<!-- ══ CONTENT ════════════════════════════════════════════════════ -->
+<!-- ═══ CONTENT ═══════════════════════════════════════════════════ -->
 <div class="wrap">
 
   <!-- I. ПОДГОТОВКА -->
@@ -1089,12 +1427,12 @@ table.wtable .wname { color: var(--ink); font-weight: 500; }
             <li>Местность: сначала защищающийся ставит 1 большой + 1 малый элемент, затем атакующий</li>
           </ol>
           <div class="rollrow">
-            <button class="ui small" onclick="rollOff()">🎲 Ролл-офф</button>
+            <button class="small ghost" onclick="rollOff()">Ролл-офф</button>
             <span id="rolloffResult" class="rollresult"></span>
           </div>
         </div>
         <div class="infocard" id="terrainInfo">
-          <h3>Особая местность стороны</h3>
+          <h3>Особая местность</h3>
           <p id="terrainInfoText"></p>
         </div>
       </div>
@@ -1128,7 +1466,7 @@ table.wtable .wname { color: var(--ink); font-weight: 500; }
           </div>
         </div>
         <div class="twistlog">
-          <div class="logheader">История раунда</div>
+          <div class="logheader">История</div>
           <ul class="loglist" id="twistLog"><li class="empty">Карты ещё не тянули</li></ul>
         </div>
       </div>
@@ -1160,28 +1498,27 @@ table.wtable .wname { color: var(--ink); font-weight: 500; }
       <hr class="divider">
 
       <div class="playerhead">
-        <span class="playerhead-label ui">Рука карт тактик</span>
-        <span class="deckcount ui" id="deckcount-p1">колода: —</span>
+        <span class="playerhead-label">Рука карт тактик</span>
+        <span class="deckcount" id="deckcount-p1">колода: —</span>
       </div>
       <div id="handzone-p1"></div>
       <div class="playerbtns">
         <button class="primary small" onclick="startHand('p1')">Начать / перетасовать</button>
         <button class="small" onclick="toggleReveal('p1')" id="revealbtn-p1">Показать руку</button>
-        <button class="ghost small" onclick="discardAndDraw('p1')">Сбросить отмеченные → добрать</button>
+        <button class="ghost small" onclick="discardAndDraw('p1')">Сбросить → добрать</button>
       </div>
     </div>
   </section>
 
   <!-- СНОСКА -->
   <div class="footnote">
-    <p><b>Откуда данные.</b> Карты твистов / тактик пересказаны по фотографиям карточек и обзору на tabletopbattles.com. Армии пересказаны по официальным PDF Spearhead-варскроллов. Сведения об объектах, особой местности и правке от октября 2025 — по статьям Warhammer Community и battleclash.com.</p>
-    <p>Точный текст способности «Icon of Nulahmia» в открытых источниках найти не удалось.</p>
-    <div class="sources">Источники: tabletopbattles.com · warhammer-community.com · battleclash.com · официальные PDF-варскроллы Spearhead</div>
+    <p><b>Откуда данные.</b> Карты твистов/тактик пересказаны по фотографиям карточек и обзору на tabletopbattles.com. Армии пересказаны по официальным PDF Spearhead-варскроллов. Сведения об объектах и правке от октября 2025 — по статьям Warhammer Community и battleclash.com. Точный текст способности «Icon of Nulahmia» в открытых источниках найти не удалось.</p>
+    <div class="sources">tabletopbattles.com · warhammer-community.com · battleclash.com · официальные PDF-варскроллы Spearhead</div>
   </div>
 
 </div><!-- /wrap -->
 
-<!-- ══ MODAL ══════════════════════════════════════════════════════ -->
+<!-- ═══ MODAL ══════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
   <div class="modal-box">
     <div class="modal-head">
@@ -1195,7 +1532,9 @@ table.wtable .wname { color: var(--ink); font-weight: 500; }
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-/* ============== TWIST / TACTIC DATA (Sand & Bone) ============== */
+/* ============================================================
+   ДАННЫЕ И ЛОГИКА — БЕЗ ИЗМЕНЕНИЙ
+   ============================================================ */
 
 const TWISTS = {
   ossia: [
@@ -1279,10 +1618,10 @@ const TERRAIN_INFO = {
   ossia: `<b>Crypt of Blood</b> (статуя/гробница) — по правке окт. 2025 теперь всегда ставится в центре поля при игре на Ossia, независимо от карты развёртывания.<br><br>
   <i>Кровавый дар</i> (любая фаза боя): выбрать свой юнит в 6" от Crypt of Blood. Бросить кубик (+1, если вы аутсайдер). На 4+ — этот юнит получает +1 к попаданию в бою до конца хода. Иначе — D3 урона по телу.`,
   dolorum: `<b>Icon of Nulahmia</b> (статуя) появляется на столе только если выпадет твист «Зачарованный очаг» — тогда аутсайдер (или победитель переброса) ставит её в любом месте поля.<br><br>
-  Точный текст её способности в открытых источниках не найден <span class="flag">не подтверждено</span>. Известно только, что механика похожа на «Кровавый дар» (риск/выгода раз за ход) и связана с бонусом к попаданию или контролю.`
+  Точный текст её способности в открытых источниках не найден <span class="flag">не подтверждено</span>. Известно только, что механика похожа на «Кровавый дар» и связана с бонусом к попаданию или контролю.`
 };
 
-/* ============== GENERIC STATE ============== */
+/* ── STATE ────────────────────────────────────────────────── */
 let state = {
   side: 'ossia',
   round: 1,
@@ -1296,211 +1635,172 @@ let state = {
 };
 
 function shuffled(n){
-  const arr = Array.from({length:n}, (_,i)=>i);
+  const arr = Array.from({length:n},(_,i)=>i);
   for(let i=arr.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
+    const j=Math.floor(Math.random()*(i+1));
     [arr[i],arr[j]]=[arr[j],arr[i]];
   }
   return arr;
 }
 
 function toast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
+  const t=document.getElementById('toast');
+  t.textContent=msg;
   t.classList.add('show');
   clearTimeout(t._h);
-  t._h = setTimeout(()=>t.classList.remove('show'), 1900);
+  t._h=setTimeout(()=>t.classList.remove('show'),2000);
 }
 
-/* ============== ROUND TRACK ============== */
+/* ── ROUND TRACK ──────────────────────────────────────────── */
 function renderRoundTrack(){
-  const el = document.getElementById('roundtrack');
-  el.innerHTML = '';
+  const el=document.getElementById('roundtrack');
+  el.innerHTML='';
   for(let i=1;i<=4;i++){
-    const node = document.createElement('div');
-    node.className = 'roundnode' + (i===state.round?' active':'') + (i<state.round?' done':'');
-    node.textContent = i;
+    const node=document.createElement('div');
+    node.className='roundnode'+(i===state.round?' active':'')+(i<state.round?' done':'');
+    node.textContent=i;
     el.appendChild(node);
-    if(i<4){
-      const line = document.createElement('div');
-      line.className = 'roundline';
-      el.appendChild(line);
-    }
+    if(i<4){const line=document.createElement('div');line.className='roundline';el.appendChild(line);}
   }
-  const prev = document.createElement('button');
-  prev.className='small ghost'; prev.textContent='‹';
-  prev.onclick = ()=>{ if(state.round>1){ state.round--; renderRoundTrack(); } };
-  const next = document.createElement('button');
-  next.className='small ghost'; next.textContent='›';
-  next.onclick = ()=>{ if(state.round<4){ state.round++; renderRoundTrack(); toast('Раунд '+state.round+' — потяните твист и доберите тактики'); } else { toast('Это последний, 4-й раунд'); } };
-  const roundbtns = document.createElement('div');
-  roundbtns.className = 'roundbtns';
-  roundbtns.appendChild(prev);
-  roundbtns.appendChild(next);
+  const prev=document.createElement('button');
+  prev.className='small ghost';prev.textContent='‹';
+  prev.onclick=()=>{if(state.round>1){state.round--;renderRoundTrack();}};
+  const next=document.createElement('button');
+  next.className='small ghost';next.textContent='›';
+  next.onclick=()=>{if(state.round<4){state.round++;renderRoundTrack();toast('Раунд '+state.round+' — потяните твист и доберите тактики');}else{toast('Это последний, 4-й раунд');}};
+  const roundbtns=document.createElement('div');
+  roundbtns.className='roundbtns';
+  roundbtns.appendChild(prev);roundbtns.appendChild(next);
   el.appendChild(roundbtns);
 }
 
-/* ============== VP ============== */
-function changeVP(p, d){
-  state.vp[p] = Math.max(0, state.vp[p]+d);
-  document.getElementById('vp-'+p).textContent = state.vp[p];
-  const tag = document.getElementById('underdogtag');
-  if(state.vp.p1 === state.vp.p2){ tag.textContent = 'ничья'; }
-  else{
-    const who = state.vp.p1 < state.vp.p2 ? 'И1 слабее' : 'И2 слабее';
-    tag.textContent = who;
-  }
+/* ── VP ───────────────────────────────────────────────────── */
+function changeVP(p,d){
+  state.vp[p]=Math.max(0,state.vp[p]+d);
+  document.getElementById('vp-'+p).textContent=state.vp[p];
+  const tag=document.getElementById('underdogtag');
+  if(state.vp.p1===state.vp.p2){tag.textContent='ничья';}
+  else{const who=state.vp.p1<state.vp.p2?'И1 слабее':'И2 слабее';tag.textContent=who;}
 }
 
-/* ============== SETUP / SIDE ============== */
+/* ── SIDE ─────────────────────────────────────────────────── */
 function selectSide(side){
-  state.side = side;
-  document.getElementById('btn-ossia').classList.toggle('sel', side==='ossia');
-  document.getElementById('btn-dolorum').classList.toggle('sel', side==='dolorum');
-  document.getElementById('twistSideLabel').textContent = side==='ossia' ? 'Ossia' : 'Dolorum';
-  document.getElementById('terrainInfoText').innerHTML = TERRAIN_INFO[side];
+  state.side=side;
+  document.getElementById('btn-ossia').classList.toggle('sel',side==='ossia');
+  document.getElementById('btn-dolorum').classList.toggle('sel',side==='dolorum');
+  document.getElementById('twistSideLabel').textContent=side==='ossia'?'Ossia':'Dolorum';
+  document.getElementById('terrainInfoText').innerHTML=TERRAIN_INFO[side];
   reshuffleTwist();
 }
 
 function rollOff(){
-  const a = 1+Math.floor(Math.random()*6);
-  const b = 1+Math.floor(Math.random()*6);
+  const a=1+Math.floor(Math.random()*6),b=1+Math.floor(Math.random()*6);
   let txt;
-  if(a===b){ txt = `Ничья (${a}:${b}) — переброс!`; }
-  else{
-    const winner = a>b ? 'Игрок 1' : 'Игрок 2';
-    txt = `${a} : ${b} → ${winner} выбирает`;
-  }
-  document.getElementById('rolloffResult').textContent = txt;
+  if(a===b){txt=`Ничья (${a}:${b}) — переброс!`;}
+  else{const winner=a>b?'Игрок 1':'Игрок 2';txt=`${a} : ${b} → ${winner} выбирает`;}
+  document.getElementById('rolloffResult').textContent=txt;
 }
 
-/* ============== TWIST ============== */
+/* ── TWIST ────────────────────────────────────────────────── */
 function reshuffleTwist(){
-  state.twistDeck = shuffled(TWISTS[state.side].length);
-  state.twistLog = [];
+  state.twistDeck=shuffled(TWISTS[state.side].length);
+  state.twistLog=[];
   renderTwistLog();
-  const flip = document.getElementById('twistFlip');
+  const flip=document.getElementById('twistFlip');
   flip.classList.remove('flipped');
   toast('Колода «'+(state.side==='ossia'?'Ossia':'Dolorum')+'» перетасована');
 }
 
 function drawTwist(){
-  if(state.twistDeck.length === 0){
-    state.twistDeck = shuffled(TWISTS[state.side].length);
-    toast('Колода кончилась — перетасована заново');
-  }
-  const idx = state.twistDeck.pop();
-  const card = TWISTS[state.side][idx];
-
-  const front = document.getElementById('twistFront');
-  let html = `<div class="cardseal">${state.side==='ossia'?'Ossia':'Dolorum'} Twist</div>
-              <div class="cardname">${card.name}</div>
-              <div class="cardeffect">${card.effect}</div>`;
-  if(card.opts){
-    html += '<ul class="opt">' + card.opts.map(o=>`<li>${o}</li>`).join('') + '</ul>';
-  }
-  front.innerHTML = html;
-
-  const flip = document.getElementById('twistFlip');
+  if(state.twistDeck.length===0){state.twistDeck=shuffled(TWISTS[state.side].length);toast('Колода кончилась — перетасована заново');}
+  const idx=state.twistDeck.pop();
+  const card=TWISTS[state.side][idx];
+  const front=document.getElementById('twistFront');
+  let html=`<div class="cardseal">${state.side==='ossia'?'Ossia':'Dolorum'} Twist</div>
+            <div class="cardname">${card.name}</div>
+            <div class="cardeffect">${card.effect}</div>`;
+  if(card.opts){html+='<ul class="opt">'+card.opts.map(o=>`<li>${o}</li>`).join('')+'</ul>';}
+  front.innerHTML=html;
+  const flip=document.getElementById('twistFlip');
   flip.classList.remove('flipped');
   void flip.offsetWidth;
   flip.classList.add('flipped');
-
-  state.twistLog.unshift({round:state.round, name:card.name});
+  state.twistLog.unshift({round:state.round,name:card.name});
   renderTwistLog();
 }
 
 function renderTwistLog(){
-  const el = document.getElementById('twistLog');
-  if(state.twistLog.length===0){
-    el.innerHTML = '<li class="empty">Карты ещё не тянули</li>';
-    return;
-  }
-  el.innerHTML = state.twistLog.map(e=>`<li><span class="lr">Р${e.round}</span>${e.name}</li>`).join('');
+  const el=document.getElementById('twistLog');
+  if(state.twistLog.length===0){el.innerHTML='<li class="empty">Карты ещё не тянули</li>';return;}
+  el.innerHTML=state.twistLog.map(e=>`<li><span class="lr">Р${e.round}</span>${e.name}</li>`).join('');
 }
 
-/* ============== ARMY LOADING (from armies.json) ============== */
+/* ── ARMIES ───────────────────────────────────────────────── */
+const ARMIES_JSON_PATH='armies.json';
+let ARMIES={};
+function getArmiesDebug(){return ARMIES;}
 
-const ARMIES_JSON_PATH = 'armies.json';
-
-let ARMIES = {};
-function getArmiesDebug(){ return ARMIES; }
-
-const ACCENT_PALETTE = [
-  '#7fb3d5', '#8fbf7f', '#d49a5a', '#c97fb0',
-  '#7fd4c4', '#d4c25a', '#a98fd4', '#d47f7f'
-];
-
+const ACCENT_PALETTE=['#7fb3d5','#8fbf7f','#d49a5a','#c97fb0','#7fd4c4','#d4c25a','#a98fd4','#d47f7f'];
 function colorForKey(key){
-  let h = 0;
-  for(let i=0;i<key.length;i++){ h = (h*31 + key.charCodeAt(i)) >>> 0; }
-  return ACCENT_PALETTE[h % ACCENT_PALETTE.length];
+  let h=0;
+  for(let i=0;i<key.length;i++){h=(h*31+key.charCodeAt(i))>>>0;}
+  return ACCENT_PALETTE[h%ACCENT_PALETTE.length];
 }
-
-function softenHex(hex, alpha){
-  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+function softenHex(hex,alpha){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
 async function loadArmies(){
   try{
-    const resp = await fetch(ARMIES_JSON_PATH, {cache:'no-store'});
-    if(resp.ok){ ARMIES = await resp.json(); }
-    else{ throw new Error('HTTP '+resp.status); }
+    const resp=await fetch(ARMIES_JSON_PATH,{cache:'no-store'});
+    if(resp.ok){ARMIES=await resp.json();}
+    else{throw new Error('HTTP '+resp.status);}
   }catch(e){
-    console.warn('Не удалось загрузить armies.json (вероятно, открыт через file:// — используйте локальный сервер или GitHub Pages)', e);
+    console.warn('Не удалось загрузить armies.json',e);
     toast('Не удалось загрузить armies.json — откройте через локальный сервер');
-    ARMIES = {};
+    ARMIES={};
   }
 }
 
 function armyAccent(army){
-  if(army.sideClass === 'hashut' || army.sideClass === 'slaves') return null;
+  if(army.sideClass==='hashut'||army.sideClass==='slaves')return null;
   return colorForKey(army.key);
 }
 
-/* ============== GENERIC STATE (army part) ============== */
-let armyState = {
-  p1: { armyKey:null, regimentId:null, enhancementId:null, used:{} }
-};
+let armyState={p1:{armyKey:null,regimentId:null,enhancementId:null,used:{}}};
 
-function abilityFullId(p, scope, id){
-  return p+'__'+armyState[p].armyKey+'__'+scope+'__'+id;
-}
-function isUsed(p, scope, id){
-  return !!armyState[p].used[abilityFullId(p,scope,id)];
-}
-function toggleUsed(p, scope, id){
-  const full = abilityFullId(p,scope,id);
-  armyState[p].used[full] = !armyState[p].used[full];
+function abilityFullId(p,scope,id){return p+'__'+armyState[p].armyKey+'__'+scope+'__'+id;}
+function isUsed(p,scope,id){return !!armyState[p].used[abilityFullId(p,scope,id)];}
+function toggleUsed(p,scope,id){
+  const full=abilityFullId(p,scope,id);
+  armyState[p].used[full]=!armyState[p].used[full];
   renderArmyContent(p);
 }
 function resetTurnFlags(p){
-  const ast = armyState[p];
-  if(!ast.armyKey) return;
-  const army = ARMIES[ast.armyKey];
-  const clearIfResets = (scope, ability)=>{
-    if(ability.limited && ability.resetsEachTurn){
-      delete ast.used[abilityFullId(p,scope,ability.id)];
-    }
+  const ast=armyState[p];
+  if(!ast.armyKey)return;
+  const army=ARMIES[ast.armyKey];
+  const clearIfResets=(scope,ability)=>{
+    if(ability.limited&&ability.resetsEachTurn){delete ast.used[abilityFullId(p,scope,ability.id)];}
   };
-  clearIfResets('trait', army.battleTrait);
-  army.regiment.forEach(r=>clearIfResets('regiment', r));
-  army.enhancements.forEach(e=>clearIfResets('enh', e));
-  army.units.forEach(u=>(u.abilities||[]).forEach(a=>clearIfResets('unit_'+u.key, a)));
+  clearIfResets('trait',army.battleTrait);
+  army.regiment.forEach(r=>clearIfResets('regiment',r));
+  army.enhancements.forEach(e=>clearIfResets('enh',e));
+  army.units.forEach(u=>(u.abilities||[]).forEach(a=>clearIfResets('unit_'+u.key,a)));
   renderArmyContent(p);
   toast((p==='p1'?'Игрок 1':'Игрок 2')+': отметки «раз за ход» сброшены');
 }
 
 function renderArmyPicker(p){
-  const el = document.getElementById('armypicker-'+p);
-  const cur = armyState[p].armyKey;
-  const keys = Object.keys(ARMIES);
-  el.innerHTML = keys.map(key=>{
-    const army = ARMIES[key];
-    const accent = armyAccent(army);
-    const cls = accent ? 'dynamic' : army.sideClass;
-    const style = accent ? `style="--army-accent:${accent}; --army-accent-bg:${softenHex(accent,.18)};"` : '';
+  const el=document.getElementById('armypicker-'+p);
+  const cur=armyState[p].armyKey;
+  const keys=Object.keys(ARMIES);
+  el.innerHTML=keys.map(key=>{
+    const army=ARMIES[key];
+    const accent=armyAccent(army);
+    const cls=accent?'dynamic':army.sideClass;
+    const style=accent?`style="--army-accent:${accent}; --army-accent-bg:${softenHex(accent,.18)};"` :'';
     return `<div class="sidebtn ${cls}${cur===key?' sel':''}" ${style} onclick="pickArmy('${p}','${key}')">
       <span class="nm">${army.label}</span>
       <span class="desc">${army.subtitle||''}</span>
@@ -1508,68 +1808,66 @@ function renderArmyPicker(p){
   }).join('');
 }
 
-function pickArmy(p, key){
-  if(armyState[p].armyKey === key) return;
-  armyState[p].armyKey = key;
-  armyState[p].regimentId = null;
-  armyState[p].enhancementId = null;
+function pickArmy(p,key){
+  if(armyState[p].armyKey===key)return;
+  armyState[p].armyKey=key;
+  armyState[p].regimentId=null;
+  armyState[p].enhancementId=null;
   renderArmyPicker(p);
   renderArmyContent(p);
   toast((p==='p1'?'Игрок 1':'Игрок 2')+' выбрал армию: '+ARMIES[key].label);
 }
 
 function resetArmy(p){
-  armyState[p] = { armyKey:null, regimentId:null, enhancementId:null, used:{} };
+  armyState[p]={armyKey:null,regimentId:null,enhancementId:null,used:{}};
   renderArmyPicker(p);
   renderArmyContent(p);
 }
 
-function openChoiceModal(p, kind){
-  const army = ARMIES[armyState[p].armyKey];
-  const list = kind === 'regiment' ? army.regiment : army.enhancements;
-  const title = kind === 'regiment' ? 'Способность отряда — выберите одну' : 'Улучшение генерала — выберите одно';
-  let html = '';
+function openChoiceModal(p,kind){
+  const army=ARMIES[armyState[p].armyKey];
+  const list=kind==='regiment'?army.regiment:army.enhancements;
+  const title=kind==='regiment'?'Способность отряда — выберите одну':'Улучшение генерала — выберите одно';
+  let html='';
   list.forEach(opt=>{
-    let body = '';
-    if(opt.declare){ body += `<div><span class="lbl2">Объявить</span>${opt.declare}</div>`; }
-    body += `<div><span class="lbl2">Эффект</span>${opt.effect}</div>`;
-    html += `<div class="modal-opt">
+    let body='';
+    if(opt.declare){body+=`<div><span class="lbl2">Объявить</span>${opt.declare}</div>`;}
+    body+=`<div><span class="lbl2">Эффект</span>${opt.effect}</div>`;
+    html+=`<div class="modal-opt">
       <div class="ab-top"><span class="mo-name">${opt.name}</span><span class="ab-timing">${opt.timing}</span></div>
       <div class="mo-body">${body}</div>
       <button class="primary" onclick="chooseOption('${p}','${kind}','${opt.id}')">Выбрать эту</button>
     </div>`;
   });
-  document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').innerHTML=html;
   document.getElementById('modalOverlay').classList.add('show');
 }
 
-function closeModal(){
-  document.getElementById('modalOverlay').classList.remove('show');
-}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('show');}
 
-function chooseOption(p, kind, optId){
-  if(kind==='regiment'){ armyState[p].regimentId = optId; }
-  else{ armyState[p].enhancementId = optId; }
+function chooseOption(p,kind,optId){
+  if(kind==='regiment'){armyState[p].regimentId=optId;}
+  else{armyState[p].enhancementId=optId;}
   closeModal();
   renderArmyContent(p);
   toast('Выбор сохранён');
 }
 
-function renderAbilityCard(p, scope, ability){
-  const used = ability.limited ? isUsed(p,scope,ability.id) : false;
-  let body = '';
-  if(ability.declare){ body += `<div><span class="lbl2">Объявить</span>${ability.declare}</div>`; }
-  body += `<div><span class="lbl2">Эффект</span>${ability.effect}</div>`;
-  if(ability.note){ body += `<div style="margin-top:6px; font-size:12.5px; color:var(--ink-faint); font-style:italic;">${ability.note}</div>`; }
+function renderAbilityCard(p,scope,ability){
+  const used=ability.limited?isUsed(p,scope,ability.id):false;
+  let body='';
+  if(ability.declare){body+=`<div><span class="lbl2">Объявить</span>${ability.declare}</div>`;}
+  body+=`<div><span class="lbl2">Эффект</span>${ability.effect}</div>`;
+  if(ability.note){body+=`<div style="margin-top:6px;font-size:12px;color:var(--ink-faint);font-style:italic;border-left:2px solid var(--bdr);padding-left:8px;">${ability.note}</div>`;}
   if(ability.table){
-    body += `<table class="wtable" style="margin-top:8px;"><tr><th>D6</th><th>Эффект</th></tr>` +
-      ability.table.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('') + `</table>`;
+    body+=`<table class="wtable" style="margin-top:8px;"><tr><th>D6</th><th>Эффект</th></tr>`+
+      ability.table.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')+'</table>';
   }
-  let foot = '';
+  let foot='';
   if(ability.limited){
-    foot = `<div class="ab-foot">
-      <button class="tiny ${used?'':'primary'}" onclick="toggleUsed('${p}','${scope}','${ability.id}')">${used?'↺ Сбросить':'Отметить использованной'}</button>
+    foot=`<div class="ab-foot">
+      <button class="tiny ${used?'ghost':'primary'}" onclick="toggleUsed('${p}','${scope}','${ability.id}')">${used?'↺ Сбросить':'Отметить использованной'}</button>
       ${used?'<span class="usedtag">использовано</span>':''}
     </div>`;
   }
@@ -1580,202 +1878,164 @@ function renderAbilityCard(p, scope, ability){
   </div>`;
 }
 
-function renderChoiceLocked(p, kind, scope, ability){
-  return `<div>
-    ${renderAbilityCard(p, scope, ability)}
-    <button class="ghost tiny" onclick="openChoiceModal('${p}','${kind}')">Изменить выбор</button>
-  </div>`;
+function renderChoiceLocked(p,kind,scope,ability){
+  return `<div>${renderAbilityCard(p,scope,ability)}<button class="ghost tiny" onclick="openChoiceModal('${p}','${kind}')">Изменить выбор</button></div>`;
 }
 
-function renderChoiceEmpty(p, kind, label){
+function renderChoiceEmpty(p,kind,label){
   return `<div class="choiceblock"><div class="cb-empty">
     <span>${label} ещё не выбрана</span>
     <button class="primary small" onclick="openChoiceModal('${p}','${kind}')">Выбрать</button>
   </div></div>`;
 }
 
-function renderUnitCard(p, scope, unit){
-  const statHtml = `<div class="statstrip">
+function renderUnitCard(p,scope,unit){
+  const statHtml=`<div class="statstrip">
     <div class="statbox"><div class="sv">${unit.move}</div><div class="sl">Move</div></div>
     <div class="statbox"><div class="sv">${unit.health}</div><div class="sl">Health</div></div>
     <div class="statbox"><div class="sv">${unit.save}</div><div class="sl">Save</div></div>
     <div class="statbox"><div class="sv">${unit.control}</div><div class="sl">Control</div></div>
   </div>`;
-  const kwHtml = `<div class="kwrow">${(unit.keywords||[]).map(k=>`<span class="kwchip">${k}</span>`).join('')}</div>`;
-
-  const weaponTable = (title, list)=>{
-    if(!list || !list.length) return '';
-    const hasRange = !!list[0].range;
-    return `<table class="wtable">
+  const kwHtml=`<div class="kwrow">${(unit.keywords||[]).map(k=>`<span class="kwchip">${k}</span>`).join('')}</div>`;
+  const weaponTable=(title,list)=>{
+    if(!list||!list.length)return'';
+    const hasRange=!!list[0].range;
+    return`<table class="wtable">
       <tr><th>${title}</th>${hasRange?'<th>Range</th>':''}<th>Att</th><th>Hit</th><th>Wound</th><th>Rend</th><th>Dmg</th><th>Ability</th></tr>
       ${list.map(w=>`<tr><td class="wname">${w.name}</td>${hasRange?`<td>${w.range}</td>`:''}<td>${w.attacks}</td><td>${w.hit}</td><td>${w.wound}</td><td>${w.rend!==undefined?w.rend:'—'}</td><td>${w.damage}</td><td>${w.ability||'—'}</td></tr>`).join('')}
     </table>`;
   };
-
-  const abilitiesHtml = (unit.abilities||[]).map(a=>renderAbilityCard(p, scope+'_'+unit.key, a)).join('');
-
-  return `<div class="unitcard">
+  const abilitiesHtml=(unit.abilities||[]).map(a=>renderAbilityCard(p,scope+'_'+unit.key,a)).join('');
+  return`<div class="unitcard">
     <h4>${unit.name}${unit.isGeneral?' <span class="ab-timing" style="margin-left:4px;">генерал</span>':''}</h4>
-    ${kwHtml}
-    ${statHtml}
-    ${weaponTable('Ranged', unit.ranged)}
-    ${weaponTable('Melee', unit.melee)}
+    ${kwHtml}${statHtml}
+    ${weaponTable('Ranged',unit.ranged)}
+    ${weaponTable('Melee',unit.melee)}
     ${abilitiesHtml}
     <details class="spoiler"><summary>Лор юнита</summary><div class="spoilerbody">${unit.lore||''}</div></details>
   </div>`;
 }
 
 function renderArmyContent(p){
-  const el = document.getElementById('armycontent-'+p);
-  const ast = armyState[p];
+  const el=document.getElementById('armycontent-'+p);
+  const ast=armyState[p];
   if(!ast.armyKey){
-    el.innerHTML = `<p style="color:var(--ink-faint); font-style:italic; font-size:14px; padding:12px 0;">Выберите армию выше, чтобы увидеть её состав, способности и юниты.</p>`;
+    el.innerHTML=`<p style="color:var(--ink-faint);font-style:italic;font-size:13px;padding:12px 0;">Выберите армию выше, чтобы увидеть её состав, способности и юниты.</p>`;
     return;
   }
-  const army = ARMIES[ast.armyKey];
-  const accent = armyAccent(army);
-  const tagCls = accent ? 'dynamic' : army.sideClass;
-  const tagStyle = accent ? `style="--army-accent:${accent};"` : '';
-
-  let html = `<div class="armyhead">
+  const army=ARMIES[ast.armyKey];
+  const accent=armyAccent(army);
+  const tagCls=accent?'dynamic':army.sideClass;
+  const tagStyle=accent?`style="--army-accent:${accent};"` :'';
+  let html=`<div class="armyhead">
     <span class="nm">${army.label}</span>
     <span class="armytag ${tagCls}" ${tagStyle}>${army.subtitle||''}</span>
   </div>`;
-
-  html += `<ul class="unitroster">
+  html+=`<ul class="unitroster">
     <li><b>Генерал:</b> ${army.general}</li>
     ${(army.unitList||[]).map(u=>`<li>${u}</li>`).join('')}
   </ul>`;
-
-  if(army.lore){
-    html += `<details class="spoiler"><summary>Лор армии</summary><div class="spoilerbody">${army.lore}</div></details>`;
-  }
-
-  html += `<div class="section-label">Боевая черта (всегда активна)</div>`;
-  html += renderAbilityCard(p, 'trait', army.battleTrait);
-
-  html += `<div class="section-label">Способность отряда</div>`;
-  if(ast.regimentId){
-    const chosen = army.regiment.find(r=>r.id===ast.regimentId);
-    html += renderChoiceLocked(p, 'regiment', 'regiment', chosen);
-  }else{
-    html += renderChoiceEmpty(p, 'regiment', 'Способность отряда');
-  }
-
-  html += `<div class="section-label">Улучшение генерала</div>`;
-  if(ast.enhancementId){
-    const chosen = army.enhancements.find(r=>r.id===ast.enhancementId);
-    html += renderChoiceLocked(p, 'enhancement', 'enh', chosen);
-  }else{
-    html += renderChoiceEmpty(p, 'enhancement', 'Улучшение генерала');
-  }
-
-  html += `<div class="section-label">Юниты</div>`;
-  html += army.units.map(u=>renderUnitCard(p, 'unit', u)).join('');
-
-  html += `<div style="margin-top:6px; display:flex; gap:8px; flex-wrap:wrap;">
+  if(army.lore){html+=`<details class="spoiler"><summary>Лор армии</summary><div class="spoilerbody">${army.lore}</div></details>`;}
+  html+=`<div class="section-label">Боевая черта (всегда активна)</div>`;
+  html+=renderAbilityCard(p,'trait',army.battleTrait);
+  html+=`<div class="section-label">Способность отряда</div>`;
+  if(ast.regimentId){const chosen=army.regiment.find(r=>r.id===ast.regimentId);html+=renderChoiceLocked(p,'regiment','regiment',chosen);}
+  else{html+=renderChoiceEmpty(p,'regiment','Способность отряда');}
+  html+=`<div class="section-label">Улучшение генерала</div>`;
+  if(ast.enhancementId){const chosen=army.enhancements.find(r=>r.id===ast.enhancementId);html+=renderChoiceLocked(p,'enhancement','enh',chosen);}
+  else{html+=renderChoiceEmpty(p,'enhancement','Улучшение генерала');}
+  html+=`<div class="section-label">Юниты</div>`;
+  html+=army.units.map(u=>renderUnitCard(p,'unit',u)).join('');
+  html+=`<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
     <button class="ghost small" onclick="resetTurnFlags('${p}')">Новый ход: сбросить «раз за ход»</button>
     <button class="ghost small" onclick="resetArmy('${p}')">Сбросить армию</button>
   </div>`;
-
-  el.innerHTML = html;
+  el.innerHTML=html;
 }
 
-/* ============== BACKUP DOWNLOAD ============== */
-
 function downloadArmiesBackup(){
-  const blob = new Blob([JSON.stringify(ARMIES, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'armies.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  const blob=new Blob([JSON.stringify(ARMIES,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='armies.json';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
   toast('armies.json выгружен');
 }
 
-/* ============== TACTICS / HANDS ============== */
+/* ── TACTICS / HANDS ──────────────────────────────────────── */
 function startHand(p){
-  const st = state.players[p];
-  st.deck = shuffled(TACTICS.length);
-  st.hand = [];
-  for(let i=0;i<3;i++){
-    st.hand.push({ idx: st.deck.pop(), marked:false });
-  }
-  st.started = true;
-  st.revealed = false;
-  document.getElementById('revealbtn-'+p).textContent = 'Показать руку';
+  const st=state.players[p];
+  st.deck=shuffled(TACTICS.length);st.hand=[];
+  for(let i=0;i<3;i++){st.hand.push({idx:st.deck.pop(),marked:false});}
+  st.started=true;st.revealed=false;
+  document.getElementById('revealbtn-'+p).textContent='Показать руку';
   renderHand(p);
   toast('Игрок '+(p==='p1'?'1':'2')+': новая рука из 3 карт тактик');
 }
 
 function toggleReveal(p){
-  const st = state.players[p];
-  if(!st.started){ toast('Сначала начните колоду'); return; }
-  st.revealed = !st.revealed;
-  document.getElementById('revealbtn-'+p).textContent = st.revealed ? 'Скрыть руку' : 'Показать руку';
+  const st=state.players[p];
+  if(!st.started){toast('Сначала начните колоду');return;}
+  st.revealed=!st.revealed;
+  document.getElementById('revealbtn-'+p).textContent=st.revealed?'Скрыть руку':'Показать руку';
   renderHand(p);
 }
 
-function toggleMark(p, handPos){
-  const st = state.players[p];
-  st.hand[handPos].marked = !st.hand[handPos].marked;
+function toggleMark(p,handPos){
+  const st=state.players[p];
+  st.hand[handPos].marked=!st.hand[handPos].marked;
   renderHand(p);
 }
 
-function toggleOpen(el){
-  el.classList.toggle('open');
-}
+function toggleOpen(el){el.classList.toggle('open');}
 
 function discardAndDraw(p){
-  const st = state.players[p];
-  if(!st.started){ toast('Сначала начните колоду'); return; }
-  const kept = st.hand.filter(c=>!c.marked);
-  let discarded = st.hand.length - kept.length;
-  st.hand = kept;
-  while(st.hand.length < 3){
+  const st=state.players[p];
+  if(!st.started){toast('Сначала начните колоду');return;}
+  const kept=st.hand.filter(c=>!c.marked);
+  let discarded=st.hand.length-kept.length;
+  st.hand=kept;
+  while(st.hand.length<3){
     if(st.deck.length===0){
-      st.deck = shuffled(TACTICS.length).filter(i => !st.hand.some(c=>c.idx===i));
-      if(st.deck.length===0) break;
+      st.deck=shuffled(TACTICS.length).filter(i=>!st.hand.some(c=>c.idx===i));
+      if(st.deck.length===0)break;
     }
-    st.hand.push({ idx: st.deck.pop(), marked:false });
+    st.hand.push({idx:st.deck.pop(),marked:false});
   }
   renderHand(p);
   toast('Игрок '+(p==='p1'?'1':'2')+': сброшено '+discarded+', рука пополнена до '+st.hand.length);
 }
 
 function renderHand(p){
-  const st = state.players[p];
-  const zone = document.getElementById('handzone-'+p);
-  document.getElementById('deckcount-'+p).textContent = st.started ? ('колода: '+st.deck.length+' · в руке: '+st.hand.length) : 'колода: —';
-
+  const st=state.players[p];
+  const zone=document.getElementById('handzone-'+p);
+  document.getElementById('deckcount-'+p).textContent=st.started?('колода: '+st.deck.length+' · в руке: '+st.hand.length):'колода: —';
   if(!st.started){
-    zone.innerHTML = '<div class="hiddenhand"><div class="cardback-mini">?</div><div class="cardback-mini">?</div><div class="cardback-mini">?</div></div>';
+    zone.innerHTML='<div class="hiddenhand"><div class="cardback-mini">?</div><div class="cardback-mini">?</div><div class="cardback-mini">?</div></div>';
     return;
   }
   if(!st.revealed){
-    zone.innerHTML = '<div class="hiddenhand">' + st.hand.map(()=>'<div class="cardback-mini">✦</div>').join('') + '</div>';
+    zone.innerHTML='<div class="hiddenhand">'+st.hand.map(()=>'<div class="cardback-mini">✦</div>').join('')+'</div>';
     return;
   }
-  zone.innerHTML = '<div class="handgrid">' + st.hand.map((c,i)=>{
-    const card = TACTICS[c.idx];
-    return `<div class="handcard${c.marked?' marked':''}" onclick="toggleOpen(this)">
+  zone.innerHTML='<div class="handgrid">'+st.hand.map((c,i)=>{
+    const card=TACTICS[c.idx];
+    return`<div class="handcard${c.marked?' marked':''}" onclick="toggleOpen(this)">
       <div class="hc-top">
         <span class="hc-name">${card.name}</span>
-        <span class="hc-mark ui">К СБРОСУ</span>
+        <span class="hc-mark">К СБРОСУ</span>
       </div>
       <div class="hc-body">
         <div class="hc-tac"><span class="lbl">Тактика</span>${card.tactic}</div>
         <div class="hc-cmd"><span class="lbl">Команда · ${card.cmdTiming}</span><br><b>${card.cmdTitle}.</b> ${card.cmd}</div>
-        <div style="margin-top:8px;"><button class="small ghost ui" onclick="event.stopPropagation(); toggleMark('${p}', ${i})">${c.marked?'Снять отметку':'Отметить к сбросу'}</button></div>
+        <div style="margin-top:10px;"><button class="small ghost" onclick="event.stopPropagation();toggleMark('${p}',${i})">${c.marked?'Снять отметку':'Отметить к сбросу'}</button></div>
       </div>
     </div>`;
-  }).join('') + '</div>';
+  }).join('')+'</div>';
 }
 
-/* ============== INIT ============== */
+/* ── INIT ─────────────────────────────────────────────────── */
 async function initApp(){
   selectSide('ossia');
   renderRoundTrack();
@@ -1785,7 +2045,6 @@ async function initApp(){
   renderHand('p1');
 }
 initApp();
-
 </script>
 </body>
 </html>
