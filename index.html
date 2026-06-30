@@ -189,10 +189,6 @@ section.block{ margin-top:34px; }
 .sidebtn.dynamic.sel{ border-color:var(--army-accent); background:linear-gradient(180deg, var(--army-accent-soft), var(--panel2)); }
 .sidebtn.dynamic.sel .nm{ color:var(--army-accent); }
 .armytag.dynamic{ color:var(--army-accent); border:1px solid var(--army-accent); }
-.importedtag{
-  font-family:'Inter',sans-serif; font-size:9.5px; text-transform:uppercase; letter-spacing:.05em;
-  color:var(--army-accent); border:1px solid var(--army-accent); border-radius:5px; padding:1px 6px; margin-left:6px; vertical-align:1px;
-}
 
 .infogrid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px;}
 @media (max-width:640px){ .infogrid{grid-template-columns:1fr;} }
@@ -409,44 +405,18 @@ table.wtable .wname{ color:var(--ink); }
 }
 .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 
-/* ---------------- import panel ---------------- */
+/* ---------------- backup panel ---------------- */
 .importpanel{
   background:var(--panel2); border:1px dashed var(--line); border-radius:12px;
   padding:14px 16px; margin-top:14px;
 }
 .importpanel h4{ margin:0 0 8px; font-size:13.5px; font-family:'Cinzel',serif; color:var(--ink); }
 .importpanel .ihint{ font-size:12.5px; color:var(--ink-faint); margin:0 0 10px; line-height:1.5; }
-.importrow{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
-.importrow input[type=password], .importrow input[type=text]{
-  flex:1; min-width:180px; background:var(--panel); border:1px solid var(--line); color:var(--ink);
-  border-radius:8px; padding:7px 10px; font-family:'Inter',sans-serif; font-size:13px;
-}
-.importrow input[type=file]{
-  flex:1; min-width:180px; font-family:'Inter',sans-serif; font-size:12.5px; color:var(--ink-dim);
-}
-.importstatus{
-  font-family:'Inter',sans-serif; font-size:12.5px; color:var(--ink-dim); margin-top:6px;
-  display:flex; align-items:center; gap:8px;
-}
-.importstatus.err{ color:var(--blood); }
-.importstatus.ok{ color:var(--gold); }
-.spinner{
-  width:13px; height:13px; border-radius:50%; border:2px solid var(--line); border-top-color:var(--gold);
-  animation:spin .8s linear infinite; display:inline-block;
-}
-@keyframes spin{ to{ transform:rotate(360deg); } }
-.importedlist{ margin-top:10px; display:flex; flex-direction:column; gap:6px; }
-.importeditem{
-  display:flex; justify-content:space-between; align-items:center; gap:8px;
-  background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 10px;
-  font-family:'Inter',sans-serif; font-size:12.5px; color:var(--ink-dim);
-}
 
 ::-webkit-scrollbar{ width:8px; height:8px;}
 ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:8px;}
 
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
 </head>
 <body>
 
@@ -549,23 +519,14 @@ table.wtable .wname{ color:var(--ink); }
 
   <section class="block">
     <div class="blocktitle"><span class="num">III.</span><h2>Моя армия</h2></div>
-    <p class="blockdesc">Эта страница открыта на устройстве одного игрока — выберите свою армию, и появятся её юниты, способности и улучшения. Способность отряда и улучшение генерала выбираются через окно выбора (можно прочитать все варианты, прежде чем решить). Карты тактик — ваша личная скрытая рука; у соперника на его экране — своя. Новые армии можно добавить, загрузив официальный PDF Spearhead-варскролла на английском — он импортируется через Claude API.</p>
+    <p class="blockdesc">Эта страница открыта на устройстве одного игрока — выберите свою армию, и появятся её юниты, способности и улучшения. Способность отряда и улучшение генерала выбираются через окно выбора (можно прочитать все варианты, прежде чем решить). Карты тактик — ваша личная скрытая рука; у соперника на его экране — своя. Новые армии добавляются через файл <code>armies.json</code> — обновите его в репозитории, чтобы расширить список.</p>
     <div class="panel">
       <div class="sidepicker" id="armypicker-p1"></div>
 
       <div class="importpanel">
-        <h4>Добавить армию из PDF</h4>
-        <p class="ihint">Загрузите официальный PDF Spearhead-варскролла (на английском). Текст будет извлечён в браузере и отправлен в Claude API для распознавания структуры армии. Ключ API хранится только в этом браузере (localStorage) и используется напрямую для запроса к api.anthropic.com — мы его никуда больше не передаём.</p>
-        <div class="importrow">
-          <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-... (ваш Claude API ключ)">
-          <button class="small ghost" onclick="forgetApiKey()">Забыть ключ</button>
-        </div>
-        <div class="importrow">
-          <input type="file" id="pdfFileInput" accept="application/pdf">
-          <button class="primary small" onclick="importArmyFromPdf()" id="importBtn">Импортировать армию</button>
-        </div>
-        <div class="importstatus" id="importStatus"></div>
-        <div class="importedlist" id="importedList"></div>
+        <h4>Резервная копия данных армий</h4>
+        <p class="ihint">Скачать текущий <code>armies.json</code>, который сейчас загружен в приложении — на случай, если нужна локальная копия.</p>
+        <button class="ghost small" onclick="downloadArmiesBackup()">⬇ Выгрузить armies.json</button>
       </div>
 
       <div id="armycontent-p1"></div>
@@ -586,7 +547,7 @@ table.wtable .wname{ color:var(--ink); }
   </section>
 
   <div class="footnote">
-    <p><b>Откуда данные.</b> Карты твистов/тактик пересказаны (не дословно) по фотографиям ваших карточек и обзору на tabletopbattles.com. Базовые армии «Кузнецы Хашута» и «Рабы Тьмы» пересказаны по официальным PDF Spearhead-варскроллов. Дополнительные армии, добавленные через импорт PDF, распознаются автоматически через Claude API на основе официальных варскроллов пользователя — также пересказ, не дословная копия. Сведения об объектах, особой местности и правке от октября 2025 — по статьям Warhammer Community и battleclash.com. Точный текст способности «Icon of Nulahmia» в открытых источниках найти не удалось.</p>
+    <p><b>Откуда данные.</b> Карты твистов/тактик пересказаны (не дословно) по фотографиям ваших карточек и обзору на tabletopbattles.com. Армии «Кузнецы Хашута» и «Рабы Тьмы» (и другие, добавленные позже) пересказаны по официальным PDF Spearhead-варскроллов. Сведения об объектах, особой местности и правке от октября 2025 — по статьям Warhammer Community и battleclash.com. Точный текст способности «Icon of Nulahmia» в открытых источниках найти не удалось.</p>
     <p>Сопоставление карт «Dais of Blood» / «Dais of the Necropolis» с конкретными терейн-моделями (Crypt of Blood / Icon of Nulahmia) в источниках явно не подтверждено — на столе ориентируйтесь на то, какая мистическая местность у вас стоит.</p>
     <div class="sources">Источники: tabletopbattles.com (обзор Sand &amp; Bone) · warhammer-community.com · battleclash.com (эррата) · официальные PDF-варскроллы Spearhead</div>
   </div>
@@ -823,11 +784,9 @@ function renderTwistLog(){
   el.innerHTML = state.twistLog.map(e=>`<li><span class="lr">Р${e.round}</span>${e.name}</li>`).join('');
 }
 
-/* ============== ARMY LOADING (builtin armies.json + localStorage imports) ============== */
+/* ============== ARMY LOADING (from armies.json) ============== */
 
 const ARMIES_JSON_PATH = 'armies.json';
-const LS_IMPORTED_KEY = 'sb_imported_armies_v1';
-const LS_API_KEY = 'sb_claude_api_key_v1';
 
 let ARMIES = {};
 function getArmiesDebug(){ return ARMIES; }
@@ -848,38 +807,20 @@ function softenHex(hex, alpha){
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-function getImportedArmies(){
-  try{
-    const raw = localStorage.getItem(LS_IMPORTED_KEY);
-    return raw ? JSON.parse(raw) : {};
-  }catch(e){ return {}; }
-}
-
-function saveImportedArmies(obj){
-  localStorage.setItem(LS_IMPORTED_KEY, JSON.stringify(obj));
-}
-
 async function loadArmies(){
-  let builtin = {};
-  let loadFailed = false;
   try{
     const resp = await fetch(ARMIES_JSON_PATH, {cache:'no-store'});
-    if(resp.ok){ builtin = await resp.json(); }
-    else{ loadFailed = true; }
+    if(resp.ok){ ARMIES = await resp.json(); }
+    else{ throw new Error('HTTP '+resp.status); }
   }catch(e){
-    loadFailed = true;
     console.warn('Не удалось загрузить armies.json (вероятно, открыт через file:// — используйте локальный сервер или GitHub Pages)', e);
-  }
-  if(loadFailed){
     toast('Не удалось загрузить armies.json — откройте страницу через локальный сервер или GitHub Pages, не двойным кликом по файлу');
+    ARMIES = {};
   }
-  const imported = getImportedArmies();
-  ARMIES = Object.assign({}, builtin, imported);
 }
 
 function armyAccent(army){
-  if(army.source === 'builtin' && army.sideClass === 'hashut') return null;
-  if(army.source === 'builtin' && army.sideClass === 'slaves') return null;
+  if(army.sideClass === 'hashut' || army.sideClass === 'slaves') return null;
   return colorForKey(army.key);
 }
 
@@ -925,9 +866,8 @@ function renderArmyPicker(p){
     const accent = armyAccent(army);
     const cls = accent ? 'dynamic' : army.sideClass;
     const style = accent ? `style="--army-accent:${accent}; --army-accent-soft:${softenHex(accent,.18)};"` : '';
-    const tag = army.source === 'imported' ? '<span class="importedtag">импорт</span>' : '';
     return `<div class="sidebtn ${cls}${cur===key?' sel':''}" ${style} onclick="pickArmy('${p}','${key}')">
-      <span class="nm">${army.label}${tag}</span>
+      <span class="nm">${army.label}</span>
       <span class="desc">${army.subtitle||''}</span>
     </div>`;
   }).join('');
@@ -1101,221 +1041,26 @@ function renderArmyContent(p){
   html += `<div style="margin-top:6px; display:flex; gap:8px; flex-wrap:wrap;">
     <button class="ghost small" onclick="resetTurnFlags('${p}')">Новый ход: сбросить «раз за ход»</button>
     <button class="ghost small" onclick="resetArmy('${p}')">Сбросить армию игрока</button>
-    ${army.source==='imported' ? `<button class="ghost small" onclick="deleteImportedArmy('${ast.armyKey}')">Удалить эту импортированную армию</button>` : ''}
   </div>`;
 
   el.innerHTML = html;
 }
 
-/* ============== PDF IMPORT VIA CLAUDE API ============== */
+/* ============== BACKUP DOWNLOAD ============== */
 
-function setImportStatus(msg, kind){
-  const el = document.getElementById('importStatus');
-  el.className = 'importstatus' + (kind ? ' '+kind : '');
-  el.innerHTML = kind==='busy' ? `<span class="spinner"></span>${msg}` : msg;
-}
-
-function getStoredApiKey(){
-  return localStorage.getItem(LS_API_KEY) || '';
-}
-
-function forgetApiKey(){
-  localStorage.removeItem(LS_API_KEY);
-  document.getElementById('apiKeyInput').value = '';
-  setImportStatus('Ключ забыт.', '');
-}
-
-async function extractPdfText(file){
-  const buf = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({data: buf}).promise;
-  let text = '';
-  for(let i=1; i<=pdf.numPages; i++){
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    text += content.items.map(it=>it.str).join(' ') + '\n\n';
-  }
-  return text;
-}
-
-const ARMY_SCHEMA_PROMPT = `Ты помогаешь конвертировать официальный PDF варскролла Warhammer Age of Sigmar: Spearhead в JSON для веб-приложения на русском языке.
-
-Тебе дан сырой текст, извлечённый из PDF (порядок строк может быть нарушен, таблицы могут быть перепутаны — постарайся восстановить логичную структуру по смыслу игровых терминов).
-
-Верни ТОЛЬКО валидный JSON (без markdown, без пояснений, без обратных кавычек) со следующей структурой:
-
-{
-  "key": "короткий_латинский_идентификатор_армии",
-  "label": "Название армии на русском",
-  "subtitle": "Краткий подзаголовок/тип отряда на русском",
-  "lore": "2-3 абзаца лора армии на русском, пересказ своими словами (НЕ дословный перевод/копия из PDF), абзацы разделены <br><br>",
-  "general": "Название юнита-генерала на русском",
-  "unitList": ["1 Название юнита 1", "1 Название юнита 2", "..."],
-  "battleTrait": {
-    "id": "trait",
-    "name": "Название боевой черты на русском",
-    "timing": "Когда применяется (например 'Пассивно' или 'Раз за ход · Ваша фаза героев')",
-    "limited": true_или_false,
-    "resetsEachTurn": true_или_false,
-    "declare": "Текст 'объявить' если есть, иначе не указывать поле",
-    "effect": "Текст эффекта на русском, пересказ своими словами",
-    "note": "Опциональная заметка, если есть",
-    "table": [["1","эффект на 1"],["2","эффект на 2"]] // только если в способности есть таблица броска кубика, иначе не указывать поле
-  },
-  "regiment": [
-    { "id": "уникальный_id", "name": "Название на русском", "timing": "...", "limited": true_или_false, "resetsEachTurn": true_или_false, "declare": "...", "effect": "..." }
-  ],
-  "enhancements": [
-    { "id": "уникальный_id", "name": "Название на русском", "timing": "...", "limited": true_или_false, "resetsEachTurn": true_или_false, "declare": "...", "effect": "..." }
-  ],
-  "units": [
-    {
-      "key": "латинский_ключ_юнита",
-      "name": "Название юнита на русском",
-      "isGeneral": true_только_для_генерала_иначе_не_указывать,
-      "move": "6\\"",
-      "health": число,
-      "save": "3+",
-      "control": число,
-      "keywords": ["Пехота","Герой"],
-      "ranged": [{ "name":"...", "range":"12\\"", "attacks":число_или_строка, "hit":"3+", "wound":"3+", "rend":число_или_строка, "damage":число_или_строка, "ability":"..." }],
-      "melee": [{ "name":"...", "attacks":число_или_строка, "hit":"3+", "wound":"3+", "rend":число_или_строка, "damage":число_или_строка, "ability":"..." }],
-      "abilities": [
-        { "id":"уникальный_id", "name":"...", "timing":"...", "limited":true_или_false, "resetsEachTurn":true_или_false, "declare":"...", "effect":"..." }
-      ],
-      "lore": "Краткий лор юнита на русском, пересказ своими словами"
-    }
-  ]
-}
-
-ВАЖНО:
-- Все игровые ключевые слова и термины (названия оружия/способностей можно переводить, но игровые keyword-механики вроде Strike-first, Ward, Crit (Mortal), Anti-charge — оставляй на английском, как в оригинале)
-- Весь описательный текст — ПЕРЕСКАЗ своими словами на русском, а не дословный перевод и не копирование структуры предложений оригинала
-- Если в PDF нет явного значения rend (ward/save modifier отсутствует) — используй "—"
-- Если поле неприменимо — просто не включай его в объект, не пиши null
-- Структура должна быть точной валидной JSON, готовой к JSON.parse()`;
-
-async function importArmyFromPdf(){
-  const fileInput = document.getElementById('pdfFileInput');
-  const apiKeyInput = document.getElementById('apiKeyInput');
-  const btn = document.getElementById('importBtn');
-
-  const file = fileInput.files[0];
-  if(!file){ setImportStatus('Сначала выберите PDF-файл.', 'err'); return; }
-
-  let apiKey = apiKeyInput.value.trim() || getStoredApiKey();
-  if(!apiKey){ setImportStatus('Введите ваш Claude API ключ.', 'err'); return; }
-  localStorage.setItem(LS_API_KEY, apiKey);
-
-  btn.disabled = true;
-  try{
-    setImportStatus('Извлекаем текст из PDF…', 'busy');
-    const pdfText = await extractPdfText(file);
-    if(!pdfText || pdfText.trim().length < 50){
-      throw new Error('Не удалось извлечь текст из PDF (возможно, это скан-изображение без текстового слоя).');
-    }
-
-    setImportStatus('Отправляем в Claude API на распознавание…', 'busy');
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 8000,
-        system: ARMY_SCHEMA_PROMPT,
-        messages: [
-          { role: 'user', content: 'Вот текст, извлечённый из PDF варскролла:\n\n' + pdfText.slice(0, 60000) }
-        ]
-      })
-    });
-
-    if(!resp.ok){
-      const errBody = await resp.text();
-      throw new Error('Ошибка API ('+resp.status+'): '+errBody.slice(0,300));
-    }
-
-    const data = await resp.json();
-    const textBlock = (data.content||[]).find(b=>b.type==='text');
-    if(!textBlock){ throw new Error('Claude не вернул текстовый ответ.'); }
-
-    let jsonStr = textBlock.text.trim();
-    jsonStr = jsonStr.replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'');
-
-    let armyObj;
-    try{
-      armyObj = JSON.parse(jsonStr);
-    }catch(e){
-      throw new Error('Claude вернул невалидный JSON. Попробуйте ещё раз или проверьте PDF.');
-    }
-
-    if(!armyObj.key || !armyObj.units){
-      throw new Error('Распознанная структура неполная (нет key или units).');
-    }
-
-    armyObj.source = 'imported';
-    if(!armyObj.sideClass) armyObj.sideClass = 'dynamic';
-
-    const imported = getImportedArmies();
-    imported[armyObj.key] = armyObj;
-    saveImportedArmies(imported);
-    ARMIES[armyObj.key] = armyObj;
-
-    setImportStatus('Армия «'+armyObj.label+'» импортирована и сохранена в этом браузере.', 'ok');
-    renderArmyPicker('p1');
-    renderImportedList();
-    fileInput.value = '';
-  }catch(err){
-    console.error(err);
-    setImportStatus('Ошибка: '+err.message, 'err');
-  }finally{
-    btn.disabled = false;
-  }
-}
-
-function deleteImportedArmy(key){
-  const imported = getImportedArmies();
-  delete imported[key];
-  saveImportedArmies(imported);
-  delete ARMIES[key];
-  if(armyState.p1.armyKey === key){ resetArmy('p1'); }
-  renderArmyPicker('p1');
-  renderImportedList();
-  toast('Импортированная армия удалена из этого браузера');
-}
-
-function downloadArmyJson(key){
-  const army = ARMIES[key];
-  const blob = new Blob([JSON.stringify(army, null, 2)], {type:'application/json'});
+function downloadArmiesBackup(){
+  const blob = new Blob([JSON.stringify(ARMIES, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = key + '.json';
+  a.download = 'armies.json';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  toast('armies.json выгружен');
 }
 
-function renderImportedList(){
-  const el = document.getElementById('importedList');
-  const imported = getImportedArmies();
-  const keys = Object.keys(imported);
-  if(keys.length === 0){ el.innerHTML = ''; return; }
-  el.innerHTML = keys.map(k=>{
-    const a = imported[k];
-    return `<div class="importeditem">
-      <span>${a.label} <span style="color:var(--ink-faint);">(${k})</span></span>
-      <span style="display:flex; gap:6px;">
-        <button class="tiny ghost" onclick="downloadArmyJson('${k}')">⬇ JSON</button>
-        <button class="tiny ghost" onclick="deleteImportedArmy('${k}')">✕ Удалить</button>
-      </span>
-    </div>`;
-  }).join('');
-}
 /* ============== TACTICS / HANDS ============== */
 function startHand(p){
   const st = state.players[p];
@@ -1402,10 +1147,7 @@ async function initApp(){
   await loadArmies();
   renderArmyPicker('p1');
   renderArmyContent('p1');
-  renderImportedList();
   renderHand('p1');
-  const savedKey = getStoredApiKey();
-  if(savedKey){ document.getElementById('apiKeyInput').value = savedKey; }
 }
 initApp();
 
