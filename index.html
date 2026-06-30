@@ -325,11 +325,18 @@ details.spoiler .spoilerbody{
   border:1px solid var(--line); border-radius:12px; padding:2px 9px; margin:0 5px 5px 0;
 }
 
-table.wtable{ width:100%; border-collapse:collapse; margin:6px 0 10px; font-size:12.5px; }
-table.wtable th, table.wtable td{ border:1px solid var(--line); padding:4px 6px; text-align:left; }
+.wtable-scroll{ width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:6px 0 10px; }
+table.wtable{ width:100%; min-width:560px; border-collapse:collapse; margin:0; font-size:12.5px; }
+table.wtable th, table.wtable td{ border:1px solid var(--line); padding:4px 6px; text-align:left; white-space:nowrap; }
 table.wtable th{ background:var(--bg2); color:var(--gold); font-family:'Inter',sans-serif; font-weight:600; font-size:10.5px; text-transform:uppercase; letter-spacing:.03em;}
 table.wtable td{ color:var(--ink-dim); }
-table.wtable .wname{ color:var(--ink); }
+table.wtable .wname{ color:var(--ink); white-space:normal; min-width:120px; }
+table.wtable.wtable-narrow{ min-width:0; }
+table.wtable.wtable-narrow td{ white-space:normal; }
+@media (max-width:640px){
+  table.wtable{ font-size:11.5px; }
+  table.wtable th, table.wtable td{ padding:3px 5px; }
+}
 
 .unitcard{ background:var(--bg2); border:1px solid var(--line); border-radius:12px; padding:13px 15px; margin-bottom:12px;}
 .unitcard h4{ font-family:'Cinzel',serif; font-size:15.5px; margin:0 0 2px; color:var(--ink);}
@@ -404,14 +411,6 @@ table.wtable .wname{ color:var(--ink); }
   opacity:0; pointer-events:none; transition:.3s; z-index:90;
 }
 .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
-
-/* ---------------- backup panel ---------------- */
-.importpanel{
-  background:var(--panel2); border:1px dashed var(--line); border-radius:12px;
-  padding:14px 16px; margin-top:14px;
-}
-.importpanel h4{ margin:0 0 8px; font-size:13.5px; font-family:'Cinzel',serif; color:var(--ink); }
-.importpanel .ihint{ font-size:12.5px; color:var(--ink-faint); margin:0 0 10px; line-height:1.5; }
 
 ::-webkit-scrollbar{ width:8px; height:8px;}
 ::-webkit-scrollbar-thumb{ background:var(--line); border-radius:8px;}
@@ -523,11 +522,7 @@ table.wtable .wname{ color:var(--ink); }
     <div class="panel">
       <div class="sidepicker" id="armypicker-p1"></div>
 
-      <div class="importpanel">
-        <h4>Резервная копия данных армий</h4>
-        <p class="ihint">Скачать текущий <code>armies.json</code>, который сейчас загружен в приложении — на случай, если нужна локальная копия.</p>
-        <button class="ghost small" onclick="downloadArmiesBackup()">⬇ Выгрузить armies.json</button>
-      </div>
+      <button class="ghost tiny" style="margin-bottom:14px;" onclick="downloadArmiesBackup()">⬇ armies.json</button>
 
       <div id="armycontent-p1"></div>
 
@@ -928,8 +923,8 @@ function renderAbilityCard(p, scope, ability){
   body += `<div><span class="lbl2">Эффект</span>${ability.effect}</div>`;
   if(ability.note){ body += `<div style="margin-top:6px; font-size:12.5px; color:var(--ink-faint); font-style:italic;">${ability.note}</div>`; }
   if(ability.table){
-    body += `<table class="wtable" style="margin-top:8px;"><tr><th>D6</th><th>Эффект</th></tr>` +
-      ability.table.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('') + `</table>`;
+    body += `<div class="wtable-scroll"><table class="wtable wtable-narrow" style="margin-top:8px;"><tr><th>D6</th><th>Эффект</th></tr>` +
+      ability.table.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('') + `</table></div>`;
   }
   let foot = '';
   if(ability.limited){
@@ -971,18 +966,23 @@ function renderUnitCard(p, scope, unit){
   const weaponTable = (title, list)=>{
     if(!list || !list.length) return '';
     const hasRange = !!list[0].range;
-    return `<table class="wtable">
+    return `<div class="wtable-scroll"><table class="wtable">
       <tr><th>${title}</th>${hasRange?'<th>Range</th>':''}<th>Att</th><th>Hit</th><th>Wound</th><th>Rend</th><th>Dmg</th><th>Ability</th></tr>
       ${list.map(w=>`<tr><td class="wname">${w.name}</td>${hasRange?`<td>${w.range}</td>`:''}<td>${w.attacks}</td><td>${w.hit}</td><td>${w.wound}</td><td>${w.rend!==undefined?w.rend:'—'}</td><td>${w.damage}</td><td>${w.ability||'—'}</td></tr>`).join('')}
-    </table>`;
+    </table></div>`;
   };
 
   const abilitiesHtml = (unit.abilities||[]).map(a=>renderAbilityCard(p, scope+'_'+unit.key, a)).join('');
+
+  const compositionHtml = unit.composition
+    ? `<div style="font-size:12.5px; color:var(--ink-faint); font-style:italic; margin:4px 0 8px;">${unit.composition}</div>`
+    : '';
 
   return `<div class="unitcard">
     <h4>${unit.name}${unit.isGeneral?' <span class="ab-timing" style="margin-left:6px;">генерал</span>':''}</h4>
     ${kwHtml}
     ${statHtml}
+    ${compositionHtml}
     ${weaponTable('Ranged', unit.ranged)}
     ${weaponTable('Melee', unit.melee)}
     ${abilitiesHtml}
