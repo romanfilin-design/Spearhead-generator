@@ -190,6 +190,54 @@ section.block{ margin-top:34px; }
 .sidebtn.dynamic.sel .nm{ color:var(--army-accent); }
 .armytag.dynamic{ color:var(--army-accent); border:1px solid var(--army-accent); }
 
+/* ---------------- army select dropdown + mode toggle ---------------- */
+.armypickerrow{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+.armyselect{
+  flex:1; min-width:220px; font-family:'Inter',sans-serif; font-size:14px;
+  background:var(--panel2); color:var(--ink); border:1.5px solid var(--line); border-radius:10px;
+  padding:10px 12px; cursor:pointer;
+}
+.armyselect:focus{ outline:none; border-color:var(--gold); }
+.modetoggle{ display:flex; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+.modebtn{
+  border:none; border-radius:0; background:var(--panel2); color:var(--ink-dim);
+  padding:9px 14px; font-size:12.5px;
+}
+.modebtn:hover{ color:var(--gold); border-color:transparent; }
+.modebtn.active{ background:var(--gold); color:#1c1606; font-weight:700; }
+
+/* ---------------- HP bar ---------------- */
+.hpbar-wrap{ margin:8px 0 10px; }
+.hpbar-label{ display:flex; justify-content:space-between; font-family:'Inter',sans-serif; font-size:11px; color:var(--ink-faint); margin-bottom:4px; text-transform:uppercase; letter-spacing:.04em; }
+.hpbar{ display:flex; gap:2px; height:16px; }
+.hpseg{
+  flex:1; background:var(--panel2); border:1px solid var(--line); border-radius:2px; cursor:pointer;
+  transition:.1s;
+}
+.hpseg:hover{ border-color:var(--gold); }
+.hpseg.alive{ background:linear-gradient(180deg,#6c9c5a,#4d7a3e); border-color:#3d6230; }
+.hpseg.dead{ background:var(--bg2); }
+.hpseg.modelmark{ border-right:2px solid var(--bg); }
+.hpbtnrow{ display:flex; gap:6px; margin-top:6px; }
+
+/* ---------------- activation toggle ---------------- */
+.activerow{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; gap:8px; }
+.activebtn{
+  display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:20px;
+  border:1.5px solid var(--line); background:var(--panel2); font-family:'Inter',sans-serif; font-size:12px; font-weight:600;
+  cursor:pointer;
+}
+.activebtn .dot{ width:9px; height:9px; border-radius:50%; background:var(--ink-faint); transition:.15s; }
+.activebtn.on{ border-color:var(--gold); color:var(--gold); }
+.activebtn.on .dot{ background:var(--gold); box-shadow:0 0 6px rgba(201,164,77,.7); }
+
+/* ---------------- game mode compact unit card ---------------- */
+.unitcard.compact{ padding:11px 13px; }
+.unitcard.compact .kwrow, .unitcard.compact .wtable-scroll, .unitcard.compact details.spoiler{ display:none; }
+.unitcard.compact .statstrip{ margin:6px 0 8px; }
+.compactabilities .abilitycard{ padding:7px 10px; margin-bottom:6px; }
+.compactabilities .ab-body{ font-size:12.5px; }
+
 .infogrid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px;}
 @media (max-width:640px){ .infogrid{grid-template-columns:1fr;} }
 .infocard{ background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:12px 14px;}
@@ -395,15 +443,6 @@ table.wtable.wtable-narrow td{ white-space:normal; }
 .modal-opt .mo-body{ font-size:13.5px; color:var(--ink-dim); margin:5px 0 9px; }
 .modal-opt button{ width:100%; }
 
-/* ---------------- footer ---------------- */
-.footnote{
-  margin-top:42px; padding-top:18px; border-top:1px solid var(--line);
-  font-size:13px; color:var(--ink-faint); line-height:1.6;
-}
-.footnote b{ color:var(--ink-dim); }
-.footnote .sources{margin-top:8px;}
-.footnote a{color:var(--gold-dim); text-decoration:underline;}
-
 .toast{
   position:fixed; bottom:18px; left:50%; transform:translateX(-50%) translateY(20px);
   background:var(--panel2); border:1px solid var(--gold-dim); color:var(--ink);
@@ -520,7 +559,13 @@ table.wtable.wtable-narrow td{ white-space:normal; }
     <div class="blocktitle"><span class="num">III.</span><h2>Моя армия</h2></div>
     <p class="blockdesc">Эта страница открыта на устройстве одного игрока — выберите свою армию, и появятся её юниты, способности и улучшения. Способность отряда и улучшение генерала выбираются через окно выбора (можно прочитать все варианты, прежде чем решить). Карты тактик — ваша личная скрытая рука; у соперника на его экране — своя. Новые армии добавляются через файл <code>armies.json</code> — обновите его в репозитории, чтобы расширить список.</p>
     <div class="panel">
-      <div class="sidepicker" id="armypicker-p1"></div>
+      <div class="armypickerrow">
+        <select class="armyselect" id="armypicker-p1" onchange="pickArmy('p1', this.value)"></select>
+        <div class="modetoggle" id="modetoggle-p1">
+          <button class="modebtn" onclick="setMode('p1','reference')" id="modebtn-ref-p1">Справочник</button>
+          <button class="modebtn" onclick="setMode('p1','game')" id="modebtn-game-p1">Игра</button>
+        </div>
+      </div>
 
       <button class="ghost tiny" style="margin-bottom:14px;" onclick="downloadArmiesBackup()">⬇ armies.json</button>
 
@@ -540,12 +585,6 @@ table.wtable.wtable-narrow td{ white-space:normal; }
       </div>
     </div>
   </section>
-
-  <div class="footnote">
-    <p><b>Откуда данные.</b> Карты твистов/тактик пересказаны (не дословно) по фотографиям ваших карточек и обзору на tabletopbattles.com. Армии «Кузнецы Хашута» и «Рабы Тьмы» (и другие, добавленные позже) пересказаны по официальным PDF Spearhead-варскроллов. Сведения об объектах, особой местности и правке от октября 2025 — по статьям Warhammer Community и battleclash.com. Точный текст способности «Icon of Nulahmia» в открытых источниках найти не удалось.</p>
-    <p>Сопоставление карт «Dais of Blood» / «Dais of the Necropolis» с конкретными терейн-моделями (Crypt of Blood / Icon of Nulahmia) в источниках явно не подтверждено — на столе ориентируйтесь на то, какая мистическая местность у вас стоит.</p>
-    <div class="sources">Источники: tabletopbattles.com (обзор Sand &amp; Bone) · warhammer-community.com · battleclash.com (эррата) · официальные PDF-варскроллы Spearhead</div>
-  </div>
 
 </div>
 
@@ -821,7 +860,7 @@ function armyAccent(army){
 
 /* ============== GENERIC STATE (army part) ============== */
 let armyState = {
-  p1: { armyKey:null, regimentId:null, enhancementId:null, used:{} }
+  p1: { armyKey:null, regimentId:null, enhancementId:null, used:{}, mode:'reference', damage:{}, activated:{} }
 };
 
 function abilityFullId(p, scope, id){
@@ -848,39 +887,78 @@ function resetTurnFlags(p){
   army.regiment.forEach(r=>clearIfResets('regiment', r));
   army.enhancements.forEach(e=>clearIfResets('enh', e));
   army.units.forEach(u=>(u.abilities||[]).forEach(a=>clearIfResets('unit_'+u.key, a)));
+  ast.activated = {};
   renderArmyContent(p);
-  toast((p==='p1'?'Игрок 1':'Игрок 2')+': отметки «раз за ход» сброшены');
+  toast((p==='p1'?'Игрок 1':'Игрок 2')+': новый ход — активации сброшены, отметки «раз за ход» сброшены');
+}
+
+/* ---------------- HP tracking ---------------- */
+function unitMaxHp(unit){
+  return (unit.health||1) * (unit.models||1);
+}
+function unitDamage(p, unitKey){
+  return armyState[p].damage[unitKey] || 0;
+}
+function setUnitDamage(p, unitKey, value){
+  const max = unitMaxHp(unitFromState(p, unitKey));
+  const clamped = Math.max(0, Math.min(max, value));
+  if(clamped === 0){ delete armyState[p].damage[unitKey]; }
+  else{ armyState[p].damage[unitKey] = clamped; }
+  renderArmyContent(p);
+}
+function unitFromState(p, unitKey){
+  const army = ARMIES[armyState[p].armyKey];
+  return army.units.find(u=>u.key===unitKey);
+}
+function hpSegClick(p, unitKey, segIndex){
+  const current = unitDamage(p, unitKey);
+  const clickedDamage = segIndex + 1;
+  setUnitDamage(p, unitKey, current === clickedDamage ? clickedDamage - 1 : clickedDamage);
+}
+
+/* ---------------- Activation tracking ---------------- */
+function isActivated(p, unitKey){
+  return !!armyState[p].activated[unitKey];
+}
+function toggleActivated(p, unitKey){
+  armyState[p].activated[unitKey] = !armyState[p].activated[unitKey];
+  renderArmyContent(p);
 }
 
 function renderArmyPicker(p){
   const el = document.getElementById('armypicker-'+p);
   const cur = armyState[p].armyKey;
   const keys = Object.keys(ARMIES);
-  el.innerHTML = keys.map(key=>{
+  const placeholder = `<option value="" ${cur?'':'selected'} disabled>Выберите армию…</option>`;
+  el.innerHTML = placeholder + keys.map(key=>{
     const army = ARMIES[key];
-    const accent = armyAccent(army);
-    const cls = accent ? 'dynamic' : army.sideClass;
-    const style = accent ? `style="--army-accent:${accent}; --army-accent-soft:${softenHex(accent,.18)};"` : '';
-    return `<div class="sidebtn ${cls}${cur===key?' sel':''}" ${style} onclick="pickArmy('${p}','${key}')">
-      <span class="nm">${army.label}</span>
-      <span class="desc">${army.subtitle||''}</span>
-    </div>`;
+    const label = army.subtitle ? `${army.label} — ${army.subtitle}` : army.label;
+    return `<option value="${key}" ${cur===key?'selected':''}>${label}</option>`;
   }).join('');
+  document.getElementById('modebtn-ref-'+p).classList.toggle('active', armyState[p].mode==='reference');
+  document.getElementById('modebtn-game-'+p).classList.toggle('active', armyState[p].mode==='game');
 }
 
 function pickArmy(p, key){
   if(armyState[p].armyKey === key) return;
-  armyState[p].armyKey = key;
-  armyState[p].regimentId = null;
-  armyState[p].enhancementId = null;
+  const mode = armyState[p].mode;
+  armyState[p] = { armyKey:key, regimentId:null, enhancementId:null, used:{}, mode, damage:{}, activated:{} };
   renderArmyPicker(p);
   renderArmyContent(p);
   toast((p==='p1'?'Игрок 1':'Игрок 2')+' выбрал армию: '+ARMIES[key].label);
 }
 
 function resetArmy(p){
-  armyState[p] = { armyKey:null, regimentId:null, enhancementId:null, used:{} };
+  const mode = armyState[p].mode;
+  armyState[p] = { armyKey:null, regimentId:null, enhancementId:null, used:{}, mode, damage:{}, activated:{} };
   renderArmyPicker(p);
+  renderArmyContent(p);
+}
+
+function setMode(p, mode){
+  armyState[p].mode = mode;
+  document.getElementById('modebtn-ref-'+p).classList.toggle('active', mode==='reference');
+  document.getElementById('modebtn-game-'+p).classList.toggle('active', mode==='game');
   renderArmyContent(p);
 }
 
@@ -954,7 +1032,39 @@ function renderChoiceEmpty(p, kind, label){
   </div></div>`;
 }
 
+function renderHpBar(p, unit){
+  const max = unitMaxHp(unit);
+  const dmg = unitDamage(p, unit.key);
+  const alive = max - dmg;
+  const perModel = unit.health || 1;
+  let segs = '';
+  for(let i=0;i<max;i++){
+    const isAlive = i < alive;
+    const isModelBoundary = (i+1) % perModel === 0 && (i+1) !== max;
+    segs += `<div class="hpseg ${isAlive?'alive':'dead'}${isModelBoundary?' modelmark':''}" onclick="hpSegClick('${p}','${unit.key}',${i})" title="${i+1}/${max}"></div>`;
+  }
+  return `<div class="hpbar-wrap">
+    <div class="hpbar-label"><span>HP</span><span>${alive} / ${max}${unit.models>1?` (${unit.models}× ${perModel})`:''}</span></div>
+    <div class="hpbar">${segs}</div>
+    <div class="hpbtnrow">
+      <button class="tiny ghost" onclick="setUnitDamage('${p}','${unit.key}', unitDamage('${p}','${unit.key}')+1)">+1 урон</button>
+      <button class="tiny ghost" onclick="setUnitDamage('${p}','${unit.key}', unitDamage('${p}','${unit.key}')-1)">−1 урон</button>
+      <button class="tiny ghost" onclick="setUnitDamage('${p}','${unit.key}', 0)">Сброс</button>
+    </div>
+  </div>`;
+}
+
+function renderActivationToggle(p, unit){
+  const on = isActivated(p, unit.key);
+  return `<button class="activebtn${on?' on':''}" onclick="toggleActivated('${p}','${unit.key}')">
+    <span class="dot"></span>${on?'Активирован':'Не активирован'}
+  </button>`;
+}
+
 function renderUnitCard(p, scope, unit){
+  const ast = armyState[p];
+  const isGameMode = ast.mode === 'game';
+
   const statHtml = `<div class="statstrip">
     <div class="statbox"><div class="sv">${unit.move}</div><div class="sl">Move</div></div>
     <div class="statbox"><div class="sv">${unit.health}</div><div class="sl">Health</div></div>
@@ -978,8 +1088,25 @@ function renderUnitCard(p, scope, unit){
     ? `<div style="font-size:12.5px; color:var(--ink-faint); font-style:italic; margin:4px 0 8px;">${unit.composition}</div>`
     : '';
 
+  const activeRow = `<div class="activerow">
+    <h4 style="margin:0;">${unit.name}${unit.isGeneral?' <span class="ab-timing" style="margin-left:6px;">генерал</span>':''}</h4>
+    ${renderActivationToggle(p, unit)}
+  </div>`;
+
+  const hpHtml = renderHpBar(p, unit);
+
+  if(isGameMode){
+    return `<div class="unitcard compact">
+      ${activeRow}
+      ${hpHtml}
+      ${statHtml}
+      <div class="compactabilities">${abilitiesHtml}</div>
+    </div>`;
+  }
+
   return `<div class="unitcard">
-    <h4>${unit.name}${unit.isGeneral?' <span class="ab-timing" style="margin-left:6px;">генерал</span>':''}</h4>
+    ${activeRow}
+    ${hpHtml}
     ${kwHtml}
     ${statHtml}
     ${compositionHtml}
@@ -1001,16 +1128,23 @@ function renderArmyContent(p){
   const accent = armyAccent(army);
   const tagCls = accent ? 'dynamic' : army.sideClass;
   const tagStyle = accent ? `style="--army-accent:${accent};"` : '';
+  const isGameMode = ast.mode === 'game';
 
   let html = `<div class="armyhead">
     <span class="nm">${army.label}</span>
     <span class="armytag ${tagCls}" ${tagStyle}>${army.subtitle||''}</span>
   </div>`;
 
-  html += `<ul class="unitroster">
+  const rosterHtml = `<ul class="unitroster">
     <li><b>Генерал:</b> ${army.general}</li>
     ${(army.unitList||[]).map(u=>`<li>${u}</li>`).join('')}
   </ul>`;
+
+  if(isGameMode){
+    html += `<details class="spoiler"><summary>Состав армии</summary><div class="spoilerbody">${rosterHtml}</div></details>`;
+  }else{
+    html += rosterHtml;
+  }
 
   if(army.lore){
     html += `<details class="spoiler"><summary>Лор армии</summary><div class="spoilerbody">${army.lore}</div></details>`;
@@ -1039,7 +1173,7 @@ function renderArmyContent(p){
   html += army.units.map(u=>renderUnitCard(p, 'unit', u)).join('');
 
   html += `<div style="margin-top:6px; display:flex; gap:8px; flex-wrap:wrap;">
-    <button class="ghost small" onclick="resetTurnFlags('${p}')">Новый ход: сбросить «раз за ход»</button>
+    <button class="primary small" onclick="resetTurnFlags('${p}')">Новый ход: сбросить активации</button>
     <button class="ghost small" onclick="resetArmy('${p}')">Сбросить армию игрока</button>
   </div>`;
 
