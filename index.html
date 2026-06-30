@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sand &amp; Bone — Генератор сражений</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#15131a;
+  --bg2:#1c1922;
+  --panel:#211d29;
+  --panel2:#27212e;
+  --ink:#e9e2d3;
+  --ink-dim:#a89e8a;
+  --ink-faint:#6f6759;
+  --line:#3a3342;
+  --ossia:#a87bbd;
+  --ossia-soft:#3a2c45;
+  --dolorum:#6c8a6e;
+  --dolorum-soft:#293b2c;
+  --blood:#a8364a;
+  --gold:#c9a44d;
+  --gold-dim:#7a6530;
+  --hashut:#c98f47;
+  --hashut-soft:#473420;
+  --slaves:#b5495f;
+  --slaves-soft:#3d2230;
+  --shadow: 0 8px 28px rgba(0,0,0,.45);
+  --army-accent:#c9a44d;
+  --army-accent-soft:#3a3342;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);}
+body{
+  font-family:'EB Garamond', Georgia, serif;
+  color:var(--ink);
+  font-size:17px;
+  line-height:1.5;
+  background:
+    radial-gradient(ellipse at 20% -10%, rgba(168,123,189,.10), transparent 45%),
+    radial-gradient(ellipse at 90% 10%, rgba(108,138,110,.10), transparent 45%),
+    var(--bg);
+  min-height:100vh;
+  padding-bottom:60px;
+}
+
+h1,h2,h3,.disp{font-family:'Cinzel',serif; letter-spacing:.03em;}
+.ui{font-family:'Inter',sans-serif;}
+
+a{color:var(--gold);}
+
+/* ---------------- top hero ---------------- */
+.hero{
+  padding:26px 18px 18px;
+  text-align:center;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(0,0,0,.25), transparent);
+}
+.hero .eyebrow{
+  font-family:'Inter',sans-serif;
+  font-size:11px;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--gold-dim);
+  margin-bottom:6px;
+}
+.hero h1{
+  font-size:30px;
+  font-weight:700;
+  margin:0 0 4px;
+  color:var(--ink);
+  text-shadow:0 0 22px rgba(201,164,77,.25);
+}
+.hero .sub{
+  color:var(--ink-dim);
+  font-style:italic;
+  font-size:15px;
+  max-width:560px;
+  margin:6px auto 0;
+}
+
+.wrap{max-width:980px; margin:0 auto; padding:0 16px;}
+
+/* ---------------- sticky control bar ---------------- */
+.stickybar{
+  position:sticky; top:0; z-index:50;
+  background:rgba(21,19,26,.92);
+  backdrop-filter: blur(6px);
+  border-bottom:1px solid var(--line);
+  padding:10px 16px;
+}
+.stickyrow{
+  max-width:980px; margin:0 auto;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:14px; flex-wrap:wrap;
+}
+.roundtrack{display:flex; align-items:center; gap:6px;}
+.roundnode{
+  width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Cinzel',serif; font-weight:700; font-size:13px;
+  border:1.5px solid var(--line); color:var(--ink-faint);
+  background:var(--panel);
+  transition:.25s;
+}
+.roundnode.active{
+  border-color:var(--gold); color:var(--bg); background:var(--gold);
+  box-shadow:0 0 14px rgba(201,164,77,.55);
+}
+.roundnode.done{ border-color:var(--gold-dim); color:var(--gold-dim); }
+.roundline{width:16px; height:1px; background:var(--line);}
+.roundbtns button{margin-left:6px;}
+
+.vprow{display:flex; align-items:center; gap:10px;}
+.vpbox{
+  display:flex; align-items:center; gap:6px;
+  background:var(--panel); border:1px solid var(--line);
+  border-radius:8px; padding:4px 8px;
+}
+.vpname{font-family:'Inter',sans-serif; font-size:11px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.06em;}
+.vpval{font-family:'Cinzel',serif; font-weight:700; font-size:17px; min-width:18px; text-align:center;}
+.vpbtn{
+  width:22px; height:22px; border-radius:6px; border:1px solid var(--line);
+  background:var(--panel2); color:var(--ink); cursor:pointer; font-size:14px; line-height:1;
+  font-family:'Inter',sans-serif;
+}
+.vpbtn:hover{border-color:var(--gold);}
+.underdogtag{
+  font-family:'Inter',sans-serif; font-size:11px; color:var(--gold);
+  border:1px solid var(--gold-dim); border-radius:20px; padding:3px 9px;
+}
+
+/* ---------------- generic buttons ---------------- */
+button{
+  font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px;
+  cursor:pointer; border-radius:8px; border:1px solid var(--line);
+  background:var(--panel2); color:var(--ink); padding:8px 14px;
+  transition:.15s;
+}
+button:hover{ border-color:var(--gold); color:var(--gold); }
+button.primary{
+  background:linear-gradient(180deg,#caa553,#a9843a);
+  color:#1c1606; border:none; font-weight:700;
+}
+button.primary:hover{ filter:brightness(1.08); color:#1c1606;}
+button.ghost{ background:transparent; }
+button:disabled{ opacity:.35; cursor:not-allowed; }
+button.small{padding:5px 10px; font-size:12px;}
+button.tiny{padding:3px 8px; font-size:11px; border-radius:6px;}
+
+/* ---------------- sections ---------------- */
+section.block{ margin-top:34px; }
+.blocktitle{
+  display:flex; align-items:baseline; gap:10px;
+  margin-bottom:4px;
+}
+.blocktitle h2{ font-size:20px; margin:0; color:var(--ink); }
+.blocktitle .num{ color:var(--gold-dim); font-size:14px; }
+.blockdesc{ color:var(--ink-dim); font-size:14.5px; margin:2px 0 16px; max-width:680px; }
+
+.panel{
+  background:var(--panel); border:1px solid var(--line); border-radius:14px;
+  padding:18px 20px; box-shadow:var(--shadow);
+}
+
+/* side selector (also reused for army picker) */
+.sidepicker{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
+.sidebtn{
+  flex:1; min-width:220px;
+  text-align:left; padding:14px 16px; border-radius:12px;
+  border:1.5px solid var(--line); background:var(--panel2); cursor:pointer;
+  font-family:'Inter',sans-serif;
+}
+.sidebtn .nm{ font-family:'Cinzel',serif; font-size:15px; display:block; margin-bottom:3px; color:var(--ink);}
+.sidebtn .desc{ font-size:12.5px; color:var(--ink-dim); line-height:1.4;}
+.sidebtn.ossia.sel{ border-color:var(--ossia); background:linear-gradient(180deg, var(--ossia-soft), var(--panel2)); }
+.sidebtn.dolorum.sel{ border-color:var(--dolorum); background:linear-gradient(180deg, var(--dolorum-soft), var(--panel2)); }
+.sidebtn.ossia.sel .nm{ color:var(--ossia); }
+.sidebtn.dolorum.sel .nm{ color:var(--dolorum); }
+.sidebtn.hashut.sel{ border-color:var(--hashut); background:linear-gradient(180deg, var(--hashut-soft), var(--panel2)); }
+.sidebtn.hashut.sel .nm{ color:var(--hashut); }
+.sidebtn.slaves.sel{ border-color:var(--slaves); background:linear-gradient(180deg, var(--slaves-soft), var(--panel2)); }
+.sidebtn.slaves.sel .nm{ color:var(--slaves); }
+.sidebtn.dynamic.sel{ border-color:var(--army-accent); background:linear-gradient(180deg, var(--army-accent-soft), var(--panel2)); }
+.sidebtn.dynamic.sel .nm{ color:var(--army-accent); }
+.armytag.dynamic{ color:var(--army-accent); border:1px solid var(--army-accent); }
+.importedtag{
+  font-family:'Inter',sans-serif; font-size:9.5px; text-transform:uppercase; letter-spacing:.05em;
+  color:var(--army-accent); border:1px solid var(--army-accent); border-radius:5px; padding:1px 6px; margin-left:6px; vertical-align:1px;
+}
+
+.infogrid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px;}
+@media (max-width:640px){ .infogrid{grid-template-columns:1fr;} }
+.infocard{ background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:12px 14px;}
+.infocard h3{ font-size:13px; margin:0 0 6px; color:var(--gold); text-transform:uppercase; letter-spacing:.05em; font-family:'Inter',sans-serif; font-weight:700;}
+.infocard p{ margin:0 0 6px; font-size:14.5px; color:var(--ink-dim); }
+.infocard p:last-child{margin-bottom:0;}
+.flag{
+  display:inline-block; font-family:'Inter',sans-serif; font-size:10.5px;
+  border:1px solid var(--gold-dim); color:var(--gold); border-radius:5px;
+  padding:1px 6px; margin-left:6px; vertical-align:1px;
+}
+
+.steps{ margin:0; padding-left:20px; color:var(--ink-dim); font-size:14.5px;}
+.steps li{ margin-bottom:5px; }
+.steps b{color:var(--ink);}
+
+/* ---------------- twist ---------------- */
+.twistarea{ display:flex; gap:18px; flex-wrap:wrap; align-items:flex-start;}
+.twistdraw{ flex:1; min-width:260px; }
+.twistlog{ flex:1; min-width:240px; }
+
+.cardstage{ perspective:1200px; min-height:190px; display:flex; align-items:center; justify-content:center; margin-bottom:14px;}
+.flipcard{
+  width:100%; max-width:420px; min-height:170px;
+  position:relative; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.2,.8,.2,1);
+}
+.flipcard.flipped{ transform:rotateY(180deg); }
+.face{
+  position:absolute; inset:0; backface-visibility:hidden;
+  border-radius:14px; border:1.5px solid var(--line);
+  padding:18px 18px; display:flex; flex-direction:column;
+  background:var(--panel2);
+}
+.face.back{
+  align-items:center; justify-content:center; text-align:center;
+  background:
+    repeating-linear-gradient(135deg, rgba(201,164,77,.05) 0 10px, transparent 10px 20px),
+    var(--panel2);
+}
+.face.back .seal{
+  width:52px; height:52px; border-radius:50%; border:2px solid var(--gold-dim);
+  display:flex; align-items:center; justify-content:center; margin-bottom:10px;
+  font-family:'Cinzel',serif; color:var(--gold-dim); font-size:20px;
+}
+.face.back .bk-label{ font-family:'Cinzel',serif; letter-spacing:.18em; font-size:12px; color:var(--ink-faint); text-transform:uppercase;}
+.face.front{ transform:rotateY(180deg); overflow-y:auto; }
+.cardseal{
+  align-self:center; font-family:'Inter',sans-serif; font-size:10px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--gold); border:1px solid var(--gold-dim);
+  border-radius:20px; padding:3px 12px; margin-bottom:8px;
+}
+.cardname{ font-family:'Cinzel',serif; font-weight:700; font-size:16px; text-align:center; margin-bottom:8px; color:var(--ink);}
+.cardeffect{ font-size:14.5px; color:var(--ink-dim); }
+.cardeffect b{color:var(--ink);}
+.cardeffect .opt{ margin:6px 0 0 0; padding-left:18px; }
+.cardeffect .note{ margin-top:8px; font-size:12.5px; color:var(--ink-faint); font-style:italic;}
+
+.twistbtnrow{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap;}
+.loglist{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; max-height:230px; overflow-y:auto;}
+.loglist li{
+  background:var(--panel2); border:1px solid var(--line); border-radius:8px;
+  padding:7px 10px; font-size:13.5px; color:var(--ink-dim); display:flex; gap:8px;
+}
+.loglist .lr{ font-family:'Inter',sans-serif; font-weight:700; color:var(--gold); font-size:12px; flex-shrink:0;}
+.loglist .empty{ color:var(--ink-faint); font-style:italic; border:1px dashed var(--line); background:transparent;}
+
+/* ---------------- players / armies ---------------- */
+.players{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+@media (max-width:760px){ .players{grid-template-columns:1fr;} }
+.playerpanel{ background:var(--panel2); border:1px solid var(--line); border-radius:14px; padding:16px;}
+.playerhead{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+.playerhead h3{ margin:0; font-size:16px; color:var(--ink);}
+.deckcount{ font-family:'Inter',sans-serif; font-size:11.5px; color:var(--ink-faint);}
+
+.divider{ border:none; border-top:1px solid var(--line); margin:16px 0; }
+
+.armyhead{ display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.armyhead .nm{ font-family:'Cinzel',serif; font-size:17px; }
+.armyhead .sub2{ font-family:'Inter',sans-serif; font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em;}
+.armytag{ font-family:'Inter',sans-serif; font-size:10.5px; border-radius:6px; padding:2px 7px; }
+.armytag.hashut{ color:var(--hashut); border:1px solid var(--hashut); }
+.armytag.slaves{ color:var(--slaves); border:1px solid var(--slaves); }
+
+details.spoiler{ background:var(--panel); border:1px solid var(--line); border-radius:8px; margin:8px 0; }
+details.spoiler summary{
+  cursor:pointer; list-style:none; padding:7px 11px;
+  font-family:'Inter',sans-serif; font-size:11.5px; color:var(--gold);
+  text-transform:uppercase; letter-spacing:.05em; user-select:none;
+}
+details.spoiler summary::-webkit-details-marker{ display:none; }
+details.spoiler summary:before{ content:'▸ '; }
+details.spoiler[open] summary:before{ content:'▾ '; }
+details.spoiler .spoilerbody{
+  padding:2px 13px 12px; font-size:14px; color:var(--ink-dim); font-style:italic; line-height:1.55;
+}
+
+.unitroster{ list-style:none; padding:0; margin:0 0 8px; font-size:13.5px; color:var(--ink-dim); }
+.unitroster li{ padding:2px 0; }
+.unitroster b{ color:var(--ink); }
+
+.traitcard, .abilitycard{
+  background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  padding:10px 13px; margin-bottom:9px;
+}
+.abilitycard.used{ opacity:.5; }
+.ab-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; flex-wrap:wrap;}
+.ab-name{ font-family:'Cinzel',serif; font-size:14.5px; color:var(--ink); }
+.ab-timing{
+  font-family:'Inter',sans-serif; font-size:10px; text-transform:uppercase; letter-spacing:.04em;
+  color:var(--gold-dim); border:1px solid var(--line); border-radius:5px; padding:1px 6px; white-space:nowrap;
+}
+.ab-body{ font-size:14px; color:var(--ink-dim); margin-top:5px; }
+.lbl2{ font-family:'Inter',sans-serif; font-size:10px; text-transform:uppercase; color:var(--gold); margin-right:4px; }
+.lbl2:after{ content:':'; }
+.ab-foot{ margin-top:7px; display:flex; gap:8px; align-items:center; }
+.usedtag{ font-family:'Inter',sans-serif; font-size:11px; color:var(--blood); }
+
+.choiceblock{ background:var(--panel); border:1px dashed var(--line); border-radius:10px; padding:11px 13px; margin-bottom:9px;}
+.choiceblock .cb-empty{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+.choiceblock .cb-empty span{ font-size:13.5px; color:var(--ink-faint); font-style:italic;}
+
+.statstrip{ display:flex; gap:8px; margin:8px 0 10px; flex-wrap:wrap; }
+.statbox{
+  flex:1; min-width:64px; text-align:center; background:var(--panel);
+  border:1px solid var(--line); border-radius:8px; padding:6px 4px;
+}
+.statbox .sv{ font-family:'Cinzel',serif; font-weight:700; font-size:16px; color:var(--ink); }
+.statbox .sl{ font-family:'Inter',sans-serif; font-size:9px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-faint); }
+
+.kwrow{ margin-bottom:8px; }
+.kwchip{
+  display:inline-block; font-family:'Inter',sans-serif; font-size:10px; color:var(--ink-dim);
+  border:1px solid var(--line); border-radius:12px; padding:2px 9px; margin:0 5px 5px 0;
+}
+
+table.wtable{ width:100%; border-collapse:collapse; margin:6px 0 10px; font-size:12.5px; }
+table.wtable th, table.wtable td{ border:1px solid var(--line); padding:4px 6px; text-align:left; }
+table.wtable th{ background:var(--bg2); color:var(--gold); font-family:'Inter',sans-serif; font-weight:600; font-size:10.5px; text-transform:uppercase; letter-spacing:.03em;}
+table.wtable td{ color:var(--ink-dim); }
+table.wtable .wname{ color:var(--ink); }
+
+.unitcard{ background:var(--bg2); border:1px solid var(--line); border-radius:12px; padding:13px 15px; margin-bottom:12px;}
+.unitcard h4{ font-family:'Cinzel',serif; font-size:15.5px; margin:0 0 2px; color:var(--ink);}
+
+.handgrid{ display:flex; flex-direction:column; gap:8px; min-height:56px;}
+.handcard{
+  border:1px solid var(--line); background:var(--panel); border-radius:10px;
+  padding:10px 12px; cursor:pointer; transition:.15s;
+}
+.handcard:hover{ border-color:var(--gold-dim); }
+.handcard.marked{ border-color:var(--blood); background:linear-gradient(180deg, rgba(168,54,74,.12), var(--panel)); }
+.handcard .hc-top{ display:flex; justify-content:space-between; align-items:baseline; gap:8px;}
+.handcard .hc-name{ font-family:'Cinzel',serif; font-size:14px; color:var(--ink);}
+.handcard .hc-mark{ font-family:'Inter',sans-serif; font-size:10.5px; color:var(--blood); opacity:0; }
+.handcard.marked .hc-mark{ opacity:1; }
+.handcard .hc-body{ font-size:13.5px; color:var(--ink-dim); margin-top:5px; display:none;}
+.handcard.open .hc-body{ display:block; }
+.handcard .hc-tac, .handcard .hc-cmd{ margin-bottom:4px; }
+.handcard .lbl{ font-family:'Inter',sans-serif; font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--gold); margin-right:4px;}
+.handcard .lbl:after{ content:':'; }
+
+.hiddenhand{
+  display:flex; gap:8px; justify-content:center; padding:14px 0;
+}
+.cardback-mini{
+  width:54px; height:76px; border-radius:7px; border:1.5px solid var(--line);
+  background:repeating-linear-gradient(135deg, rgba(201,164,77,.07) 0 8px, transparent 8px 16px), var(--panel);
+  display:flex; align-items:center; justify-content:center; color:var(--gold-dim); font-family:'Cinzel',serif; font-size:16px;
+}
+
+.playerbtns{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+
+/* ---------------- modal ---------------- */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(10,9,13,.72); backdrop-filter:blur(2px);
+  display:none; align-items:flex-start; justify-content:center; z-index:200; padding:5vh 14px;
+  overflow-y:auto;
+}
+.modal-overlay.show{ display:flex; }
+.modal-box{
+  background:var(--panel); border:1px solid var(--gold-dim); border-radius:14px;
+  max-width:640px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,.6); margin-bottom:5vh;
+}
+.modal-head{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 18px; border-bottom:1px solid var(--line);
+}
+.modal-head span{ font-family:'Cinzel',serif; font-size:16px; color:var(--gold); }
+.modal-head button{ padding:4px 10px; }
+.modal-body{ padding:16px 18px; max-height:70vh; overflow-y:auto; }
+.modal-opt{
+  background:var(--panel2); border:1px solid var(--line); border-radius:10px;
+  padding:12px 14px; margin-bottom:10px;
+}
+.modal-opt .mo-name{ font-family:'Cinzel',serif; font-size:15px; color:var(--ink); }
+.modal-opt .mo-body{ font-size:13.5px; color:var(--ink-dim); margin:5px 0 9px; }
+.modal-opt button{ width:100%; }
+
+/* ---------------- footer ---------------- */
+.footnote{
+  margin-top:42px; padding-top:18px; border-top:1px solid var(--line);
+  font-size:13px; color:var(--ink-faint); line-height:1.6;
+}
+.footnote b{ color:var(--ink-dim); }
+.footnote .sources{margin-top:8px;}
+.footnote a{color:var(--gold-dim); text-decoration:underline;}
+
+.toast{
+  position:fixed; bottom:18px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--panel2); border:1px solid var(--gold-dim); color:var(--ink);
+  padding:9px 18px; border-radius:30px; font-family:'Inter',sans-serif; font-size:13px;
+  opacity:0; pointer-events:none; transition:.3s; z-index:90;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ---------------- import panel ---------------- */
+.importpanel{
+  background:var(--panel2); border:1px dashed var(--line); border-radius:12px;
+  padding:14px 16px; margin-top:14px;
+}
+.importpanel h4{ margin:0 0 8px; font-size:13.5px; font-family:'Cinzel',serif; color:var(--ink); }
+.importpanel .ihint{ font-size:12.5px; color:var(--ink-faint); margin:0 0 10px; line-height:1.5; }
+.importrow{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
+.importrow input[type=password], .importrow input[type=text]{
+  flex:1; min-width:180px; background:var(--panel); border:1px solid var(--line); color:var(--ink);
+  border-radius:8px; padding:7px 10px; font-family:'Inter',sans-serif; font-size:13px;
+}
+.importrow input[type=file]{
+  flex:1; min-width:180px; font-family:'Inter',sans-serif; font-size:12.5px; color:var(--ink-dim);
+}
+.importstatus{
+  font-family:'Inter',sans-serif; font-size:12.5px; color:var(--ink-dim); margin-top:6px;
+  display:flex; align-items:center; gap:8px;
+}
+.importstatus.err{ color:var(--blood); }
+.importstatus.ok{ color:var(--gold); }
+.spinner{
+  width:13px; height:13px; border-radius:50%; border:2px solid var(--line); border-top-color:var(--gold);
+  animation:spin .8s linear infinite; display:inline-block;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.importedlist{ margin-top:10px; display:flex; flex-direction:column; gap:6px; }
+.importeditem{
+  display:flex; justify-content:space-between; align-items:center; gap:8px;
+  background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 10px;
+  font-family:'Inter',sans-serif; font-size:12.5px; color:var(--ink-dim);
+}
+
+::-webkit-scrollbar{ width:8px; height:8px;}
+::-webkit-scrollbar-thumb{ background:var(--line); border-radius:8px;}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">Warhammer Age of Sigmar · Spearhead</div>
+  <h1>SAND &amp; BONE</h1>
+  <div class="sub">Генератор сражений: армии, карты твистов, карты тактик, раунды и очки — для игры на терейне Realm of Death.</div>
+</div>
+
+<div class="stickybar">
+  <div class="stickyrow">
+    <div class="roundtrack ui" id="roundtrack"></div>
+    <div class="vprow">
+      <div class="vpbox">
+        <span class="vpname">И1</span>
+        <button class="vpbtn" onclick="changeVP('p1',-1)">−</button>
+        <span class="vpval" id="vp-p1">0</span>
+        <button class="vpbtn" onclick="changeVP('p1',1)">+</button>
+      </div>
+      <div class="vpbox">
+        <span class="vpname">И2</span>
+        <button class="vpbtn" onclick="changeVP('p2',-1)">−</button>
+        <span class="vpval" id="vp-p2">0</span>
+        <button class="vpbtn" onclick="changeVP('p2',1)">+</button>
+      </div>
+      <span class="underdogtag" id="underdogtag">ничья по очкам</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="block">
+    <div class="blocktitle"><span class="num">I.</span><h2>Подготовка</h2></div>
+    <p class="blockdesc">Сторона поля и базовые шаги перед битвой. Выбор стороны определяет, какую колоду твистов тянуть, и информацию по объектам.</p>
+    <div class="panel">
+
+      <div class="sidepicker">
+        <div class="sidebtn ossia" id="btn-ossia" onclick="selectSide('ossia')">
+          <span class="nm">OSSIA · Песок</span>
+          <span class="desc">Фиолетовая сторона. 4 объекта по 5", ближе к центру стола. С патча окт. 2025 — Crypt of Blood ставится в центре поля при игре на этой стороне.</span>
+        </div>
+        <div class="sidebtn dolorum" id="btn-dolorum" onclick="selectSide('dolorum')">
+          <span class="nm">DOLORUM · Кости</span>
+          <span class="desc">Тёмно-зелёная сторона. 5 объектов: центральный — 7", остальные четыре — по 5".</span>
+        </div>
+      </div>
+
+      <div class="infogrid">
+        <div class="infocard">
+          <h3>Шаги перед битвой</h3>
+          <ol class="steps">
+            <li>Ролл-офф → победитель выбирает <b>атакующего/защищающегося</b></li>
+            <li>Атакующий выбирает способность отряда и улучшение, затем защищающийся</li>
+            <li>Защищающийся выбирает сторону — <b>Ossia или Dolorum</b></li>
+            <li>Защищающийся выбирает карту развёртывания и территорию</li>
+            <li>Местность: сначала защищающийся ставит 1 большой + 1 малый элемент (здесь всё — стены/ограды), затем атакующий</li>
+          </ol>
+          <div style="margin-top:10px;">
+            <button class="ui" onclick="rollOff()">🎲 Бросить ролл-офф</button>
+            <span id="rolloffResult" class="ui" style="margin-left:8px; color:var(--gold); font-size:13px;"></span>
+          </div>
+        </div>
+        <div class="infocard" id="terrainInfo">
+          <h3>Особая местность стороны</h3>
+          <p id="terrainInfoText"></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="blocktitle"><span class="num">II.</span><h2>Карта твиста</h2></div>
+    <p class="blockdesc">Колода твистов общая и открытая — одна карта тянется в начале <b>каждого</b> раунда и действует сразу для обоих игроков. Это часть правил, секретности здесь нет.</p>
+    <div class="panel">
+      <div class="twistarea">
+        <div class="twistdraw">
+          <div class="cardstage">
+            <div class="flipcard" id="twistFlip">
+              <div class="face back">
+                <div class="seal">✦</div>
+                <div class="bk-label">Twist — <span id="twistSideLabel">Ossia</span></div>
+              </div>
+              <div class="face front" id="twistFront"></div>
+            </div>
+          </div>
+          <div class="twistbtnrow">
+            <button class="primary" onclick="drawTwist()">Тянуть карту твиста</button>
+            <button class="ghost small" onclick="reshuffleTwist()">↻ Перетасовать колоду</button>
+          </div>
+        </div>
+        <div class="twistlog">
+          <div style="font-family:'Inter',sans-serif; font-size:11.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px;">История раунда</div>
+          <ul class="loglist" id="twistLog"><li class="empty">Карты ещё не тянули</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="blocktitle"><span class="num">III.</span><h2>Моя армия</h2></div>
+    <p class="blockdesc">Эта страница открыта на устройстве одного игрока — выберите свою армию, и появятся её юниты, способности и улучшения. Способность отряда и улучшение генерала выбираются через окно выбора (можно прочитать все варианты, прежде чем решить). Карты тактик — ваша личная скрытая рука; у соперника на его экране — своя. Новые армии можно добавить, загрузив официальный PDF Spearhead-варскролла на английском — он импортируется через Claude API.</p>
+    <div class="panel">
+      <div class="sidepicker" id="armypicker-p1"></div>
+
+      <div class="importpanel">
+        <h4>Добавить армию из PDF</h4>
+        <p class="ihint">Загрузите официальный PDF Spearhead-варскролла (на английском). Текст будет извлечён в браузере и отправлен в Claude API для распознавания структуры армии. Ключ API хранится только в этом браузере (localStorage) и используется напрямую для запроса к api.anthropic.com — мы его никуда больше не передаём.</p>
+        <div class="importrow">
+          <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-... (ваш Claude API ключ)">
+          <button class="small ghost" onclick="forgetApiKey()">Забыть ключ</button>
+        </div>
+        <div class="importrow">
+          <input type="file" id="pdfFileInput" accept="application/pdf">
+          <button class="primary small" onclick="importArmyFromPdf()" id="importBtn">Импортировать армию</button>
+        </div>
+        <div class="importstatus" id="importStatus"></div>
+        <div class="importedlist" id="importedList"></div>
+      </div>
+
+      <div id="armycontent-p1"></div>
+
+      <hr class="divider">
+
+      <div class="playerhead">
+        <span class="ui" style="font-size:12.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em;">Рука карт тактик</span>
+        <span class="deckcount ui" id="deckcount-p1">колода: —</span>
+      </div>
+      <div id="handzone-p1"></div>
+      <div class="playerbtns">
+        <button class="primary small" onclick="startHand('p1')">Начать / перетасовать</button>
+        <button class="small" onclick="toggleReveal('p1')" id="revealbtn-p1">Показать руку</button>
+        <button class="ghost small" onclick="discardAndDraw('p1')">Сбросить отмеченные → добрать</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="footnote">
+    <p><b>Откуда данные.</b> Карты твистов/тактик пересказаны (не дословно) по фотографиям ваших карточек и обзору на tabletopbattles.com. Базовые армии «Кузнецы Хашута» и «Рабы Тьмы» пересказаны по официальным PDF Spearhead-варскроллов. Дополнительные армии, добавленные через импорт PDF, распознаются автоматически через Claude API на основе официальных варскроллов пользователя — также пересказ, не дословная копия. Сведения об объектах, особой местности и правке от октября 2025 — по статьям Warhammer Community и battleclash.com. Точный текст способности «Icon of Nulahmia» в открытых источниках найти не удалось.</p>
+    <p>Сопоставление карт «Dais of Blood» / «Dais of the Necropolis» с конкретными терейн-моделями (Crypt of Blood / Icon of Nulahmia) в источниках явно не подтверждено — на столе ориентируйтесь на то, какая мистическая местность у вас стоит.</p>
+    <div class="sources">Источники: tabletopbattles.com (обзор Sand &amp; Bone) · warhammer-community.com · battleclash.com (эррата) · официальные PDF-варскроллы Spearhead</div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box">
+    <div class="modal-head"><span id="modalTitle"></span><button onclick="closeModal()">✕ Закрыть</button></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============== TWIST / TACTIC DATA (Sand & Bone) ============== */
+
+const TWISTS = {
+  ossia: [
+    { name:"Воля Некрополиса", effect:`Аутсайдер выбирает один из двух эффектов (нет аутсайдера — переброс, победитель выбирает):`,
+      opts:[
+        "«Гибкая оборона» — выбрать свой юнит; до конца раунда игнорировать все модификаторы его спасброска, и плюсы, и минусы.",
+        "«Сломленная воля» — выбрать вражеский юнит; до конца раунда его контроль не может быть выше 1."
+      ]},
+    { name:"Бескомпромиссное вторжение", effect:`Каждый игрок получает +1 PV в конце хода за каждый объект вне своей территории, который он контролирует и который не оспаривается врагом.<br><br>Если есть аутсайдер — он выбирает свой юнит и бросает D6, прибавляя результат к его контролю до конца раунда.` },
+    { name:"Дисциплинированное завоевание", effect:`Аутсайдер выбирает 2 объекта (нет аутсайдера — каждый игрок выбирает по 1, начиная с активного).<br><br>Каждый игрок получает +2 PV в конце хода, если контролирует оба выбранных объекта.` },
+    { name:"Согласованный обстрел", effect:`Аутсайдер выбирает объект (нет аутсайдера — переброс, победитель выбирает).<br><br>До конца раунда −1 к попаданию для вражеских юнитов, пока они оспаривают этот объект.` },
+    { name:"Налаженные линии снабжения", effect:`Аутсайдер выбирает 2 элемента местности (нет аутсайдера — каждый игрок выбирает себе разный элемент).<br><br>Каждый игрок получает +1 PV в конце хода, если контролирует свой выбранный элемент.<br><br>Также аутсайдер выбирает свой юнит — пока он оспаривает один из выбранных элементов, до конца раунда у него Ward (5+).` },
+    { name:"Несокрушимые редуты", effect:`Аутсайдер выбирает один из двух эффектов (нет аутсайдера — переброс):`,
+      opts:[
+        "«Точный удар» — выбрать свой юнит; пока он целиком на своей территории, до конца раунда у него Strike-first.",
+        "«Раскол в рядах» — выбрать вражеский юнит; пока он целиком на своей территории, до конца раунда у него Strike-last."
+      ]},
+  ],
+  dolorum: [
+    { name:"Зачарованный очаг", effect:`Аутсайдер выставляет местность «Икона Нулахмии» (нет аутсайдера — переброс, победитель выставляет): в любом месте поля, дальше 3" от другой местности, дальше 3" от всех юнитов, не касаясь объектов.<div class="note">Этот твист — единственный способ ввести «Икону Нулахмии» в игру на стороне Dolorum.</div>` },
+    { name:"Подавляющее горе", effect:`Аутсайдер выбирает объект (нет аутсайдера — переброс). В этом раунде объект никем не контролируется и не может перейти под контроль.` },
+    { name:"Дикая скорбь", effect:`Каждый игрок получает +1 PV в конце хода за каждый свой юнит, находящийся в бою с врагом.<br><br>Если есть аутсайдер — в конце его хода, если у него больше уничтоженных юнитов, чем у врага, +1 доп. PV.` },
+    { name:"Скорбь выживших", effect:`Каждый игрок получает +1 PV в конце хода за каждый юнит из своей изначальной армии, уничтоженный или заменённый за партию (сами юниты-замены не считаются).<br><br>Аутсайдер выбирает свой юнит (нет аутсайдера — переброс): этот юнит может зачарджить в этом ходу, даже если уже отступал или бежал.<div class="note">Эффект очков дан в версии правки октября 2025.</div>` },
+    { name:"Прогони свои страхи", effect:`Каждый игрок получает +1 PV в конце хода за каждый объект, который контролирует, но который в начале его хода контролировал соперник.<br><br>Если есть аутсайдер — выбрать свой юнит; до конца раунда его оружие ближнего боя получает Anti-charge (+1 Rend).` },
+    { name:"Темнеющие небеса", effect:`Аутсайдер выбирает объект (нет аутсайдера — переброс).<br><br>До конца раунда объект считается оспариваемым юнитом выбравшего игрока с фиксированным контролем 1 (модификаторы не действуют).<div class="note">Если объект также оспаривают вражеские юниты — чтобы удержать контроль в конце хода, нужен контроль выше их.</div>` },
+  ]
+};
+
+const TACTICS = [
+  { name:"Мрачное освящение",
+    tactic:`Выполняется в конце хода, если вы контролируете объект не целиком на своей территории (кроме Дайса Крови и Дайса Некрополиса).`,
+    cmdTitle:"Последний вздох", cmdTiming:"Ваша фаза героев",
+    cmd:`Выбрать свой уничтоженный и ещё не заменённый юнит. Выставить замену: либо юнит с суммарным Health до 4, либо одну модель с уже накопленным уроном (Health минус 4). Дальше 6" от всех врагов.` },
+  { name:"Атака с двух сторон",
+    tactic:`Выполняется в конце хода, если вы контролируете 2 объекта, которые в начале хода контролировал соперник.`,
+    cmdTitle:"Полупрозрачная плоть", cmdTiming:"Реакция: соперник объявил способность атаки",
+    cmd:`Юнит, выбранный целью этой атаки — до конца фазы все попадания и ранения по нему с результатом 1–3 проваливаются.` },
+  { name:"Война на истощение",
+    tactic:`Выполняется в конце хода, если в этот ход были уничтожены вражеские юниты, и их уничтожено больше, чем своих.`,
+    cmdTitle:"Скорость смерти", cmdTiming:"Конец любого хода",
+    cmd:`Выбрать свой юнит в бою. Убрать его с поля и выставить заново дальше 6" от всех врагов.` },
+  { name:"Опустошённые земли",
+    tactic:`Выполняется в конце хода, если ваш юнит дрался (Fight) в этот ход и при этом не оспаривает объект, оставаясь на поле.`,
+    cmdTitle:"Аура конца", cmdTiming:"Ваша фаза героев",
+    cmd:`Выбрать своего Героя, оспаривающего объект, затем каждого вражеского юнита, оспаривающего тот же объект. Бросить кость за каждого — на 4+ нанести 2 урона по телу.` },
+  { name:"Взять без боя",
+    tactic:`Выполняется в конце хода, если вы получили контроль над объектом, который в начале хода контролировал соперник, и никто из оспаривавших его юнитов не дрался в этот ход.`,
+    cmdTitle:"Монумент живой кости", cmdTiming:"Любая фаза героев",
+    cmd:`Выбрать элемент местности на своей территории — он также считается объектом.` },
+  { name:"Дайс Крови",
+    tactic:`Выполняется в конце хода, если вы контролируете Дайс Крови.`,
+    cmdTitle:"Жажда крови", cmdTiming:"Вражеская фаза боя",
+    cmd:`Выбрать свой юнит: +1 к Attacks оружия ближнего боя до конца раунда. Но контроль юнита не может быть выше 1 до конца раунда.` },
+  { name:"Хватка смерти",
+    tactic:`Выполняется в конце хода, если вы контролируете 2 объекта не целиком на своей территории.`,
+    cmdTitle:"Перестроить ряды", cmdTiming:"Вражеская фаза движения",
+    cmd:`Выбрать свой юнит. В бою — может использовать Retreat как в вашу фазу движения. Не в бою и без урона — бросить кость за каждую погибшую модель, на 5+ вернуть её. С уроном — бросить кость за каждое очко урона, на 5+ снять 1 (Heal 1).` },
+  { name:"Набег",
+    tactic:`Выполняется в конце хода, если ваши юниты целиком на территории врага и не в бою.`,
+    cmdTitle:"Устрашающий натиск", cmdTiming:"Любая фаза чарджа",
+    cmd:`Выбрать свой юнит в бою и вражеский юнит, с которым он бьётся. Бросить кость, вычесть результат из контроля врага до конца хода.` },
+  { name:"Две могилы",
+    tactic:`Выполняется в конце хода, если в этот ход погибли модели и на своей, и на территории врага.`,
+    cmdTitle:"Контратака", cmdTiming:"Вражеская фаза чарджа",
+    cmd:`Выбрать свой юнит не в бою — он может зачарджить как в вашу фазу чарджа.` },
+  { name:"Держать позицию",
+    tactic:`Выполняется в конце хода, если вы контролируете большой элемент местности на своей территории.`,
+    cmdTitle:"Отчаянный рывок", cmdTiming:"Любая фаза боя",
+    cmd:`Выбрать свой юнит в бою — он может сдвинуться на 3", в том числе входя в бой.` },
+  { name:"Выжечь дотла",
+    tactic:`Выполняется в конце хода, если ваши юниты в 3" от дальнего края поля на территории врага.`,
+    cmdTitle:"Решительный натиск", cmdTiming:"Любая фаза чарджа",
+    cmd:`Выбрать свой юнит не в бою — добавить D3 к броску чарджа до конца хода.` },
+  { name:"Дайс Некрополиса",
+    tactic:`Выполняется в конце хода, если вы контролируете Дайс Некрополиса.`,
+    cmdTitle:"Перемолоть в пыль", cmdTiming:"Любая фаза боя",
+    cmd:`Выбрать свой юнит — может использовать Fight дважды за эту фазу. После первого раза получает D3 урона по телу и Strike-last до конца хода.` },
+];
+
+const TERRAIN_INFO = {
+  ossia: `<b>Crypt of Blood</b> (статуя/гробница) — по правке окт. 2025 теперь всегда ставится в центре поля при игре на Ossia, независимо от карты развёртывания.<br><br>
+  <i>Кровавый дар</i> (любая фаза боя): выбрать свой юнит в 6" от Crypt of Blood. Бросить кубик (+1, если вы аутсайдер). На 4+ — этот юнит получает +1 к попаданию в бою до конца хода. Иначе — D3 урона по телу.`,
+  dolorum: `<b>Icon of Nulahmia</b> (статуя) появляется на столе только если выпадет твист «Зачарованный очаг» — тогда аутсайдер (или победитель переброса) ставит её в любом месте поля.<br><br>
+  Точный текст её способности в открытых источниках не найден <span class="flag">не подтверждено</span>. Известно только, что механика похожа на «Кровавый дар» (риск/выгода раз за ход) и связана с бонусом к попаданию или контролю.`
+};
+
+/* ============== GENERIC STATE ============== */
+let state = {
+  side: 'ossia',
+  round: 1,
+  vp: { p1:0, p2:0 },
+  twistDeck: [],
+  twistLog: [],
+  players: {
+    p1: { deck:[], hand:[], revealed:false, started:false },
+    p2: { deck:[], hand:[], revealed:false, started:false }
+  }
+};
+
+function shuffled(n){
+  const arr = Array.from({length:n}, (_,i)=>i);
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>t.classList.remove('show'), 1900);
+}
+
+/* ============== ROUND TRACK ============== */
+function renderRoundTrack(){
+  const el = document.getElementById('roundtrack');
+  el.innerHTML = '';
+  for(let i=1;i<=4;i++){
+    const node = document.createElement('div');
+    node.className = 'roundnode' + (i===state.round?' active':'') + (i<state.round?' done':'');
+    node.textContent = i;
+    el.appendChild(node);
+    if(i<4){
+      const line = document.createElement('div');
+      line.className = 'roundline';
+      el.appendChild(line);
+    }
+  }
+  const prev = document.createElement('button');
+  prev.className='small ghost'; prev.textContent='‹';
+  prev.onclick = ()=>{ if(state.round>1){ state.round--; renderRoundTrack(); } };
+  const next = document.createElement('button');
+  next.className='small ghost'; next.textContent='›';
+  next.onclick = ()=>{ if(state.round<4){ state.round++; renderRoundTrack(); toast('Раунд '+state.round+' — потяните твист и доберите тактики'); } else { toast('Это последний, 4-й раунд'); } };
+  el.appendChild(prev); el.appendChild(next);
+}
+
+/* ============== VP ============== */
+function changeVP(p, d){
+  state.vp[p] = Math.max(0, state.vp[p]+d);
+  document.getElementById('vp-'+p).textContent = state.vp[p];
+  const tag = document.getElementById('underdogtag');
+  if(state.vp.p1 === state.vp.p2){ tag.textContent = 'ничья по очкам — аутсайдера нет'; }
+  else{
+    const who = state.vp.p1 < state.vp.p2 ? 'Игрок 1' : 'Игрок 2';
+    tag.textContent = 'аутсайдер: ' + who;
+  }
+}
+
+/* ============== SETUP / SIDE ============== */
+function selectSide(side){
+  state.side = side;
+  document.getElementById('btn-ossia').classList.toggle('sel', side==='ossia');
+  document.getElementById('btn-dolorum').classList.toggle('sel', side==='dolorum');
+  document.getElementById('twistSideLabel').textContent = side==='ossia' ? 'Ossia' : 'Dolorum';
+  document.getElementById('terrainInfoText').innerHTML = TERRAIN_INFO[side];
+  reshuffleTwist();
+}
+
+function rollOff(){
+  const a = 1+Math.floor(Math.random()*6);
+  const b = 1+Math.floor(Math.random()*6);
+  let txt;
+  if(a===b){ txt = `Ничья (${a}:${b}) — переброс!`; }
+  else{
+    const winner = a>b ? 'Игрок 1' : 'Игрок 2';
+    txt = `${a} : ${b} → ${winner} выбирает, кто атакующий`;
+  }
+  document.getElementById('rolloffResult').textContent = txt;
+}
+
+/* ============== TWIST ============== */
+function reshuffleTwist(){
+  state.twistDeck = shuffled(TWISTS[state.side].length);
+  state.twistLog = [];
+  renderTwistLog();
+  const flip = document.getElementById('twistFlip');
+  flip.classList.remove('flipped');
+  toast('Колода твистов «'+(state.side==='ossia'?'Ossia':'Dolorum')+'» перетасована');
+}
+
+function drawTwist(){
+  if(state.twistDeck.length === 0){
+    state.twistDeck = shuffled(TWISTS[state.side].length);
+    toast('Колода кончилась — перетасована заново');
+  }
+  const idx = state.twistDeck.pop();
+  const card = TWISTS[state.side][idx];
+
+  const front = document.getElementById('twistFront');
+  let html = `<div class="cardseal">${state.side==='ossia'?'Ossia':'Dolorum'} Twist</div>
+              <div class="cardname">${card.name}</div>
+              <div class="cardeffect">${card.effect}</div>`;
+  if(card.opts){
+    html += '<ul class="opt">' + card.opts.map(o=>`<li>${o}</li>`).join('') + '</ul>';
+  }
+  front.innerHTML = html;
+
+  const flip = document.getElementById('twistFlip');
+  flip.classList.remove('flipped');
+  void flip.offsetWidth;
+  flip.classList.add('flipped');
+
+  state.twistLog.unshift({round:state.round, name:card.name});
+  renderTwistLog();
+}
+
+function renderTwistLog(){
+  const el = document.getElementById('twistLog');
+  if(state.twistLog.length===0){
+    el.innerHTML = '<li class="empty">Карты ещё не тянули</li>';
+    return;
+  }
+  el.innerHTML = state.twistLog.map(e=>`<li><span class="lr">Р${e.round}</span>${e.name}</li>`).join('');
+}
+
+/* ============== ARMY LOADING (builtin armies.json + localStorage imports) ============== */
+
+const ARMIES_JSON_PATH = 'armies.json';
+const LS_IMPORTED_KEY = 'sb_imported_armies_v1';
+const LS_API_KEY = 'sb_claude_api_key_v1';
+
+let ARMIES = {};
+function getArmiesDebug(){ return ARMIES; }
+
+const ACCENT_PALETTE = [
+  '#7fb3d5', '#8fbf7f', '#d49a5a', '#c97fb0',
+  '#7fd4c4', '#d4c25a', '#a98fd4', '#d47f7f'
+];
+
+function colorForKey(key){
+  let h = 0;
+  for(let i=0;i<key.length;i++){ h = (h*31 + key.charCodeAt(i)) >>> 0; }
+  return ACCENT_PALETTE[h % ACCENT_PALETTE.length];
+}
+
+function softenHex(hex, alpha){
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function getImportedArmies(){
+  try{
+    const raw = localStorage.getItem(LS_IMPORTED_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+
+function saveImportedArmies(obj){
+  localStorage.setItem(LS_IMPORTED_KEY, JSON.stringify(obj));
+}
+
+async function loadArmies(){
+  let builtin = {};
+  let loadFailed = false;
+  try{
+    const resp = await fetch(ARMIES_JSON_PATH, {cache:'no-store'});
+    if(resp.ok){ builtin = await resp.json(); }
+    else{ loadFailed = true; }
+  }catch(e){
+    loadFailed = true;
+    console.warn('Не удалось загрузить armies.json (вероятно, открыт через file:// — используйте локальный сервер или GitHub Pages)', e);
+  }
+  if(loadFailed){
+    toast('Не удалось загрузить armies.json — откройте страницу через локальный сервер или GitHub Pages, не двойным кликом по файлу');
+  }
+  const imported = getImportedArmies();
+  ARMIES = Object.assign({}, builtin, imported);
+}
+
+function armyAccent(army){
+  if(army.source === 'builtin' && army.sideClass === 'hashut') return null;
+  if(army.source === 'builtin' && army.sideClass === 'slaves') return null;
+  return colorForKey(army.key);
+}
+
+/* ============== GENERIC STATE (army part) ============== */
+let armyState = {
+  p1: { armyKey:null, regimentId:null, enhancementId:null, used:{} }
+};
+
+function abilityFullId(p, scope, id){
+  return p+'__'+armyState[p].armyKey+'__'+scope+'__'+id;
+}
+function isUsed(p, scope, id){
+  return !!armyState[p].used[abilityFullId(p,scope,id)];
+}
+function toggleUsed(p, scope, id){
+  const full = abilityFullId(p,scope,id);
+  armyState[p].used[full] = !armyState[p].used[full];
+  renderArmyContent(p);
+}
+function resetTurnFlags(p){
+  const ast = armyState[p];
+  if(!ast.armyKey) return;
+  const army = ARMIES[ast.armyKey];
+  const clearIfResets = (scope, ability)=>{
+    if(ability.limited && ability.resetsEachTurn){
+      delete ast.used[abilityFullId(p,scope,ability.id)];
+    }
+  };
+  clearIfResets('trait', army.battleTrait);
+  army.regiment.forEach(r=>clearIfResets('regiment', r));
+  army.enhancements.forEach(e=>clearIfResets('enh', e));
+  army.units.forEach(u=>(u.abilities||[]).forEach(a=>clearIfResets('unit_'+u.key, a)));
+  renderArmyContent(p);
+  toast((p==='p1'?'Игрок 1':'Игрок 2')+': отметки «раз за ход» сброшены');
+}
+
+function renderArmyPicker(p){
+  const el = document.getElementById('armypicker-'+p);
+  const cur = armyState[p].armyKey;
+  const keys = Object.keys(ARMIES);
+  el.innerHTML = keys.map(key=>{
+    const army = ARMIES[key];
+    const accent = armyAccent(army);
+    const cls = accent ? 'dynamic' : army.sideClass;
+    const style = accent ? `style="--army-accent:${accent}; --army-accent-soft:${softenHex(accent,.18)};"` : '';
+    const tag = army.source === 'imported' ? '<span class="importedtag">импорт</span>' : '';
+    return `<div class="sidebtn ${cls}${cur===key?' sel':''}" ${style} onclick="pickArmy('${p}','${key}')">
+      <span class="nm">${army.label}${tag}</span>
+      <span class="desc">${army.subtitle||''}</span>
+    </div>`;
+  }).join('');
+}
+
+function pickArmy(p, key){
+  if(armyState[p].armyKey === key) return;
+  armyState[p].armyKey = key;
+  armyState[p].regimentId = null;
+  armyState[p].enhancementId = null;
+  renderArmyPicker(p);
+  renderArmyContent(p);
+  toast((p==='p1'?'Игрок 1':'Игрок 2')+' выбрал армию: '+ARMIES[key].label);
+}
+
+function resetArmy(p){
+  armyState[p] = { armyKey:null, regimentId:null, enhancementId:null, used:{} };
+  renderArmyPicker(p);
+  renderArmyContent(p);
+}
+
+function openChoiceModal(p, kind){
+  const army = ARMIES[armyState[p].armyKey];
+  const list = kind === 'regiment' ? army.regiment : army.enhancements;
+  const title = kind === 'regiment' ? 'Способность отряда — выберите одну' : 'Улучшение генерала — выберите одно';
+  let html = '';
+  list.forEach(opt=>{
+    let body = '';
+    if(opt.declare){ body += `<div><span class="lbl2">Объявить</span>${opt.declare}</div>`; }
+    body += `<div><span class="lbl2">Эффект</span>${opt.effect}</div>`;
+    html += `<div class="modal-opt">
+      <div class="ab-top"><span class="mo-name">${opt.name}</span><span class="ab-timing">${opt.timing}</span></div>
+      <div class="mo-body">${body}</div>
+      <button class="primary" onclick="chooseOption('${p}','${kind}','${opt.id}')">Выбрать эту</button>
+    </div>`;
+  });
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+function chooseOption(p, kind, optId){
+  if(kind==='regiment'){ armyState[p].regimentId = optId; }
+  else{ armyState[p].enhancementId = optId; }
+  closeModal();
+  renderArmyContent(p);
+  toast('Выбор сохранён');
+}
+
+function renderAbilityCard(p, scope, ability){
+  const used = ability.limited ? isUsed(p,scope,ability.id) : false;
+  let body = '';
+  if(ability.declare){ body += `<div><span class="lbl2">Объявить</span>${ability.declare}</div>`; }
+  body += `<div><span class="lbl2">Эффект</span>${ability.effect}</div>`;
+  if(ability.note){ body += `<div style="margin-top:6px; font-size:12.5px; color:var(--ink-faint); font-style:italic;">${ability.note}</div>`; }
+  if(ability.table){
+    body += `<table class="wtable" style="margin-top:8px;"><tr><th>D6</th><th>Эффект</th></tr>` +
+      ability.table.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('') + `</table>`;
+  }
+  let foot = '';
+  if(ability.limited){
+    foot = `<div class="ab-foot">
+      <button class="tiny ${used?'':'primary'}" onclick="toggleUsed('${p}','${scope}','${ability.id}')">${used?'↺ Сбросить':'Отметить использованной'}</button>
+      ${used?'<span class="usedtag">использовано</span>':''}
+    </div>`;
+  }
+  return `<div class="abilitycard${used?' used':''}">
+    <div class="ab-top"><span class="ab-name">${ability.name}</span><span class="ab-timing">${ability.timing}</span></div>
+    <div class="ab-body">${body}</div>
+    ${foot}
+  </div>`;
+}
+
+function renderChoiceLocked(p, kind, scope, ability){
+  return `<div>
+    ${renderAbilityCard(p, scope, ability)}
+    <button class="ghost tiny" onclick="openChoiceModal('${p}','${kind}')">Изменить выбор</button>
+  </div>`;
+}
+
+function renderChoiceEmpty(p, kind, label){
+  return `<div class="choiceblock"><div class="cb-empty">
+    <span>${label} ещё не выбрана</span>
+    <button class="primary small" onclick="openChoiceModal('${p}','${kind}')">Выбрать</button>
+  </div></div>`;
+}
+
+function renderUnitCard(p, scope, unit){
+  const statHtml = `<div class="statstrip">
+    <div class="statbox"><div class="sv">${unit.move}</div><div class="sl">Move</div></div>
+    <div class="statbox"><div class="sv">${unit.health}</div><div class="sl">Health</div></div>
+    <div class="statbox"><div class="sv">${unit.save}</div><div class="sl">Save</div></div>
+    <div class="statbox"><div class="sv">${unit.control}</div><div class="sl">Control</div></div>
+  </div>`;
+  const kwHtml = `<div class="kwrow">${(unit.keywords||[]).map(k=>`<span class="kwchip">${k}</span>`).join('')}</div>`;
+
+  const weaponTable = (title, list)=>{
+    if(!list || !list.length) return '';
+    const hasRange = !!list[0].range;
+    return `<table class="wtable">
+      <tr><th>${title}</th>${hasRange?'<th>Range</th>':''}<th>Att</th><th>Hit</th><th>Wound</th><th>Rend</th><th>Dmg</th><th>Ability</th></tr>
+      ${list.map(w=>`<tr><td class="wname">${w.name}</td>${hasRange?`<td>${w.range}</td>`:''}<td>${w.attacks}</td><td>${w.hit}</td><td>${w.wound}</td><td>${w.rend!==undefined?w.rend:'—'}</td><td>${w.damage}</td><td>${w.ability||'—'}</td></tr>`).join('')}
+    </table>`;
+  };
+
+  const abilitiesHtml = (unit.abilities||[]).map(a=>renderAbilityCard(p, scope+'_'+unit.key, a)).join('');
+
+  return `<div class="unitcard">
+    <h4>${unit.name}${unit.isGeneral?' <span class="ab-timing" style="margin-left:6px;">генерал</span>':''}</h4>
+    ${kwHtml}
+    ${statHtml}
+    ${weaponTable('Ranged', unit.ranged)}
+    ${weaponTable('Melee', unit.melee)}
+    ${abilitiesHtml}
+    <details class="spoiler"><summary>Лор юнита</summary><div class="spoilerbody">${unit.lore||''}</div></details>
+  </div>`;
+}
+
+function renderArmyContent(p){
+  const el = document.getElementById('armycontent-'+p);
+  const ast = armyState[p];
+  if(!ast.armyKey){
+    el.innerHTML = `<p style="color:var(--ink-faint); font-style:italic; font-size:14px;">Выберите армию выше, чтобы увидеть её состав, способности и юниты.</p>`;
+    return;
+  }
+  const army = ARMIES[ast.armyKey];
+  const accent = armyAccent(army);
+  const tagCls = accent ? 'dynamic' : army.sideClass;
+  const tagStyle = accent ? `style="--army-accent:${accent};"` : '';
+
+  let html = `<div class="armyhead">
+    <span class="nm">${army.label}</span>
+    <span class="armytag ${tagCls}" ${tagStyle}>${army.subtitle||''}</span>
+  </div>`;
+
+  html += `<ul class="unitroster">
+    <li><b>Генерал:</b> ${army.general}</li>
+    ${(army.unitList||[]).map(u=>`<li>${u}</li>`).join('')}
+  </ul>`;
+
+  if(army.lore){
+    html += `<details class="spoiler"><summary>Лор армии</summary><div class="spoilerbody">${army.lore}</div></details>`;
+  }
+
+  html += `<div style="margin-top:12px; font-family:'Inter',sans-serif; font-size:11.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.06em;">Боевая черта (всегда активна)</div>`;
+  html += renderAbilityCard(p, 'trait', army.battleTrait);
+
+  html += `<div style="margin-top:10px; font-family:'Inter',sans-serif; font-size:11.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.06em;">Способность отряда</div>`;
+  if(ast.regimentId){
+    const chosen = army.regiment.find(r=>r.id===ast.regimentId);
+    html += renderChoiceLocked(p, 'regiment', 'regiment', chosen);
+  }else{
+    html += renderChoiceEmpty(p, 'regiment', 'Способность отряда');
+  }
+
+  html += `<div style="margin-top:10px; font-family:'Inter',sans-serif; font-size:11.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.06em;">Улучшение генерала</div>`;
+  if(ast.enhancementId){
+    const chosen = army.enhancements.find(r=>r.id===ast.enhancementId);
+    html += renderChoiceLocked(p, 'enhancement', 'enh', chosen);
+  }else{
+    html += renderChoiceEmpty(p, 'enhancement', 'Улучшение генерала');
+  }
+
+  html += `<div style="margin-top:12px; font-family:'Inter',sans-serif; font-size:11.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.06em;">Юниты</div>`;
+  html += army.units.map(u=>renderUnitCard(p, 'unit', u)).join('');
+
+  html += `<div style="margin-top:6px; display:flex; gap:8px; flex-wrap:wrap;">
+    <button class="ghost small" onclick="resetTurnFlags('${p}')">Новый ход: сбросить «раз за ход»</button>
+    <button class="ghost small" onclick="resetArmy('${p}')">Сбросить армию игрока</button>
+    ${army.source==='imported' ? `<button class="ghost small" onclick="deleteImportedArmy('${ast.armyKey}')">Удалить эту импортированную армию</button>` : ''}
+  </div>`;
+
+  el.innerHTML = html;
+}
+
+/* ============== PDF IMPORT VIA CLAUDE API ============== */
+
+function setImportStatus(msg, kind){
+  const el = document.getElementById('importStatus');
+  el.className = 'importstatus' + (kind ? ' '+kind : '');
+  el.innerHTML = kind==='busy' ? `<span class="spinner"></span>${msg}` : msg;
+}
+
+function getStoredApiKey(){
+  return localStorage.getItem(LS_API_KEY) || '';
+}
+
+function forgetApiKey(){
+  localStorage.removeItem(LS_API_KEY);
+  document.getElementById('apiKeyInput').value = '';
+  setImportStatus('Ключ забыт.', '');
+}
+
+async function extractPdfText(file){
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+  let text = '';
+  for(let i=1; i<=pdf.numPages; i++){
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(it=>it.str).join(' ') + '\n\n';
+  }
+  return text;
+}
+
+const ARMY_SCHEMA_PROMPT = `Ты помогаешь конвертировать официальный PDF варскролла Warhammer Age of Sigmar: Spearhead в JSON для веб-приложения на русском языке.
+
+Тебе дан сырой текст, извлечённый из PDF (порядок строк может быть нарушен, таблицы могут быть перепутаны — постарайся восстановить логичную структуру по смыслу игровых терминов).
+
+Верни ТОЛЬКО валидный JSON (без markdown, без пояснений, без обратных кавычек) со следующей структурой:
+
+{
+  "key": "короткий_латинский_идентификатор_армии",
+  "label": "Название армии на русском",
+  "subtitle": "Краткий подзаголовок/тип отряда на русском",
+  "lore": "2-3 абзаца лора армии на русском, пересказ своими словами (НЕ дословный перевод/копия из PDF), абзацы разделены <br><br>",
+  "general": "Название юнита-генерала на русском",
+  "unitList": ["1 Название юнита 1", "1 Название юнита 2", "..."],
+  "battleTrait": {
+    "id": "trait",
+    "name": "Название боевой черты на русском",
+    "timing": "Когда применяется (например 'Пассивно' или 'Раз за ход · Ваша фаза героев')",
+    "limited": true_или_false,
+    "resetsEachTurn": true_или_false,
+    "declare": "Текст 'объявить' если есть, иначе не указывать поле",
+    "effect": "Текст эффекта на русском, пересказ своими словами",
+    "note": "Опциональная заметка, если есть",
+    "table": [["1","эффект на 1"],["2","эффект на 2"]] // только если в способности есть таблица броска кубика, иначе не указывать поле
+  },
+  "regiment": [
+    { "id": "уникальный_id", "name": "Название на русском", "timing": "...", "limited": true_или_false, "resetsEachTurn": true_или_false, "declare": "...", "effect": "..." }
+  ],
+  "enhancements": [
+    { "id": "уникальный_id", "name": "Название на русском", "timing": "...", "limited": true_или_false, "resetsEachTurn": true_или_false, "declare": "...", "effect": "..." }
+  ],
+  "units": [
+    {
+      "key": "латинский_ключ_юнита",
+      "name": "Название юнита на русском",
+      "isGeneral": true_только_для_генерала_иначе_не_указывать,
+      "move": "6\\"",
+      "health": число,
+      "save": "3+",
+      "control": число,
+      "keywords": ["Пехота","Герой"],
+      "ranged": [{ "name":"...", "range":"12\\"", "attacks":число_или_строка, "hit":"3+", "wound":"3+", "rend":число_или_строка, "damage":число_или_строка, "ability":"..." }],
+      "melee": [{ "name":"...", "attacks":число_или_строка, "hit":"3+", "wound":"3+", "rend":число_или_строка, "damage":число_или_строка, "ability":"..." }],
+      "abilities": [
+        { "id":"уникальный_id", "name":"...", "timing":"...", "limited":true_или_false, "resetsEachTurn":true_или_false, "declare":"...", "effect":"..." }
+      ],
+      "lore": "Краткий лор юнита на русском, пересказ своими словами"
+    }
+  ]
+}
+
+ВАЖНО:
+- Все игровые ключевые слова и термины (названия оружия/способностей можно переводить, но игровые keyword-механики вроде Strike-first, Ward, Crit (Mortal), Anti-charge — оставляй на английском, как в оригинале)
+- Весь описательный текст — ПЕРЕСКАЗ своими словами на русском, а не дословный перевод и не копирование структуры предложений оригинала
+- Если в PDF нет явного значения rend (ward/save modifier отсутствует) — используй "—"
+- Если поле неприменимо — просто не включай его в объект, не пиши null
+- Структура должна быть точной валидной JSON, готовой к JSON.parse()`;
+
+async function importArmyFromPdf(){
+  const fileInput = document.getElementById('pdfFileInput');
+  const apiKeyInput = document.getElementById('apiKeyInput');
+  const btn = document.getElementById('importBtn');
+
+  const file = fileInput.files[0];
+  if(!file){ setImportStatus('Сначала выберите PDF-файл.', 'err'); return; }
+
+  let apiKey = apiKeyInput.value.trim() || getStoredApiKey();
+  if(!apiKey){ setImportStatus('Введите ваш Claude API ключ.', 'err'); return; }
+  localStorage.setItem(LS_API_KEY, apiKey);
+
+  btn.disabled = true;
+  try{
+    setImportStatus('Извлекаем текст из PDF…', 'busy');
+    const pdfText = await extractPdfText(file);
+    if(!pdfText || pdfText.trim().length < 50){
+      throw new Error('Не удалось извлечь текст из PDF (возможно, это скан-изображение без текстового слоя).');
+    }
+
+    setImportStatus('Отправляем в Claude API на распознавание…', 'busy');
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 8000,
+        system: ARMY_SCHEMA_PROMPT,
+        messages: [
+          { role: 'user', content: 'Вот текст, извлечённый из PDF варскролла:\n\n' + pdfText.slice(0, 60000) }
+        ]
+      })
+    });
+
+    if(!resp.ok){
+      const errBody = await resp.text();
+      throw new Error('Ошибка API ('+resp.status+'): '+errBody.slice(0,300));
+    }
+
+    const data = await resp.json();
+    const textBlock = (data.content||[]).find(b=>b.type==='text');
+    if(!textBlock){ throw new Error('Claude не вернул текстовый ответ.'); }
+
+    let jsonStr = textBlock.text.trim();
+    jsonStr = jsonStr.replace(/^```json\s*/i,'').replace(/^```\s*/,'').replace(/```\s*$/,'');
+
+    let armyObj;
+    try{
+      armyObj = JSON.parse(jsonStr);
+    }catch(e){
+      throw new Error('Claude вернул невалидный JSON. Попробуйте ещё раз или проверьте PDF.');
+    }
+
+    if(!armyObj.key || !armyObj.units){
+      throw new Error('Распознанная структура неполная (нет key или units).');
+    }
+
+    armyObj.source = 'imported';
+    if(!armyObj.sideClass) armyObj.sideClass = 'dynamic';
+
+    const imported = getImportedArmies();
+    imported[armyObj.key] = armyObj;
+    saveImportedArmies(imported);
+    ARMIES[armyObj.key] = armyObj;
+
+    setImportStatus('Армия «'+armyObj.label+'» импортирована и сохранена в этом браузере.', 'ok');
+    renderArmyPicker('p1');
+    renderImportedList();
+    fileInput.value = '';
+  }catch(err){
+    console.error(err);
+    setImportStatus('Ошибка: '+err.message, 'err');
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function deleteImportedArmy(key){
+  const imported = getImportedArmies();
+  delete imported[key];
+  saveImportedArmies(imported);
+  delete ARMIES[key];
+  if(armyState.p1.armyKey === key){ resetArmy('p1'); }
+  renderArmyPicker('p1');
+  renderImportedList();
+  toast('Импортированная армия удалена из этого браузера');
+}
+
+function downloadArmyJson(key){
+  const army = ARMIES[key];
+  const blob = new Blob([JSON.stringify(army, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = key + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function renderImportedList(){
+  const el = document.getElementById('importedList');
+  const imported = getImportedArmies();
+  const keys = Object.keys(imported);
+  if(keys.length === 0){ el.innerHTML = ''; return; }
+  el.innerHTML = keys.map(k=>{
+    const a = imported[k];
+    return `<div class="importeditem">
+      <span>${a.label} <span style="color:var(--ink-faint);">(${k})</span></span>
+      <span style="display:flex; gap:6px;">
+        <button class="tiny ghost" onclick="downloadArmyJson('${k}')">⬇ JSON</button>
+        <button class="tiny ghost" onclick="deleteImportedArmy('${k}')">✕ Удалить</button>
+      </span>
+    </div>`;
+  }).join('');
+}
+/* ============== TACTICS / HANDS ============== */
+function startHand(p){
+  const st = state.players[p];
+  st.deck = shuffled(TACTICS.length);
+  st.hand = [];
+  for(let i=0;i<3;i++){
+    st.hand.push({ idx: st.deck.pop(), marked:false });
+  }
+  st.started = true;
+  st.revealed = false;
+  document.getElementById('revealbtn-'+p).textContent = 'Показать руку';
+  renderHand(p);
+  toast('Игрок '+(p==='p1'?'1':'2')+': новая рука из 3 карт тактик');
+}
+
+function toggleReveal(p){
+  const st = state.players[p];
+  if(!st.started){ toast('Сначала начните колоду'); return; }
+  st.revealed = !st.revealed;
+  document.getElementById('revealbtn-'+p).textContent = st.revealed ? 'Скрыть руку' : 'Показать руку';
+  renderHand(p);
+}
+
+function toggleMark(p, handPos){
+  const st = state.players[p];
+  st.hand[handPos].marked = !st.hand[handPos].marked;
+  renderHand(p);
+}
+
+function toggleOpen(el){
+  el.classList.toggle('open');
+}
+
+function discardAndDraw(p){
+  const st = state.players[p];
+  if(!st.started){ toast('Сначала начните колоду'); return; }
+  const kept = st.hand.filter(c=>!c.marked);
+  let discarded = st.hand.length - kept.length;
+  st.hand = kept;
+  while(st.hand.length < 3){
+    if(st.deck.length===0){
+      st.deck = shuffled(TACTICS.length).filter(i => !st.hand.some(c=>c.idx===i));
+      if(st.deck.length===0) break;
+    }
+    st.hand.push({ idx: st.deck.pop(), marked:false });
+  }
+  renderHand(p);
+  toast('Игрок '+(p==='p1'?'1':'2')+': сброшено '+discarded+', рука пополнена до '+st.hand.length);
+}
+
+function renderHand(p){
+  const st = state.players[p];
+  const zone = document.getElementById('handzone-'+p);
+  document.getElementById('deckcount-'+p).textContent = st.started ? ('колода: '+st.deck.length+' · в руке: '+st.hand.length) : 'колода: —';
+
+  if(!st.started){
+    zone.innerHTML = '<div class="hiddenhand"><div class="cardback-mini">?</div><div class="cardback-mini">?</div><div class="cardback-mini">?</div></div>';
+    return;
+  }
+  if(!st.revealed){
+    zone.innerHTML = '<div class="hiddenhand">' + st.hand.map(()=>'<div class="cardback-mini">✦</div>').join('') + '</div>';
+    return;
+  }
+  zone.innerHTML = '<div class="handgrid">' + st.hand.map((c,i)=>{
+    const card = TACTICS[c.idx];
+    return `<div class="handcard${c.marked?' marked':''}" onclick="toggleOpen(this)">
+      <div class="hc-top">
+        <span class="hc-name">${card.name}</span>
+        <span class="hc-mark ui">К СБРОСУ</span>
+      </div>
+      <div class="hc-body">
+        <div class="hc-tac"><span class="lbl">Тактика</span>${card.tactic}</div>
+        <div class="hc-cmd"><span class="lbl">Команда · ${card.cmdTiming}</span><br><b>${card.cmdTitle}.</b> ${card.cmd}</div>
+        <div style="margin-top:8px;"><button class="small ghost ui" onclick="event.stopPropagation(); toggleMark('${p}', ${i})">${c.marked?'Снять отметку':'Отметить к сбросу'}</button></div>
+      </div>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+/* ============== INIT ============== */
+async function initApp(){
+  selectSide('ossia');
+  renderRoundTrack();
+  await loadArmies();
+  renderArmyPicker('p1');
+  renderArmyContent('p1');
+  renderImportedList();
+  renderHand('p1');
+  const savedKey = getStoredApiKey();
+  if(savedKey){ document.getElementById('apiKeyInput').value = savedKey; }
+}
+initApp();
+
+</script>
+</body>
+</html>
