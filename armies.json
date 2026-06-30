@@ -522,5 +522,327 @@
     ],
     "key": "slaves",
     "source": "builtin"
+  },
+  "kharadron": {
+    "key": "kharadron",
+    "label": "Kharadron Overlords",
+    "sideClass": "dynamic",
+    "subtitle": "Grundstok Trailblazers",
+    "lore": "Первейший долг Grundcorps — охранять небесные флоты великой державы кархадронов, и большинство несёт эту службу прямо с палубы могучего капитал-корабля, на жалованье у адмирала или капитана, чьих доходов от аэродолей хватает на такой эскорт. Но их обязанности простираются куда дальше обычной обороны палубы. Используя манёвренные Ганхолеры, тяжеловооружённые отряды Grundstok Trailblazers служат отличными передовыми силами — способными найти ценный груз или позицию и удержать её до подхода основного флота.<br><br>Обычно такие задания исходят от членов Гильдии Эндринеров. Дела этих видных особ порой уводят их далеко от относительной безопасности Айронклада или Фрегата. Какой бы заоблачной ни была цена контракта с Grundcorps, она того стоит: тяжёлое вооружение и шквальный огонь группы Grundstok Marines заставит дважды подумать любого врага, прежде чем напасть, а Ганхолеры — пусть и лёгкие по меркам прочих кархадронских судов — несут достаточно тяжёлых боеприпасов, чтобы одним залпом уничтожить вражеский отряд целиком.<br><br><i>«Неважно, как ты себя называешь — император, маг-лорд или хоть бог: получишь бронебойную пулю Bazz-Grummund в башку — и всё, отправляешься на вечный покой», — сержант-канонир Олби «Прищур» Полгссон из Grundcorps.</i>",
+    "general": "Endrinmaster with Dirigible Suit",
+    "unitList": [
+      "5 Grundstok Thunderers",
+      "1 Grundstok Gunhauler",
+      "3 Endrinriggers"
+    ],
+    "battleTrait": {
+      "id": "trait",
+      "name": "Gunhauler Escort",
+      "timing": "Пассивно",
+      "limited": false,
+      "effect": "Грозный силуэт Grundstok Gunhauler над головой мешает врагам сосредотачивать огонь на наземных силах Trailblazers. Пока дружественный юнит Kharadron Overlords Infantry целиком находится в 6\" от дружественного Grundstok Gunhauler, у атак, нацеленных на этот юнит, −1 к попаданию."
+    },
+    "regiment": [
+      {
+        "id": "rapid_relocation",
+        "name": "Rapid Relocation",
+        "timing": "Раз за битву (армия) · Ваша фаза движения",
+        "limited": true,
+        "resetsEachTurn": false,
+        "declare": "Выбрать дружественный юнит с ключевым словом Fly — целью.",
+        "effect": "Пилот Ганхолера набирает высоту, закладывает вираж и возвращается в бой совсем с другого направления. Убрать цель с поля боя и выставить заново в любом месте стола, дальше 6\" от всех вражеских юнитов. В этот ход цель не может использовать способности Charge."
+      },
+      {
+        "id": "propeller_downdraught",
+        "name": "Propeller Downdraught",
+        "timing": "Пассивно",
+        "limited": false,
+        "effect": "Воздушные потоки, поднятые низко летящим Ганхолером, превращают чарж вражеских отрядов во встречный ветер. Пока вражеский юнит находится в 9\" от дружественного Grundstok Gunhauler, у него −1 к броску чарджа."
+      }
+    ],
+    "enhancements": [
+      {
+        "id": "emergency_fuel_injection_pods",
+        "name": "Emergency Fuel Injection Pods",
+        "timing": "Раз за битву (армия) · Любая фаза боя",
+        "limited": true,
+        "resetsEachTurn": false,
+        "effect": "Щёлкнув переключателем с рунической гравировкой, спрятанным в костюме, Эндринмастер на ходу форсирует свою экипировку. До конца хода генерал получает Strike-first."
+      },
+      {
+        "id": "prospector_and_pioneer",
+        "name": "Prospector and Pioneer",
+        "timing": "Пассивно",
+        "limited": false,
+        "effect": "Будь то въедливый надсмотрщик или харизматичный авантюрист — этот генерал настоящая сила природы, когда дело доходит до застолбления новых владений для своего небесного порта. +2 к характеристике Control генерала."
+      },
+      {
+        "id": "celestium_burst_bomblets",
+        "name": "Celestium-Burst Bomblets",
+        "timing": "Любая фаза боя",
+        "limited": true,
+        "resetsEachTurn": true,
+        "declare": "Выбрать вражеский юнит, сражающийся в ближнем бою с вашим генералом — целью.",
+        "effect": "Давние торговые соглашения с Азирхеймом позволили наладить производство этих боеприпасов, разрушающих сверхъестественные защиты. Бросить кость. На 3+ до конца хода цель не может совершать броски Ward."
+      },
+      {
+        "id": "extraction_failsafes",
+        "name": "Extraction Fail-Safes",
+        "timing": "Пассивно",
+        "limited": false,
+        "effect": "Этот Эндринмастер оснастил свой Dirigible Suit второстепенными узлами, которые можно сбросить, чтобы отвлечь преследующего врага. При использовании способности Retreat этим юнитом вычесть 1 из числа очков урона, наносимых ему."
+      }
+    ],
+    "units": [
+      {
+        "key": "endrinmaster",
+        "name": "Endrinmaster with Dirigible Suit",
+        "isGeneral": true,
+        "move": "12\"",
+        "health": 8,
+        "save": "3+",
+        "control": 2,
+        "keywords": [
+          "Hero",
+          "Infantry",
+          "Fly"
+        ],
+        "ranged": [
+          {
+            "name": "Aethercannon",
+            "range": "18\"",
+            "attacks": 1,
+            "hit": "3+",
+            "wound": "3+",
+            "rend": 2,
+            "damage": 3,
+            "ability": "—"
+          },
+          {
+            "name": "Dirigible Suit Weapon Battery",
+            "range": "12\"",
+            "attacks": 6,
+            "hit": "3+",
+            "wound": "3+",
+            "rend": 1,
+            "damage": 1,
+            "ability": "—"
+          }
+        ],
+        "melee": [
+          {
+            "name": "Upgraded Aethermatic Saw",
+            "attacks": 4,
+            "hit": "3+",
+            "wound": "3+",
+            "rend": 2,
+            "damage": 2,
+            "ability": "—"
+          }
+        ],
+        "abilities": [
+          {
+            "id": "endrinmaster_extraordinaire",
+            "name": "Endrinmaster Extraordinaire",
+            "timing": "Ваша фаза героев",
+            "limited": false,
+            "declare": "Выбрать дружественный юнит с ключевым словом Fly, целиком находящийся в 12\" от этого юнита — целью.",
+            "effect": "Снаряжение этого Эндринмастера увешано инструментами и приспособлениями, позволяющими в спешке проводить полевой ремонт. Бросить D3. На 2+ применить Heal(X) к цели, где X равен результату броска."
+          }
+        ],
+        "lore": "Многие Эндринмастеры поднимаются в небо в дирижабельных костюмах работы лучших мастеров: аэротурбины несут их к нуждающимся в починке небесным кораблям, а встроенная батарея оружия тем временем разносит врагов на куски."
+      },
+      {
+        "key": "thunderers",
+        "name": "Grundstok Thunderers",
+        "move": "4\"",
+        "health": 2,
+        "save": "3+",
+        "control": 1,
+        "keywords": [
+          "Infantry",
+          "Reinforcements"
+        ],
+        "ranged": [
+          {
+            "name": "Aethershot Rifle",
+            "range": "18\"",
+            "attacks": 2,
+            "hit": "3+",
+            "wound": "4+",
+            "rend": 1,
+            "damage": 1,
+            "ability": "—"
+          },
+          {
+            "name": "Aetheric Fumigator или Decksweeper",
+            "range": "10\"",
+            "attacks": 5,
+            "hit": "3+",
+            "wound": "4+",
+            "rend": "—",
+            "damage": 1,
+            "ability": "Shoot in Combat"
+          },
+          {
+            "name": "Grundstok Mortar или Aethercannon",
+            "range": "18\"",
+            "attacks": 2,
+            "hit": "4+",
+            "wound": "3+",
+            "rend": 1,
+            "damage": 2,
+            "ability": "—"
+          }
+        ],
+        "melee": [
+          {
+            "name": "Gun Butt",
+            "attacks": 1,
+            "hit": "4+",
+            "wound": "5+",
+            "rend": "—",
+            "damage": 1,
+            "ability": "—"
+          }
+        ],
+        "abilities": [
+          {
+            "id": "bewilderblast_rounds",
+            "name": "Bewilderblast Rounds",
+            "timing": "Раз за битву (армия) · Любая фаза стрельбы",
+            "limited": true,
+            "resetsEachTurn": false,
+            "declare": "Выбрать вражеский юнит, которому в этой фазе стрелковые атаки этого юнита уже нанесли хотя бы одно очко урона — целью.",
+            "effect": "Эти специальные патроны производят вспышку света и грохот, серьёзно нарушая слаженность цели. До конца хода вычесть D6 из характеристики Control цели."
+          }
+        ],
+        "lore": "Grundstok Thunderers — тяжело бронированные морпехи на службе у воздушных флотов, защищающие их от любой угрозы. Меткие стрелки и закалённые ветераны множества походов, они обращают врагов в крошево шквалом аэродроби и мортирных снарядов.",
+        "composition": "1 модель вооружена Aethershot Rifle. 1 модель вооружена Aetheric Fumigator. 1 модель вооружена Decksweeper. 1 модель вооружена Grundstok Mortar. 1 модель вооружена Aethercannon. Каждая модель также вооружена Gun Butt."
+      },
+      {
+        "key": "gunhauler",
+        "name": "Grundstok Gunhauler",
+        "move": "14\"",
+        "health": 10,
+        "save": "2+",
+        "control": 2,
+        "keywords": [
+          "War Machine",
+          "Fly"
+        ],
+        "ranged": [
+          {
+            "name": "Sky Ordnance",
+            "range": "15\"",
+            "attacks": 3,
+            "hit": "4+",
+            "wound": "3+",
+            "rend": 2,
+            "damage": 3,
+            "ability": "—"
+          }
+        ],
+        "melee": [
+          {
+            "name": "Boarding Weapons",
+            "attacks": 4,
+            "hit": "4+",
+            "wound": "4+",
+            "rend": "—",
+            "damage": 1,
+            "ability": "—"
+          }
+        ],
+        "abilities": [
+          {
+            "id": "gunhauler_overwatch",
+            "name": "Gunhauler Overwatch",
+            "timing": "Любая фаза боя",
+            "limited": false,
+            "declare": "Выбрать вражеский юнит, который зачарджил в этот ход и сейчас сражается в ближнем бою с этим юнитом — целью.",
+            "effect": "В последний момент экипаж Ганхолера даёт поспешный залп по группе наступающих врагов. Бросить D3. На 2+ нанести цели урон по телу, равный результату броска."
+          }
+        ],
+        "lore": "Малый, манёвренный и смертоносный, Grundstok Gunhauler — корабль эскортного класса, обязанность которого — обеспечивать безопасность более крупных судов воздушного флота. Со своей ролью он справляется отлично: прикрывает строй, а затем уходит в стремительные атакующие заходы."
+      },
+      {
+        "key": "endrinriggers",
+        "name": "Endrinriggers",
+        "move": "12\"",
+        "health": 2,
+        "save": "3+",
+        "control": 1,
+        "keywords": [
+          "Infantry",
+          "Fly",
+          "Reinforcements"
+        ],
+        "ranged": [
+          {
+            "name": "Rapid Fire Rivet Gun",
+            "range": "10\"",
+            "attacks": 3,
+            "hit": "3+",
+            "wound": "4+",
+            "rend": 1,
+            "damage": 1,
+            "ability": "Shoot in Combat"
+          },
+          {
+            "name": "Aethermatic Volley Gun",
+            "range": "15\"",
+            "attacks": "2D6",
+            "hit": "4+",
+            "wound": "4+",
+            "rend": "—",
+            "damage": 1,
+            "ability": "Crit (2 Hits)"
+          },
+          {
+            "name": "Skyrigger Heavy Weapon",
+            "range": "15\"",
+            "attacks": 1,
+            "hit": "4+",
+            "wound": "3+",
+            "rend": 1,
+            "damage": "D3",
+            "ability": "Anti-Monster (+1 Rend)"
+          }
+        ],
+        "melee": [
+          {
+            "name": "Aethermatic Saw",
+            "attacks": 3,
+            "hit": "4+",
+            "wound": "3+",
+            "rend": 1,
+            "damage": 2,
+            "ability": "Anti-charge (+1 Rend)"
+          },
+          {
+            "name": "Gun Butt",
+            "attacks": 1,
+            "hit": "4+",
+            "wound": "5+",
+            "rend": "—",
+            "damage": 1,
+            "ability": "—"
+          }
+        ],
+        "abilities": [
+          {
+            "id": "cloudweaving_skyfarers",
+            "name": "Cloudweaving Skyfarers",
+            "timing": "Вражеская фаза движения",
+            "limited": false,
+            "effect": "Не только корабли кархадронов бороздят небеса — рунные эндриносферы дают своим носителям способность к полёту, делая их манёвренными бойцами. Бросить кость. На 3+ этот юнит может применить способность «Обычное движение», как если бы шла ваша фаза движения."
+          }
+        ],
+        "lore": "С аэроэндринами за спиной, Endrinriggers проводят ремонт своих любимых кораблей высоко над землёй. В бою их аэроинструменты превращаются в смертоносное оружие, способное пробивать броню или с лязгом отсекать конечности.",
+        "composition": "1 модель вооружена Rapid Fire Rivet Gun и Aethermatic Saw. 1 модель вооружена Aethermatic Volley Gun и Gun Butt. 1 модель вооружена Skyrigger Heavy Weapon (Grapnel Launcher, Skyhook или Drill Launcher) и Gun Butt."
+      }
+    ],
+    "source": "builtin"
   }
 }
