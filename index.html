@@ -267,9 +267,18 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   margin: 0 auto;
   padding: 9px 14px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: center;
+  gap: 8px 10px;
+}
+
+/* Below ~460px the two clusters no longer fit on one line —
+   stack them so the bar never forces horizontal scroll. */
+@media (max-width: 460px) {
+  .stickyrow { flex-direction: column; align-items: stretch; }
+  .roundtrack { justify-content: center; }
+  .vprow { justify-content: center; }
 }
 
 /* Round track */
@@ -509,9 +518,10 @@ section.block { margin-top: 36px; }
   box-shadow: var(--shd), var(--shd-in);
   position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 
-/* Top-edge aged bronze shimmer */
+/* Top-edge aged bronze shimmer — kept behind real content */
 .card::before {
   content: '';
   position: absolute;
@@ -519,9 +529,10 @@ section.block { margin-top: 36px; }
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--bdr-hi), transparent);
   pointer-events: none;
+  z-index: -1;
 }
 
-/* Corner ornaments */
+/* Corner ornaments — kept behind real content */
 .card::after {
   content: '';
   position: absolute;
@@ -530,6 +541,7 @@ section.block { margin-top: 36px; }
   border-radius: calc(var(--r-lg) - 3px);
   pointer-events: none;
   opacity: .35;
+  z-index: -1;
 }
 
 /* ── SIDE PICKER ─────────────────────────────────────────── */
@@ -771,7 +783,12 @@ section.block { margin-top: 36px; }
   background: linear-gradient(160deg, var(--surf-3) 0%, var(--surf-2) 100%);
   border-color: var(--bronze-dim);
   box-shadow: inset 0 0 30px rgba(0,0,0,.4), var(--shd);
+  /* Native scrollbar is hidden below — its overlay thumb otherwise
+     paints on top of the card text and looks like a stray gold line. */
+  scrollbar-width: none;
 }
+.face.front::-webkit-scrollbar { display: none; }
+
 .face.front::before {
   content: '';
   position: absolute;
@@ -780,6 +797,19 @@ section.block { margin-top: 36px; }
   background: linear-gradient(90deg, transparent, var(--bronze-dim), transparent);
   border-radius: var(--r-lg) var(--r-lg) 0 0;
   pointer-events: none;
+  z-index: 2;
+}
+/* Bottom fade — hints that the card content is scrollable now that
+   the native scrollbar is hidden */
+.face.front::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 28px;
+  background: linear-gradient(180deg, transparent, var(--surf-2) 92%);
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  pointer-events: none;
+  z-index: 2;
 }
 
 .cardseal {
@@ -1094,6 +1124,78 @@ details.spoiler .spoilerbody {
   margin-top: 3px;
 }
 
+/* ── HP TRACKER + ACTIVATION ─────────────────────────────── */
+.hpwrap {
+  background: var(--surf-1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r);
+  padding: 10px 12px 12px;
+  margin: 0 0 12px;
+}
+.hprow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.hplabel {
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+.hptrack {
+  flex: 1;
+  display: flex;
+  gap: 2px;
+  height: 22px;
+  min-width: 0;
+}
+.hpseg {
+  flex: 1;
+  min-width: 4px;
+  background: var(--void);
+  border: 1px solid var(--bdr);
+  border-radius: 2px;
+  transition: background var(--t), border-color var(--t);
+}
+.hpseg.filled {
+  background: linear-gradient(180deg, var(--blood-hi), var(--blood));
+  border-color: var(--blood-hi);
+  box-shadow: inset 0 1px 0 rgba(255,160,160,.15);
+}
+/* Divider marking where an individual model's wounds end */
+.hpseg.bound { border-right: 2px solid var(--bronze-hi); margin-right: 1px; }
+.hpval {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+  flex-shrink: 0;
+  min-width: 46px;
+  text-align: right;
+}
+.hpval.dead { color: var(--ink-faint); }
+
+.hpbtns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.hpbtn {
+  width: 44px;
+  padding: 0;
+  font-size: 19px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.hpbtn.dmg:hover  { border-color: var(--blood-hi); color: var(--blood-text); background: var(--blood-bg); }
+.hpbtn.heal:hover { border-color: var(--dolorum);  color: #6aaa70;          background: var(--dolorum-bg); }
+
+.actbtn { flex: 1; min-width: 150px; }
+.actbtn svg { width: 15px; height: 15px; flex-shrink: 0; stroke: var(--ink-faint); fill: none; stroke-width: 1.6; transition: stroke var(--t), fill var(--t); }
+.actbtn.on {
+  background: linear-gradient(175deg, var(--bronze-hi) 0%, var(--bronze-dim) 100%);
+  color: #2a1c06;
+  border-color: var(--bronze-hi);
+  box-shadow: 0 2px 12px rgba(158,120,56,.4), inset 0 1px 0 rgba(255,220,160,.2);
+}
+.actbtn.on svg { stroke: #2a1c06; fill: #2a1c06; }
+
 /* Keywords */
 .kwrow { margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
 .kwchip {
@@ -1217,14 +1319,9 @@ table.wtable .wname { color: var(--ink); font-weight: 600; }
 
 /* ── IMPORT PANEL ────────────────────────────────────────── */
 .importpanel {
-  background: var(--void);
-  border: 1px dashed var(--bdr-mid);
-  border-radius: var(--r);
-  padding: 14px 15px;
   margin-top: 14px;
 }
-.importpanel h4 { font-family: 'Cinzel', serif; font-size: 13px; color: var(--ink-mid); margin-bottom: 6px; font-weight: 700; }
-.ihint { font-size: 12px; color: var(--ink-faint); margin: 0 0 10px; line-height: 1.55; }
+.importpanel button { width: 100%; }
 
 /* ── MODAL ───────────────────────────────────────────────── */
 .modal-overlay {
@@ -1300,19 +1397,6 @@ table.wtable .wname { color: var(--ink); font-weight: 600; }
 .modal-opt .mo-name { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
 .modal-opt .mo-body { font-size: 13px; color: var(--ink-mid); margin: 6px 0 10px; line-height: 1.55; }
 .modal-opt button { width: 100%; }
-
-/* ── FOOTNOTE ────────────────────────────────────────────── */
-.footnote {
-  margin-top: 52px;
-  padding-top: 18px;
-  border-top: 1px solid var(--bdr);
-  font-size: 12px;
-  color: var(--ink-faint);
-  line-height: 1.7;
-}
-.footnote b { color: var(--ink-mid); font-weight: 600; }
-.footnote .sources { margin-top: 8px; }
-.footnote a { color: var(--bronze-dim); text-decoration: underline; }
 
 /* ── TOAST ───────────────────────────────────────────────── */
 .toast {
@@ -1488,8 +1572,6 @@ details.spoiler summary:focus-visible {
       </div>
 
       <div class="importpanel">
-        <h4>Резервная копия</h4>
-        <p class="ihint">Скачать текущий <code>armies.json</code> — на случай если нужна локальная копия.</p>
         <button class="ghost small" onclick="downloadArmiesBackup()">⬇ Выгрузить armies.json</button>
       </div>
 
@@ -1510,11 +1592,6 @@ details.spoiler summary:focus-visible {
     </div>
   </section>
 
-  <!-- СНОСКА -->
-  <div class="footnote">
-    <p><b>Откуда данные.</b> Карты твистов/тактик пересказаны по фотографиям карточек и обзору на tabletopbattles.com. Армии пересказаны по официальным PDF Spearhead-варскроллов. Сведения об объектах и правке от октября 2025 — по статьям Warhammer Community и battleclash.com. Точный текст способности «Icon of Nulahmia» в открытых источниках найти не удалось.</p>
-    <div class="sources">tabletopbattles.com · warhammer-community.com · battleclash.com · официальные PDF-варскроллы Spearhead</div>
-  </div>
 
 </div><!-- /wrap -->
 
@@ -1768,7 +1845,7 @@ function armyAccent(army){
   return colorForKey(army.key);
 }
 
-let armyState={p1:{armyKey:null,regimentId:null,enhancementId:null,used:{}}};
+let armyState={p1:{armyKey:null,regimentId:null,enhancementId:null,used:{},hp:{},activated:{}}};
 
 function abilityFullId(p,scope,id){return p+'__'+armyState[p].armyKey+'__'+scope+'__'+id;}
 function isUsed(p,scope,id){return !!armyState[p].used[abilityFullId(p,scope,id)];}
@@ -1777,6 +1854,61 @@ function toggleUsed(p,scope,id){
   armyState[p].used[full]=!armyState[p].used[full];
   renderArmyContent(p);
 }
+
+/* ── HP TRACKER + ACTIVATION (per unit) ──────────────────── */
+const ACTIVATION_ICON=`<svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.4L21 11l-6.6 2.6L12 20l-2.4-6.4L3 11l6.6-2.6z"/></svg>`;
+
+function unitMaxHP(unit){ return (unit.health||1) * (unit.models||1); }
+function hpFullId(p,unitKey){ return p+'__'+armyState[p].armyKey+'__hp__'+unitKey; }
+function activationFullId(p,unitKey){ return p+'__'+armyState[p].armyKey+'__act__'+unitKey; }
+
+function getUnitHP(p,unit){
+  const id=hpFullId(p,unit.key);
+  if(!(id in armyState[p].hp)){ armyState[p].hp[id]=unitMaxHP(unit); }
+  return armyState[p].hp[id];
+}
+function changeUnitHP(p,unitKey,delta){
+  const army=ARMIES[armyState[p].armyKey];
+  const unit=army.units.find(u=>u.key===unitKey);
+  const max=unitMaxHP(unit);
+  const cur=getUnitHP(p,unit);
+  armyState[p].hp[hpFullId(p,unitKey)]=Math.max(0,Math.min(max,cur+delta));
+  renderArmyContent(p);
+}
+function isActivated(p,unitKey){ return !!armyState[p].activated[activationFullId(p,unitKey)]; }
+function toggleActivated(p,unitKey){
+  const id=activationFullId(p,unitKey);
+  armyState[p].activated[id]=!armyState[p].activated[id];
+  renderArmyContent(p);
+}
+
+function renderHpTracker(p,unit){
+  const max=unitMaxHP(unit);
+  const cur=getUnitHP(p,unit);
+  const perModel=unit.health||1;
+  let segs='';
+  for(let i=0;i<max;i++){
+    const filled=i<cur;
+    const isBoundary=(i+1)%perModel===0 && i!==max-1;
+    segs+=`<div class="hpseg${filled?' filled':''}${isBoundary?' bound':''}"></div>`;
+  }
+  const activated=isActivated(p,unit.key);
+  return `<div class="hpwrap">
+    <div class="hprow">
+      <span class="hplabel">HP</span>
+      <div class="hptrack">${segs}</div>
+      <span class="hpval${cur===0?' dead':''}">${cur}/${max}</span>
+    </div>
+    <div class="hpbtns">
+      <button class="hpbtn dmg" onclick="changeUnitHP('${p}','${unit.key}',-1)" aria-label="Урон юниту ${unit.name}">−</button>
+      <button class="hpbtn heal" onclick="changeUnitHP('${p}','${unit.key}',1)" aria-label="Восстановить хп юниту ${unit.name}">+</button>
+      <button class="actbtn ${activated?'on':''}" onclick="toggleActivated('${p}','${unit.key}')">
+        ${ACTIVATION_ICON}<span>${activated?'Активирован':'Активировать'}</span>
+      </button>
+    </div>
+  </div>`;
+}
+
 function resetTurnFlags(p){
   const ast=armyState[p];
   if(!ast.armyKey)return;
@@ -1787,9 +1919,12 @@ function resetTurnFlags(p){
   clearIfResets('trait',army.battleTrait);
   army.regiment.forEach(r=>clearIfResets('regiment',r));
   army.enhancements.forEach(e=>clearIfResets('enh',e));
-  army.units.forEach(u=>(u.abilities||[]).forEach(a=>clearIfResets('unit_'+u.key,a)));
+  army.units.forEach(u=>{
+    (u.abilities||[]).forEach(a=>clearIfResets('unit_'+u.key,a));
+    delete ast.activated[activationFullId(p,u.key)];
+  });
   renderArmyContent(p);
-  toast((p==='p1'?'Игрок 1':'Игрок 2')+': отметки «раз за ход» сброшены');
+  toast((p==='p1'?'Игрок 1':'Игрок 2')+': активации и отметки «раз за ход» сброшены');
 }
 
 function renderArmyPicker(p){
@@ -1819,7 +1954,7 @@ function pickArmy(p,key){
 }
 
 function resetArmy(p){
-  armyState[p]={armyKey:null,regimentId:null,enhancementId:null,used:{}};
+  armyState[p]={armyKey:null,regimentId:null,enhancementId:null,used:{},hp:{},activated:{}};
   renderArmyPicker(p);
   renderArmyContent(p);
 }
@@ -1909,6 +2044,7 @@ function renderUnitCard(p,scope,unit){
   return`<div class="unitcard">
     <h4>${unit.name}${unit.isGeneral?' <span class="ab-timing" style="margin-left:4px;">генерал</span>':''}</h4>
     ${kwHtml}${statHtml}
+    ${renderHpTracker(p,unit)}
     ${weaponTable('Ranged',unit.ranged)}
     ${weaponTable('Melee',unit.melee)}
     ${abilitiesHtml}
