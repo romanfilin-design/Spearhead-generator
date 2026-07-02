@@ -780,9 +780,9 @@ section.block { margin-top: 36px; }
   transform: rotateY(180deg);
   overflow-y: auto;
   padding: 18px;
-  background: linear-gradient(160deg, var(--surf-3) 0%, var(--surf-2) 100%);
+  background: var(--surf-1);
   border-color: var(--bronze-dim);
-  box-shadow: inset 0 0 30px rgba(0,0,0,.4), var(--shd);
+  box-shadow: var(--shd);
   /* Native scrollbar is hidden below — its overlay thumb otherwise
      paints on top of the card text and looks like a stray gold line. */
   scrollbar-width: none;
@@ -1096,6 +1096,29 @@ details.spoiler .spoilerbody {
   letter-spacing: .03em;
 }
 
+/* Unit portrait — optional, only rendered when unit.image is set */
+.unitportrait {
+  width: 100%;
+  height: 176px;
+  border-radius: var(--r);
+  overflow: hidden;
+  margin: 8px 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 62%, rgba(122,20,20,.12), transparent 70%),
+    var(--surf-1);
+  border: 1px solid var(--bdr);
+  box-shadow: var(--shd-sm);
+}
+.unitportrait img {
+  max-width: 92%;
+  max-height: 92%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.55));
+}
+
 /* Stat strip — 4-col embossed boxes */
 .statstrip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0 12px; }
 .statbox {
@@ -1209,9 +1232,16 @@ details.spoiler .spoilerbody {
   letter-spacing: .04em;
 }
 
-/* Weapon table */
-table.wtable { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 11.5px; }
-table.wtable th, table.wtable td { border: 1px solid var(--bdr); padding: 5px 6px; text-align: left; }
+/* Weapon table — horizontally scrollable wrapper so columns never get
+   clipped on narrow phones (English weapon names run long) */
+.wtable-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 6px 0 10px;
+  border-radius: var(--r-sm);
+}
+table.wtable { width: 100%; min-width: 460px; border-collapse: collapse; font-size: 11.5px; }
+table.wtable th, table.wtable td { border: 1px solid var(--bdr); padding: 5px 6px; text-align: left; white-space: nowrap; }
 table.wtable th {
   background: var(--surf-1);
   color: var(--bronze-text);
@@ -1222,9 +1252,9 @@ table.wtable th {
   letter-spacing: .07em;
 }
 table.wtable td { color: var(--ink-mid); background: var(--void); }
-table.wtable .wname { color: var(--ink); font-weight: 600; }
+table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; min-width: 120px; }
 @media (max-width: 420px) {
-  table.wtable { font-size: 10.5px; }
+  table.wtable { font-size: 10.5px; min-width: 420px; }
   table.wtable th, table.wtable td { padding: 4px; }
 }
 
@@ -2035,15 +2065,18 @@ function renderUnitCard(p,scope,unit){
   const weaponTable=(title,list)=>{
     if(!list||!list.length)return'';
     const hasRange=!!list[0].range;
-    return`<table class="wtable">
+    return`<div class="wtable-wrap"><table class="wtable">
       <tr><th>${title}</th>${hasRange?'<th>Range</th>':''}<th>Att</th><th>Hit</th><th>Wound</th><th>Rend</th><th>Dmg</th><th>Ability</th></tr>
       ${list.map(w=>`<tr><td class="wname">${w.name}</td>${hasRange?`<td>${w.range}</td>`:''}<td>${w.attacks}</td><td>${w.hit}</td><td>${w.wound}</td><td>${w.rend!==undefined?w.rend:'—'}</td><td>${w.damage}</td><td>${w.ability||'—'}</td></tr>`).join('')}
-    </table>`;
+    </table></div>`;
   };
   const abilitiesHtml=(unit.abilities||[]).map(a=>renderAbilityCard(p,scope+'_'+unit.key,a)).join('');
+  const portraitHtml=unit.image?`<div class="unitportrait"><img src="${unit.image}" alt="${unit.name}" loading="lazy"></div>`:'';
   return`<div class="unitcard">
     <h4>${unit.name}${unit.isGeneral?' <span class="ab-timing" style="margin-left:4px;">генерал</span>':''}</h4>
-    ${kwHtml}${statHtml}
+    ${kwHtml}
+    ${portraitHtml}
+    ${statHtml}
     ${renderHpTracker(p,unit)}
     ${weaponTable('Ranged',unit.ranged)}
     ${weaponTable('Melee',unit.melee)}

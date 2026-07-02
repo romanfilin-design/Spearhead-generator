@@ -1,0 +1,9 @@
+# Secrets — never commit
+.env
+*.token
+
+# OS junk
+.DS_Store
+
+# Local Python tooling
+.venv-tools/
