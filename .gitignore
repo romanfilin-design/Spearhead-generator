@@ -7,3 +7,7 @@
 
 # Local Python tooling
 .venv-tools/
+
+# Raw portrait source material — only the processed _nobg.png in assets/textures/ is tracked
+source_portraits/*/
+!source_portraits/README.md
