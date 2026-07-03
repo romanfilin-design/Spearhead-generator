@@ -666,7 +666,8 @@
           }
         ],
         "lore": "Многие Эндринмастеры поднимаются в небо в дирижабельных костюмах работы лучших мастеров: аэротурбины несут их к нуждающимся в починке небесным кораблям, а встроенная батарея оружия тем временем разносит врагов на куски.",
-        "models": 1
+        "models": 1,
+        "image": "assets/textures/unit_endrinmaster_nobg.png"
       },
       {
         "key": "thunderers",
@@ -735,7 +736,8 @@
         ],
         "lore": "Grundstok Thunderers — тяжело бронированные морпехи на службе у воздушных флотов, защищающие их от любой угрозы. Меткие стрелки и закалённые ветераны множества походов, они обращают врагов в крошево шквалом аэродроби и мортирных снарядов.",
         "composition": "1 модель вооружена Aethershot Rifle. 1 модель вооружена Aetheric Fumigator. 1 модель вооружена Decksweeper. 1 модель вооружена Grundstok Mortar. 1 модель вооружена Aethercannon. Каждая модель также вооружена Gun Butt.",
-        "models": 5
+        "models": 5,
+        "image": "assets/textures/unit_thunderers_nobg.png"
       },
       {
         "key": "gunhauler",
@@ -782,7 +784,8 @@
           }
         ],
         "lore": "Малый, манёвренный и смертоносный, Grundstok Gunhauler — корабль эскортного класса, обязанность которого — обеспечивать безопасность более крупных судов воздушного флота. Со своей ролью он справляется отлично: прикрывает строй, а затем уходит в стремительные атакующие заходы.",
-        "models": 1
+        "models": 1,
+        "image": "assets/textures/unit_gunhauler_nobg.png"
       },
       {
         "key": "endrinriggers",
@@ -859,7 +862,8 @@
         ],
         "lore": "С аэроэндринами за спиной, Endrinriggers проводят ремонт своих любимых кораблей высоко над землёй. В бою их аэроинструменты превращаются в смертоносное оружие, способное пробивать броню или с лязгом отсекать конечности.",
         "composition": "1 модель вооружена Rapid Fire Rivet Gun и Aethermatic Saw. 1 модель вооружена Aethermatic Volley Gun и Gun Butt. 1 модель вооружена Skyrigger Heavy Weapon (Grapnel Launcher, Skyhook или Drill Launcher) и Gun Butt.",
-        "models": 3
+        "models": 3,
+        "image": "assets/textures/unit_endrinriggers_nobg.png"
       }
     ],
     "source": "builtin"
