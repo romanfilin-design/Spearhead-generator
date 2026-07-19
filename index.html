@@ -1889,32 +1889,32 @@ function toggleUsed(p,scope,id){
 const ACTIVATION_ICON=`<svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.4L21 11l-6.6 2.6L12 20l-2.4-6.4L3 11l6.6-2.6z"/></svg>`;
 
 function unitMaxHP(unit){ return (unit.health||1) * (unit.models||1); }
-function hpFullId(p,unitKey){ return p+'__'+armyState[p].armyKey+'__hp__'+unitKey; }
-function activationFullId(p,unitKey){ return p+'__'+armyState[p].armyKey+'__act__'+unitKey; }
+function hpFullId(p,unitKey,idx){ return p+'__'+armyState[p].armyKey+'__hp__'+unitKey+'__'+(idx||0); }
+function activationFullId(p,unitKey,idx){ return p+'__'+armyState[p].armyKey+'__act__'+unitKey+'__'+(idx||0); }
 
-function getUnitHP(p,unit){
-  const id=hpFullId(p,unit.key);
+function getUnitHP(p,unit,idx){
+  const id=hpFullId(p,unit.key,idx);
   if(!(id in armyState[p].hp)){ armyState[p].hp[id]=unitMaxHP(unit); }
   return armyState[p].hp[id];
 }
-function changeUnitHP(p,unitKey,delta){
+function changeUnitHP(p,unitKey,idx,delta){
   const army=ARMIES[armyState[p].armyKey];
   const unit=army.units.find(u=>u.key===unitKey);
   const max=unitMaxHP(unit);
-  const cur=getUnitHP(p,unit);
-  armyState[p].hp[hpFullId(p,unitKey)]=Math.max(0,Math.min(max,cur+delta));
+  const cur=getUnitHP(p,unit,idx);
+  armyState[p].hp[hpFullId(p,unitKey,idx)]=Math.max(0,Math.min(max,cur+delta));
   renderArmyContent(p);
 }
-function isActivated(p,unitKey){ return !!armyState[p].activated[activationFullId(p,unitKey)]; }
-function toggleActivated(p,unitKey){
-  const id=activationFullId(p,unitKey);
+function isActivated(p,unitKey,idx){ return !!armyState[p].activated[activationFullId(p,unitKey,idx)]; }
+function toggleActivated(p,unitKey,idx){
+  const id=activationFullId(p,unitKey,idx);
   armyState[p].activated[id]=!armyState[p].activated[id];
   renderArmyContent(p);
 }
 
-function renderHpTracker(p,unit){
+function renderHpTracker(p,unit,idx){
   const max=unitMaxHP(unit);
-  const cur=getUnitHP(p,unit);
+  const cur=getUnitHP(p,unit,idx);
   const perModel=unit.health||1;
   let segs='';
   for(let i=0;i<max;i++){
@@ -1922,7 +1922,7 @@ function renderHpTracker(p,unit){
     const isBoundary=(i+1)%perModel===0 && i!==max-1;
     segs+=`<div class="hpseg${filled?' filled':''}${isBoundary?' bound':''}"></div>`;
   }
-  const activated=isActivated(p,unit.key);
+  const activated=isActivated(p,unit.key,idx);
   return `<div class="hpwrap">
     <div class="hprow">
       <span class="hplabel">HP</span>
@@ -1930,9 +1930,9 @@ function renderHpTracker(p,unit){
       <span class="hpval${cur===0?' dead':''}">${cur}/${max}</span>
     </div>
     <div class="hpbtns">
-      <button class="hpbtn dmg" onclick="changeUnitHP('${p}','${unit.key}',-1)" aria-label="Урон юниту ${unit.name}">−</button>
-      <button class="hpbtn heal" onclick="changeUnitHP('${p}','${unit.key}',1)" aria-label="Восстановить хп юниту ${unit.name}">+</button>
-      <button class="actbtn ${activated?'on':''}" onclick="toggleActivated('${p}','${unit.key}')">
+      <button class="hpbtn dmg" onclick="changeUnitHP('${p}','${unit.key}',${idx||0},-1)" aria-label="Урон юниту ${unit.name}">−</button>
+      <button class="hpbtn heal" onclick="changeUnitHP('${p}','${unit.key}',${idx||0},1)" aria-label="Восстановить хп юниту ${unit.name}">+</button>
+      <button class="actbtn ${activated?'on':''}" onclick="toggleActivated('${p}','${unit.key}',${idx||0})">
         ${ACTIVATION_ICON}<span>${activated?'Активирован':'Активировать'}</span>
       </button>
     </div>
@@ -1950,8 +1950,11 @@ function resetTurnFlags(p){
   army.regiment.forEach(r=>clearIfResets('regiment',r));
   army.enhancements.forEach(e=>clearIfResets('enh',e));
   army.units.forEach(u=>{
-    (u.abilities||[]).forEach(a=>clearIfResets('unit_'+u.key,a));
-    delete ast.activated[activationFullId(p,u.key)];
+    const n=u.count||1;
+    for(let idx=0;idx<n;idx++){
+      (u.abilities||[]).forEach(a=>clearIfResets('unit_'+u.key+'_'+idx,a));
+      delete ast.activated[activationFullId(p,u.key,idx)];
+    }
   });
   renderArmyContent(p);
   toast((p==='p1'?'Игрок 1':'Игрок 2')+': активации и отметки «раз за ход» сброшены');
@@ -2054,7 +2057,8 @@ function renderChoiceEmpty(p,kind,label){
   </div></div>`;
 }
 
-function renderUnitCard(p,scope,unit){
+function renderUnitCard(p,scope,unit,idx,count){
+  idx=idx||0;
   const statHtml=`<div class="statstrip">
     <div class="statbox"><div class="sv">${unit.move}</div><div class="sl">Move</div></div>
     <div class="statbox"><div class="sv">${unit.health}</div><div class="sl">Health</div></div>
@@ -2070,14 +2074,15 @@ function renderUnitCard(p,scope,unit){
       ${list.map(w=>`<tr><td class="wname">${w.name}</td>${hasRange?`<td>${w.range}</td>`:''}<td>${w.attacks}</td><td>${w.hit}</td><td>${w.wound}</td><td>${w.rend!==undefined?w.rend:'—'}</td><td>${w.damage}</td><td>${w.ability||'—'}</td></tr>`).join('')}
     </table></div>`;
   };
-  const abilitiesHtml=(unit.abilities||[]).map(a=>renderAbilityCard(p,scope+'_'+unit.key,a)).join('');
+  const abilitiesHtml=(unit.abilities||[]).map(a=>renderAbilityCard(p,scope+'_'+unit.key+'_'+idx,a)).join('');
   const portraitHtml=unit.image?`<div class="unitportrait"><img src="${unit.image}" alt="${unit.name}" loading="lazy"></div>`:'';
+  const squadTag=count>1?` <span class="ab-timing" style="margin-left:4px;">отряд ${idx+1}/${count}</span>`:'';
   return`<div class="unitcard">
-    <h4>${unit.name}${unit.isGeneral?' <span class="ab-timing" style="margin-left:4px;">генерал</span>':''}</h4>
+    <h4>${unit.name}${unit.isGeneral?' <span class="ab-timing" style="margin-left:4px;">генерал</span>':''}${squadTag}</h4>
     ${kwHtml}
     ${portraitHtml}
     ${statHtml}
-    ${renderHpTracker(p,unit)}
+    ${renderHpTracker(p,unit,idx)}
     ${weaponTable('Ranged',unit.ranged)}
     ${weaponTable('Melee',unit.melee)}
     ${abilitiesHtml}
@@ -2114,7 +2119,12 @@ function renderArmyContent(p){
   if(ast.enhancementId){const chosen=army.enhancements.find(r=>r.id===ast.enhancementId);html+=renderChoiceLocked(p,'enhancement','enh',chosen);}
   else{html+=renderChoiceEmpty(p,'enhancement','Улучшение генерала');}
   html+=`<div class="section-label">Юниты</div>`;
-  html+=army.units.map(u=>renderUnitCard(p,'unit',u)).join('');
+  html+=army.units.map(u=>{
+    const n=u.count||1;
+    let cards='';
+    for(let idx=0;idx<n;idx++){ cards+=renderUnitCard(p,'unit',u,idx,n); }
+    return cards;
+  }).join('');
   html+=`<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
     <button class="ghost small" onclick="resetTurnFlags('${p}')">Новый ход: сбросить «раз за ход»</button>
     <button class="ghost small" onclick="resetArmy('${p}')">Сбросить армию</button>
