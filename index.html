@@ -1252,6 +1252,8 @@ table.wtable th {
   letter-spacing: .07em;
 }
 table.wtable td { color: var(--ink-mid); background: var(--void); }
+.term-clickable { color: var(--bronze-text); text-decoration: underline dotted; text-underline-offset: 2px; cursor: pointer; }
+.term-clickable:hover, .term-clickable:focus { color: var(--ink); }
 table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; min-width: 120px; }
 /* On narrow phones: scale the table to fit instead of horizontal-scrolling it —
    drop the min-width floor, switch to fixed layout so columns share the
@@ -1893,6 +1895,42 @@ function toggleUsed(p,scope,id){
 /* ── HP TRACKER + ACTIVATION (per unit) ──────────────────── */
 const ACTIVATION_ICON=`<svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.4L21 11l-6.6 2.6L12 20l-2.4-6.4L3 11l6.6-2.6z"/></svg>`;
 
+/* ── WEAPON RULE GLOSSARY — клик по свойству оружия в таблице ──────
+   Ключи покрывают ровно те термины, что реально встречаются в
+   armies.json (см. поле ability в ranged/melee) — не "с потолка". */
+const TERM_GLOSSARY={
+  'Anti':'Anti-<ключевое слово> (+N Rend) — против юнитов с указанным ключевым словом характеристика Rend этого оружия увеличивается на N.',
+  'Charge':'Charge (+N Damage) — если этот юнит зачарджил в этой фазе, атаки этим оружием получают +N к Damage.',
+  'Companion':'Companion — это оружие принадлежит существу-компаньону юнита (например, ездовому животному), а не самому бойцу; работает как обычное оружие этого юнита в бою.',
+  'Crit (Mortal)':'Crit (Mortal) — при критическом попадании (Crit) этой атакой наносится урон напрямую по телу (Mortal Damage), минуя бросок Save.',
+  'Crit (2 Hits)':'Crit (2 Hits) — при критическом попадании (Crit) засчитывается 2 попадания вместо одного.',
+  'Shoot in Combat':'Shoot in Combat — этим оружием можно стрелять, даже если юнит находится в бою, не только в фазу Shooting.',
+};
+function normalizeAbilityTerm(raw){
+  const t=(raw||'').trim();
+  if(/^Anti-/i.test(t))return'Anti';
+  return t;
+}
+function showTermInfo(rawTerm){
+  const key=normalizeAbilityTerm(rawTerm);
+  const text=TERM_GLOSSARY[key];
+  if(!text)return;
+  document.getElementById('modalTitle').textContent=rawTerm;
+  document.getElementById('modalBody').innerHTML=`<p>${text}</p>`;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function renderAbilityCell(raw){
+  if(!raw||raw==='—'||raw==='-')return raw||'—';
+  return raw.split(',').map(part=>{
+    const trimmed=part.trim();
+    const key=normalizeAbilityTerm(trimmed);
+    if(TERM_GLOSSARY[key]){
+      return `<span class="term-clickable" onclick="showTermInfo('${trimmed.replace(/'/g,"\\'")}')" tabindex="0">${trimmed}</span>`;
+    }
+    return trimmed;
+  }).join(', ');
+}
+
 function unitMaxHP(unit){ return (unit.health||1) * (unit.models||1); }
 function hpFullId(p,unitKey,idx){ return p+'__'+armyState[p].armyKey+'__hp__'+unitKey+'__'+(idx||0); }
 function activationFullId(p,unitKey,idx){ return p+'__'+armyState[p].armyKey+'__act__'+unitKey+'__'+(idx||0); }
@@ -2076,7 +2114,7 @@ function renderUnitCard(p,scope,unit,idx,count){
     const hasRange=!!list[0].range;
     return`<div class="wtable-wrap"><table class="wtable">
       <tr><th>${title}</th>${hasRange?'<th>Range</th>':''}<th>Att</th><th>Hit</th><th>Wound</th><th>Rend</th><th>Dmg</th><th>Ability</th></tr>
-      ${list.map(w=>`<tr><td class="wname">${w.name}</td>${hasRange?`<td>${w.range}</td>`:''}<td>${w.attacks}</td><td>${w.hit}</td><td>${w.wound}</td><td>${w.rend!==undefined?w.rend:'—'}</td><td>${w.damage}</td><td>${w.ability||'—'}</td></tr>`).join('')}
+      ${list.map(w=>`<tr><td class="wname">${w.name}</td>${hasRange?`<td>${w.range}</td>`:''}<td>${w.attacks}</td><td>${w.hit}</td><td>${w.wound}</td><td>${w.rend!==undefined?w.rend:'—'}</td><td>${w.damage}</td><td>${renderAbilityCell(w.ability)}</td></tr>`).join('')}
     </table></div>`;
   };
   const abilitiesHtml=(unit.abilities||[]).map(a=>renderAbilityCard(p,scope+'_'+unit.key+'_'+idx,a)).join('');
