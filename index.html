@@ -799,18 +799,6 @@ section.block { margin-top: 36px; }
   pointer-events: none;
   z-index: 2;
 }
-/* Bottom fade — hints that the card content is scrollable now that
-   the native scrollbar is hidden */
-.face.front::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: 28px;
-  background: linear-gradient(180deg, transparent, var(--surf-2) 92%);
-  border-radius: 0 0 var(--r-lg) var(--r-lg);
-  pointer-events: none;
-  z-index: 2;
-}
 
 .cardseal {
   align-self: center;
