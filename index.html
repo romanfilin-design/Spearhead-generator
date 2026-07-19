@@ -1253,9 +1253,14 @@ table.wtable th {
 }
 table.wtable td { color: var(--ink-mid); background: var(--void); }
 table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; min-width: 120px; }
-@media (max-width: 420px) {
-  table.wtable { font-size: 10.5px; min-width: 420px; }
-  table.wtable th, table.wtable td { padding: 4px; }
+/* On narrow phones: scale the table to fit instead of horizontal-scrolling it —
+   drop the min-width floor, switch to fixed layout so columns share the
+   available width, and let cell text wrap instead of forcing overflow. */
+@media (max-width: 480px) {
+  .wtable-wrap { overflow-x: hidden; }
+  table.wtable { min-width: 0; table-layout: fixed; font-size: 9px; }
+  table.wtable th, table.wtable td { padding: 3px 2px; white-space: normal; overflow-wrap: break-word; }
+  table.wtable .wname { min-width: 0; }
 }
 
 /* ── TACTICS HAND ────────────────────────────────────────── */
