@@ -242,6 +242,18 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 }
 
 /* ── STICKY BAR ─────────────────────────────────────────── */
+.roombar { max-width: 680px; margin: 0 auto; padding: 4px 14px 0; }
+.roomrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; justify-content: center; font-size: 12px; }
+.roomlabel { color: var(--ink-faint); }
+.roomrow input[type="text"] {
+  background: var(--surf-2); border: 1px solid var(--bdr); border-radius: var(--r-sm);
+  color: var(--ink); padding: 4px 6px; font-size: 12px; font-family: inherit;
+}
+.roomcode { font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: .12em; color: var(--bronze-text); }
+.roomstatus { color: var(--ink-faint); font-style: italic; }
+.roomdot { width: 8px; height: 8px; border-radius: 50%; background: #6a6; box-shadow: 0 0 6px #6a6; display: inline-block; }
+.roomdot.off { background: #a55; box-shadow: 0 0 6px #a55; }
+
 .stickybar {
   position: sticky;
   top: 0;
@@ -1475,6 +1487,24 @@ details.spoiler summary:focus-visible {
   <p class="hero-sub">Генератор сражений: армии, карты твистов, тактики и очки победы для терейна Realm of Death.</p>
 </header>
 
+<!-- ═══ КОМНАТА (онлайн-синк раунда/очков/твиста + войска соперника) ══ -->
+<div class="roombar">
+  <div class="roomrow" id="roomRowIdle">
+    <span class="roomlabel">Комната:</span>
+    <button class="ghost small" onclick="uiCreateRoom()">Создать</button>
+    <input type="text" id="roomCodeInput" placeholder="код" maxlength="5" style="width:70px;text-transform:uppercase;">
+    <button class="ghost small" onclick="uiJoinRoom()">Войти</button>
+    <span class="roomstatus" id="roomStatus"></span>
+  </div>
+  <div class="roomrow" id="roomRowActive" style="display:none;">
+    <span class="roomlabel">Комната:</span>
+    <span class="roomcode" id="roomCodeDisplay"></span>
+    <span class="roomdot" id="roomDot"></span>
+    <span class="roomstatus" id="roomStatusActive"></span>
+    <button class="ghost small" onclick="uiLeaveRoom()">Выйти</button>
+  </div>
+</div>
+
 <!-- ═══ STICKY BAR ════════════════════════════════════════════════ -->
 <div class="stickybar">
   <div class="stickyrow">
@@ -1617,6 +1647,16 @@ details.spoiler summary:focus-visible {
     </div>
   </section>
 
+  <!-- IV. АРМИЯ СОПЕРНИКА (только просмотр, из комнаты) -->
+  <section class="block" id="oppSection" style="display:none;">
+    <div class="section-header">
+      <span class="section-num">IV</span>
+      <h2>Армия соперника</h2>
+      <div class="section-rule"></div>
+    </div>
+    <p class="blockdesc">Обновляется автоматически из комнаты — только просмотр.</p>
+    <div class="card" id="oppContent"></div>
+  </section>
 
 </div><!-- /wrap -->
 
@@ -1633,6 +1673,7 @@ details.spoiler summary:focus-visible {
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script type="module" src="firebase-room.js"></script>
 <script>
 /* ============================================================
    ДАННЫЕ И ЛОГИКА — БЕЗ ИЗМЕНЕНИЙ
@@ -2243,6 +2284,158 @@ function renderHand(p){
       </div>
     </div>`;
   }).join('')+'</div>';
+}
+
+/* ── ONLINE ROOM SYNC ─────────────────────────────────────────
+   Опрос вместо хуков на каждую мутацию: раз в секунду сравниваем
+   сериализованный снимок общих полей (раунд/очки/сторона/твист) и
+   своего войска с тем, что публиковали в прошлый раз — если
+   изменилось, пушим в Firestore. Встречное обновление из комнаты
+   мержим в state и перерисовываем нужные куски UI. */
+let roomState={code:null,uid:null,unsubRoom:null,unsubOthers:null};
+let lastSharedBlob=null,lastPlayerBlob=null;
+let roomSyncTimer=null;
+
+function sharedSnapshot(){
+  return {round:state.round,vp:state.vp,side:state.side,twistDeck:state.twistDeck,twistLog:state.twistLog};
+}
+function playerSnapshot(){
+  return {army:armyState.p1,hand:state.players.p1};
+}
+
+function setRoomStatus(text,active){
+  document.getElementById('roomStatus').textContent=text||'';
+  if(active){
+    document.getElementById('roomStatusActive').textContent=text||'';
+  }
+}
+
+async function uiCreateRoom(){
+  if(!window.SBRoom){toast('Комната ещё загружается, попробуйте через секунду');return;}
+  try{
+    setRoomStatus('создаю…');
+    const {code,uid}=await window.SBRoom.createRoom();
+    enterRoom(code,uid);
+    toast('Комната создана: '+code);
+  }catch(e){
+    console.error(e);
+    setRoomStatus('ошибка создания');
+  }
+}
+
+async function uiJoinRoom(){
+  if(!window.SBRoom){toast('Комната ещё загружается, попробуйте через секунду');return;}
+  const code=document.getElementById('roomCodeInput').value;
+  if(!code){toast('Введите код комнаты');return;}
+  try{
+    setRoomStatus('вхожу…');
+    const res=await window.SBRoom.joinRoom(code);
+    enterRoom(res.code,res.uid);
+    toast('Вы в комнате '+res.code);
+  }catch(e){
+    console.error(e);
+    setRoomStatus('комната не найдена');
+  }
+}
+
+function enterRoom(code,uid){
+  roomState.code=code;roomState.uid=uid;
+  lastSharedBlob=null;lastPlayerBlob=null;
+  document.getElementById('roomRowIdle').style.display='none';
+  document.getElementById('roomRowActive').style.display='flex';
+  document.getElementById('roomCodeDisplay').textContent=code;
+  document.getElementById('oppSection').style.display='';
+
+  roomState.unsubRoom=window.SBRoom.subscribeRoom(code,onRemoteShared);
+  roomState.unsubOthers=window.SBRoom.subscribeOthers(code,uid,onRemoteOthers);
+
+  if(roomSyncTimer)clearInterval(roomSyncTimer);
+  roomSyncTimer=setInterval(pushIfChanged,1000);
+  pushIfChanged();
+}
+
+function uiLeaveRoom(){
+  if(roomState.unsubRoom)roomState.unsubRoom();
+  if(roomState.unsubOthers)roomState.unsubOthers();
+  if(roomSyncTimer)clearInterval(roomSyncTimer);
+  roomState={code:null,uid:null,unsubRoom:null,unsubOthers:null};
+  document.getElementById('roomRowIdle').style.display='flex';
+  document.getElementById('roomRowActive').style.display='none';
+  document.getElementById('oppSection').style.display='none';
+  toast('Вы вышли из комнаты');
+}
+
+function pushIfChanged(){
+  if(!roomState.code)return;
+  const sharedBlob=JSON.stringify(sharedSnapshot());
+  if(sharedBlob!==lastSharedBlob){
+    lastSharedBlob=sharedBlob;
+    window.SBRoom.publishShared(roomState.code,sharedSnapshot()).catch(e=>console.error(e));
+  }
+  const playerBlob=JSON.stringify(playerSnapshot());
+  if(playerBlob!==lastPlayerBlob){
+    lastPlayerBlob=playerBlob;
+    window.SBRoom.publishSelf(roomState.code,roomState.uid,playerSnapshot()).catch(e=>console.error(e));
+  }
+  document.getElementById('roomDot').classList.remove('off');
+}
+
+function onRemoteShared(data){
+  if(!data)return;
+  const incomingBlob=JSON.stringify({round:data.round,vp:data.vp,side:data.side,twistDeck:data.twistDeck,twistLog:data.twistLog});
+  if(incomingBlob===lastSharedBlob)return; // эхо своей же публикации
+  lastSharedBlob=incomingBlob;
+  if(data.round!==undefined)state.round=data.round;
+  if(data.vp)state.vp=data.vp;
+  if(data.side)state.side=data.side;
+  if(data.twistDeck)state.twistDeck=data.twistDeck;
+  if(data.twistLog)state.twistLog=data.twistLog;
+  renderRoundTrack();
+  document.getElementById('vp-p1').textContent=state.vp.p1;
+  document.getElementById('vp-p2').textContent=state.vp.p2;
+  document.getElementById('btn-ossia').classList.toggle('sel',state.side==='ossia');
+  document.getElementById('btn-dolorum').classList.toggle('sel',state.side==='dolorum');
+  document.getElementById('twistSideLabel').textContent=state.side==='ossia'?'Ossia':'Dolorum';
+  renderTwistLog();
+  setRoomStatus('синхронизировано',true);
+}
+
+function onRemoteOthers(others){
+  if(!others.length){
+    document.getElementById('oppContent').innerHTML='<p style="color:var(--ink-faint);font-style:italic;font-size:13px;">Соперник ещё не подключился или не выбрал армию.</p>';
+    return;
+  }
+  const opp=others[0];
+  if(!opp.army||!opp.army.armyKey){
+    document.getElementById('oppContent').innerHTML='<p style="color:var(--ink-faint);font-style:italic;font-size:13px;">Соперник в комнате, армия ещё не выбрана.</p>';
+    return;
+  }
+  armyState.opp=opp.army;
+  const army=ARMIES[opp.army.armyKey];
+  if(!army)return;
+  let html=`<div class="armyhead"><span class="nm">${army.label}</span></div>`;
+  html+=army.units.map(u=>{
+    const n=u.count||1;
+    let cards='';
+    for(let idx=0;idx<n;idx++){cards+=renderOppUnitSummary(u,idx,n);}
+    return cards;
+  }).join('');
+  document.getElementById('oppContent').innerHTML=html;
+}
+
+function renderOppUnitSummary(unit,idx,count){
+  const max=unitMaxHP(unit);
+  const cur=getUnitHP('opp',unit,idx);
+  const activated=isActivated('opp',unit.key,idx);
+  const squadTag=count>1?` · отряд ${idx+1}/${count}`:'';
+  return `<div class="unitcard" style="pointer-events:none;">
+    <h4>${unit.name}${squadTag}</h4>
+    <div class="hpwrap"><div class="hprow">
+      <span class="hplabel">HP</span>
+      <span class="hpval${cur===0?' dead':''}">${cur}/${max}</span>
+      <span class="ab-timing" style="margin-left:auto;">${activated?'Активирован':'Не активирован'}</span>
+    </div></div>
+  </div>`;
 }
 
 /* ── INIT ─────────────────────────────────────────────────── */
