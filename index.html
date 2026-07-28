@@ -174,14 +174,13 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   background: linear-gradient(90deg, transparent, var(--bronze-dim), var(--bronze), var(--bronze-dim), transparent);
 }
 
-.hero-eyebrow {
-  font-family: 'Inter', sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: .28em;
-  text-transform: uppercase;
-  color: var(--bronze-dim);
-  margin-bottom: 14px;
+.hero-logo {
+  display: block;
+  margin: 0 auto 14px;
+  max-width: min(420px, 88%);
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 4px 24px rgba(158,120,56,.25));
 }
 
 .hero h1 {
@@ -211,6 +210,24 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   background: linear-gradient(90deg, transparent, var(--bronze-dim));
 }
 .hero-title-row .h-orn.right { background: linear-gradient(90deg, var(--bronze-dim), transparent); }
+
+.modepicker { max-width: 680px; margin: 0 auto; padding: 0 14px 16px; }
+.modepicker-grid { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.modecard {
+  flex: 1; min-width: 150px; max-width: 220px; padding: 14px 16px;
+  border-radius: var(--r); border: 1.5px solid var(--bdr); background: var(--surf-2);
+  cursor: pointer; text-align: center; transition: border-color var(--t), background var(--t), transform var(--t);
+}
+.modecard:hover { border-color: var(--bronze-dim); }
+.modecard.active { border-color: var(--bronze-hi); background: var(--bronze-bg); }
+.modecard.disabled { opacity: .4; cursor: not-allowed; pointer-events: none; }
+.modecard-name { font-family: 'Cinzel', serif; font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 4px; }
+.modecard-desc { font-size: 11.5px; color: var(--ink-faint); line-height: 1.4; }
+.modepicker-selected {
+  display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;
+}
+.modelabel { color: var(--ink-faint); }
+.modename { font-family: 'Cinzel', serif; font-weight: 700; color: var(--bronze-text); }
 
 .hero-divider {
   display: flex;
@@ -1497,15 +1514,35 @@ details.spoiler summary:focus-visible {
 
 <!-- ═══ HERO ══════════════════════════════════════════════════════ -->
 <header class="hero">
-  <div class="hero-eyebrow">Warhammer Age of Sigmar · Spearhead</div>
-  <div class="hero-title-row">
-    <div class="h-orn"></div>
-    <h1>SAND &amp; BONE</h1>
-    <div class="h-orn right"></div>
-  </div>
+  <img class="hero-logo" src="assets/logo/spearhead.png" alt="Warhammer Age of Sigmar · Spearhead">
   <div class="hero-divider">✦</div>
-  <p class="hero-sub">Генератор сражений: армии, карты твистов, тактики и очки победы для терейна Realm of Death.</p>
+  <p class="hero-sub">Генератор сражений: армии, карты твистов, тактики и очки победы.</p>
 </header>
+
+<!-- ═══ ВЫБОР РЕЖИМА ══════════════════════════════════════════════ -->
+<div class="modepicker" id="modePicker">
+  <div class="modepicker-grid" id="modePickerGrid">
+    <div class="modecard active" onclick="chooseMode('sand_bone')">
+      <div class="modecard-name">Sand &amp; Bone</div>
+      <div class="modecard-desc">Realm of Death — армии, карты твистов, тактики и очки победы.</div>
+    </div>
+    <div class="modecard disabled">
+      <div class="modecard-name">Режим 2</div>
+      <div class="modecard-desc">Скоро</div>
+    </div>
+    <div class="modecard disabled">
+      <div class="modecard-name">Режим 3</div>
+      <div class="modecard-desc">Скоро</div>
+    </div>
+  </div>
+  <div class="modepicker-selected" id="modePickerSelected" style="display:none;">
+    <span class="modelabel">Режим:</span>
+    <span class="modename" id="modeNameDisplay"></span>
+    <button class="ghost small" onclick="changeMode()">Сменить</button>
+  </div>
+</div>
+
+<div id="appBody" style="display:none;">
 
 <!-- ═══ КОМНАТА (онлайн-синк раунда/очков/твиста + войска соперника) ══ -->
 <div class="roombar">
@@ -1679,6 +1716,8 @@ details.spoiler summary:focus-visible {
   </section>
 
 </div><!-- /wrap -->
+
+</div><!-- /appBody -->
 
 <!-- ═══ MODAL ══════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
@@ -2544,6 +2583,24 @@ function renderOppUnitSummary(unit,idx,count){
       <span class="ab-timing" style="margin-left:auto;">${activated?'Активирован':'Не активирован'}</span>
     </div></div>
   </div>`;
+}
+
+/* ── MODE PICKER ──────────────────────────────────────────── */
+const MODE_NAMES={sand_bone:'Sand & Bone'};
+let appMode=null;
+function chooseMode(key){
+  if(!MODE_NAMES[key])return;
+  appMode=key;
+  document.getElementById('modePickerGrid').style.display='none';
+  document.getElementById('modePickerSelected').style.display='flex';
+  document.getElementById('modeNameDisplay').textContent=MODE_NAMES[key];
+  document.getElementById('appBody').style.display='';
+}
+function changeMode(){
+  appMode=null;
+  document.getElementById('modePickerGrid').style.display='flex';
+  document.getElementById('modePickerSelected').style.display='none';
+  document.getElementById('appBody').style.display='none';
 }
 
 /* ── INIT ─────────────────────────────────────────────────── */
