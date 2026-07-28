@@ -1049,6 +1049,7 @@ details.spoiler .spoilerbody {
 .lbl2::after { content: ':'; }
 
 .ab-foot { margin-top: 10px; display: flex; gap: 8px; align-items: center; }
+.reinfrow { margin-top: 8px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .usedtag { font-family: 'Inter', sans-serif; font-size: 10.5px; color: var(--blood-text); font-weight: 600; }
 
 /* ── CHOICE BLOCK ────────────────────────────────────────── */
@@ -1219,8 +1220,27 @@ details.spoiler .spoilerbody {
 }
 .actbtn.on svg { stroke: #2a1c06; fill: #2a1c06; }
 
+.phaserow { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.phasebtn {
+  flex: 1; min-width: 64px; padding: 7px 4px; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .04em; text-align: center;
+  border-radius: var(--r-sm); border: 1px solid var(--bdr); background: var(--surf-2);
+  color: var(--ink-faint); cursor: pointer; transition: background var(--t), color var(--t), border-color var(--t);
+}
+.phasebtn.on {
+  background: linear-gradient(175deg, var(--bronze-hi) 0%, var(--bronze-dim) 100%);
+  color: #2a1c06; border-color: var(--bronze-hi);
+  box-shadow: 0 2px 10px rgba(158,120,56,.35), inset 0 1px 0 rgba(255,220,160,.2);
+}
+
 /* Keywords */
 .kwrow { margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+.targetbadges { margin: -2px 0 8px; display: flex; flex-wrap: wrap; gap: 4px; }
+.targetbadge {
+  font-size: 10.5px; font-weight: 600; color: var(--bronze-text);
+  background: var(--bronze-bg); border: 1px solid var(--bronze-dim);
+  border-radius: var(--r-xs); padding: 2px 7px;
+}
 .kwchip {
   font-family: 'Inter', sans-serif;
   font-size: 9.5px;
@@ -1977,10 +1997,34 @@ function changeUnitHP(p,unitKey,idx,delta){
   armyState[p].hp[hpFullId(p,unitKey,idx)]=Math.max(0,Math.min(max,cur+delta));
   renderArmyContent(p);
 }
-function isActivated(p,unitKey,idx){ return !!armyState[p].activated[activationFullId(p,unitKey,idx)]; }
-function toggleActivated(p,unitKey,idx){
+const PHASES=[['mv','Move'],['sh','Shoot'],['ch','Charge'],['cb','Combat']];
+function getPhaseState(p,unitKey,idx){
   const id=activationFullId(p,unitKey,idx);
-  armyState[p].activated[id]=!armyState[p].activated[id];
+  return armyState[p].activated[id]||{};
+}
+function isActivated(p,unitKey,idx){
+  const ph=getPhaseState(p,unitKey,idx);
+  return PHASES.some(([k])=>ph[k]);
+}
+function isPhaseActivated(p,unitKey,idx,phase){ return !!getPhaseState(p,unitKey,idx)[phase]; }
+function togglePhaseActivated(p,unitKey,idx,phase){
+  const id=activationFullId(p,unitKey,idx);
+  const ph=Object.assign({},armyState[p].activated[id]);
+  ph[phase]=!ph[phase];
+  armyState[p].activated[id]=ph;
+  renderArmyContent(p);
+}
+
+/* ── REINFORCEMENTS USED MARKER ──────────────────────────────
+   Юнит с ключевым словом Reinforcements можно вернуть через Call for
+   Reinforcements только один раз за битву — сама вернувшаяся замена
+   повторной замене уже не подлежит. */
+function reinfFullId(p,unitKey,idx){ return p+'__'+armyState[p].armyKey+'__reinf__'+unitKey+'__'+(idx||0); }
+function isReinfUsed(p,unitKey,idx){ return !!armyState[p].reinf&&!!armyState[p].reinf[reinfFullId(p,unitKey,idx)]; }
+function toggleReinfUsed(p,unitKey,idx){
+  if(!armyState[p].reinf)armyState[p].reinf={};
+  const id=reinfFullId(p,unitKey,idx);
+  armyState[p].reinf[id]=!armyState[p].reinf[id];
   renderArmyContent(p);
 }
 
@@ -1994,7 +2038,10 @@ function renderHpTracker(p,unit,idx){
     const isBoundary=(i+1)%perModel===0 && i!==max-1;
     segs+=`<div class="hpseg${filled?' filled':''}${isBoundary?' bound':''}"></div>`;
   }
-  const activated=isActivated(p,unit.key,idx);
+  const phaseBtns=PHASES.map(([k,label])=>{
+    const on=isPhaseActivated(p,unit.key,idx,k);
+    return `<button class="phasebtn ${on?'on':''}" onclick="togglePhaseActivated('${p}','${unit.key}',${idx||0},'${k}')">${label}</button>`;
+  }).join('');
   return `<div class="hpwrap">
     <div class="hprow">
       <span class="hplabel">HP</span>
@@ -2004,10 +2051,8 @@ function renderHpTracker(p,unit,idx){
     <div class="hpbtns">
       <button class="hpbtn dmg" onclick="changeUnitHP('${p}','${unit.key}',${idx||0},-1)" aria-label="Урон юниту ${unit.name}">−</button>
       <button class="hpbtn heal" onclick="changeUnitHP('${p}','${unit.key}',${idx||0},1)" aria-label="Восстановить хп юниту ${unit.name}">+</button>
-      <button class="actbtn ${activated?'on':''}" onclick="toggleActivated('${p}','${unit.key}',${idx||0})">
-        ${ACTIVATION_ICON}<span>${activated?'Активирован':'Активировать'}</span>
-      </button>
     </div>
+    <div class="phaserow">${phaseBtns}</div>
   </div>`;
 }
 
@@ -2094,6 +2139,48 @@ function chooseOption(p,kind,optId){
   toast('Выбор сохранён');
 }
 
+/* ── BUFF TARGET PICKER ───────────────────────────────────── */
+function targetInstances(army){
+  const list=[];
+  army.units.forEach(u=>{
+    const n=u.count||1;
+    for(let idx=0;idx<n;idx++)list.push({unit:u,idx,n});
+  });
+  return list;
+}
+function getAbilityTarget(p,abilityId){
+  return (armyState[p].targets||{})[abilityId]||null;
+}
+function setAbilityTarget(p,abilityId,val){
+  if(!armyState[p].targets)armyState[p].targets={};
+  if(val){const[unitKey,idx]=val.split('__');armyState[p].targets[abilityId]={unitKey,idx:+idx,name:null};}
+  else{delete armyState[p].targets[abilityId];}
+  renderArmyContent(p);
+}
+function findAbilityByIdInArmy(army,id){
+  if(army.battleTrait&&army.battleTrait.id===id)return army.battleTrait;
+  const inList=(list)=>list&&list.find(a=>a.id===id);
+  let found=inList(army.regiment)||inList(army.enhancements);
+  if(found)return found;
+  for(const u of army.units){found=inList(u.abilities);if(found)return found;}
+  return null;
+}
+function targetBadgesFor(p,unitKey,idx){
+  const ast=armyState[p];
+  if(!ast.targets)return'';
+  const army=ARMIES[ast.armyKey];
+  const badges=[];
+  Object.keys(ast.targets).forEach(abilityId=>{
+    const t=ast.targets[abilityId];
+    if(t.unitKey===unitKey&&t.idx===idx){
+      const ability=findAbilityByIdInArmy(army,abilityId);
+      if(ability)badges.push(ability.name);
+    }
+  });
+  if(!badges.length)return'';
+  return `<div class="targetbadges">${badges.map(n=>`<span class="targetbadge">🔺 ${n}</span>`).join('')}</div>`;
+}
+
 function renderAbilityCard(p,scope,ability){
   const used=ability.limited?isUsed(p,scope,ability.id):false;
   let body='';
@@ -2103,6 +2190,19 @@ function renderAbilityCard(p,scope,ability){
   if(ability.table){
     body+=`<table class="wtable" style="margin-top:8px;"><tr><th>D6</th><th>Эффект</th></tr>`+
       ability.table.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')+'</table>';
+  }
+  if(ability.targetable&&armyState[p].armyKey){
+    const army=ARMIES[armyState[p].armyKey];
+    const cur=getAbilityTarget(p,ability.id);
+    const curVal=cur?cur.unitKey+'__'+cur.idx:'';
+    const opts=targetInstances(army).filter(t=>!ability.targetFilter||t.unit.key===ability.targetFilter);
+    body+=`<div style="margin-top:8px;">
+      <span class="lbl2">Цель</span>
+      <select onchange="setAbilityTarget('${p}','${ability.id}',this.value)" style="background:var(--surf-2);color:var(--ink);border:1px solid var(--bdr);border-radius:var(--r-sm);padding:4px 6px;font-family:inherit;font-size:12px;">
+        <option value="">— не выбрана —</option>
+        ${opts.map(o=>`<option value="${o.unit.key}__${o.idx}" ${curVal===o.unit.key+'__'+o.idx?'selected':''}>${o.unit.name}${o.n>1?' · отряд '+(o.idx+1)+'/'+o.n:''}</option>`).join('')}
+      </select>
+    </div>`;
   }
   let foot='';
   if(ability.limited){
@@ -2149,12 +2249,20 @@ function renderUnitCard(p,scope,unit,idx,count){
   const abilitiesHtml=(unit.abilities||[]).map(a=>renderAbilityCard(p,scope+'_'+unit.key+'_'+idx,a)).join('');
   const portraitHtml=unit.image?`<div class="unitportrait"><img src="${unit.image}" alt="${unit.name}" loading="lazy"></div>`:'';
   const squadTag=count>1?` <span class="ab-timing" style="margin-left:4px;">отряд ${idx+1}/${count}</span>`:'';
+  const isReinf=(unit.keywords||[]).includes('Reinforcements');
+  const reinfUsed=isReinf&&isReinfUsed(p,unit.key,idx);
+  const reinfHtml=isReinf?`<div class="reinfrow">
+      <button class="tiny ${reinfUsed?'ghost':'primary'}" onclick="toggleReinfUsed('${p}','${unit.key}',${idx||0})">${reinfUsed?'↺ Сбросить':'Отметить Reinforcements'}</button>
+      ${reinfUsed?'<span class="usedtag">Call for Reinforcements использован</span>':''}
+    </div>`:'';
   return`<div class="unitcard">
     <h4>${unit.name}${unit.isGeneral?' <span class="ab-timing" style="margin-left:4px;">генерал</span>':''}${squadTag}</h4>
     ${kwHtml}
+    ${targetBadgesFor(p,unit.key,idx)}
     ${portraitHtml}
     ${statHtml}
     ${renderHpTracker(p,unit,idx)}
+    ${reinfHtml}
     ${weaponTable('Ranged',unit.ranged)}
     ${weaponTable('Melee',unit.melee)}
     ${abilitiesHtml}
