@@ -6,7 +6,7 @@
 <title>Sand &amp; Bone — Генератор сражений</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 
 /* ════════════════════════════════════════════════════════
@@ -17,38 +17,49 @@
 
 /* ── TOKENS ─────────────────────────────────────────────── */
 :root {
-  /* Backgrounds — warm coal-black, not cold blue */
-  --void:      #060408;
-  --bg:        #0c0a10;
-  --surf-1:    #131018;
-  --surf-2:    #1a1622;
-  --surf-3:    #221d2e;
-  --surf-4:    #2c2540;
+  /* Backgrounds — near-black ember char, not cold blue */
+  --void:      #060504;
+  --bg:        #0c0b08;
+  --surf-1:    #14110c;
+  --surf-2:    #1c1712;
+  --surf-3:    #241e17;
+  --surf-4:    #2e251a;
 
-  /* Text — aged parchment tones, high contrast on dark */
-  --ink:       #d9cab0;   /* 11.2:1 on --bg  ✓ WCAG AAA */
-  --ink-mid:   #9a8a6e;   /*  5.6:1 on --bg  ✓ WCAG AA  */
-  --ink-faint: #5e5040;   /* used for decorative/disabled */
+  /* Text — warm bone tones, high contrast on dark */
+  --ink:       #e7e1d3;
+  --ink-mid:   #a79a85;
+  --ink-faint: #6b6152;
 
-  /* Borders — tarnished bronze/rust */
-  --bdr:       rgba(140, 95, 35, 0.22);
-  --bdr-mid:   rgba(160, 110, 45, 0.42);
-  --bdr-hi:    rgba(190, 140, 60, 0.75);
-  --bdr-focus: #a07838;
+  /* Borders — ember-tinted */
+  --bdr:       rgba(194, 85, 56, 0.16);
+  --bdr-mid:   rgba(194, 85, 56, 0.32);
+  --bdr-hi:    rgba(236, 138, 94, 0.6);
+  --bdr-focus: #ec8a5e;
 
-  /* Blood red — primary CTA / active states */
-  --blood:      #7a1818;
-  --blood-hi:   #a02020;
-  --blood-glow: rgba(122,24,24,.45);
-  --blood-bg:   rgba(122,24,24,.13);
-  --blood-text: #e07070;  /* blood colour readable on dark */
+  /* Ember — single unified accent (drives CTA/active/highlights) */
+  --ember:      #c25538;
+  --ember-hi:   #ec8a5e;
+  --ember-dim:  #7a2e20;
+  --ember-bg:   rgba(194,85,56,.14);
+  --ember-text: #e8946a;
 
-  /* Bronze / tarnished gold */
-  --bronze:     #9e7838;
-  --bronze-hi:  #c49840;
-  --bronze-dim: #5a4018;
-  --bronze-bg:  rgba(158,120,56,.12);
-  --bronze-text: #c4984a;
+  /* Legacy names kept so every existing rule repaints automatically */
+  --blood:      var(--ember);
+  --blood-hi:   var(--ember-hi);
+  --blood-glow: rgba(194,85,56,.4);
+  --blood-bg:   var(--ember-bg);
+  --blood-text: var(--ember-text);
+  --bronze:     var(--ember);
+  --bronze-hi:  var(--ember-hi);
+  --bronze-dim: var(--ember-dim);
+  --bronze-bg:  var(--ember-bg);
+  --bronze-text: var(--ember-text);
+
+  /* Steel — cool contrast reserved for HP/damage + alert badges */
+  --steel:      #4a5560;
+  --steel-hi:   #6b7885;
+  --steel-bg:   rgba(74,85,96,.20);
+  --steel-text: #9aa7b2;
 
   /* Side accent colours */
   --ossia:      #6248a0;
@@ -59,8 +70,8 @@
   --hashut-bg:  rgba(138,92,38,.15);
   --slaves:     #882030;
   --slaves-bg:  rgba(136,32,48,.15);
-  --army-accent:    #9e7838;
-  --army-accent-bg: rgba(158,120,56,.12);
+  --army-accent:    #c25538;
+  --army-accent-bg: rgba(194,85,56,.14);
 
   /* Shadows */
   --shd-sm:  0 2px 8px  rgba(0,0,0,.75);
@@ -68,12 +79,12 @@
   --shd-lg:  0 8px 40px rgba(0,0,0,.90);
   --shd-in:  inset 0 0 28px rgba(0,0,0,.45);
 
-  /* Radius — angular, stone-and-iron feel */
+  /* Radius — flatter, angular ember-plate feel */
   --r-xs: 2px;
   --r-sm: 4px;
-  --r:    7px;
-  --r-lg: 11px;
-  --r-xl: 16px;
+  --r:    6px;
+  --r-lg: 8px;
+  --r-xl: 14px;
 
   /* Motion */
   --ease:    cubic-bezier(.25,.46,.45,.94);
@@ -125,7 +136,7 @@ body::before {
 
 /* ── TYPOGRAPHY ─────────────────────────────────────────── */
 h1, h2, h3, h4, .disp {
-  font-family: 'Cinzel', 'Palatino Linotype', serif;
+  font-family: 'Oswald', sans-serif;
   line-height: 1.2;
   letter-spacing: .03em;
 }
@@ -221,13 +232,20 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 .modecard:hover { border-color: var(--bronze-dim); }
 .modecard.active { border-color: var(--bronze-hi); background: var(--bronze-bg); }
 .modecard.disabled { opacity: .4; cursor: not-allowed; pointer-events: none; }
-.modecard-name { font-family: 'Cinzel', serif; font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 4px; }
+.modecard-name { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 4px; }
 .modecard-desc { font-size: 11.5px; color: var(--ink-faint); line-height: 1.4; }
+.modecard { position: relative; }
+.modetag {
+  position: absolute; top: 8px; right: 8px; font-size: 8.5px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint);
+  border: 1px solid var(--bdr-mid); border-radius: var(--r-xs); padding: 2px 5px;
+  background: var(--surf-1);
+}
 .modepicker-selected {
   display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;
 }
 .modelabel { color: var(--ink-faint); }
-.modename { font-family: 'Cinzel', serif; font-weight: 700; color: var(--bronze-text); }
+.modename { font-family: 'Oswald', sans-serif; font-weight: 700; color: var(--bronze-text); }
 
 .hero-divider {
   display: flex;
@@ -266,7 +284,7 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   background: var(--surf-2); border: 1px solid var(--bdr); border-radius: var(--r-sm);
   color: var(--ink); padding: 4px 6px; font-size: 12px; font-family: inherit;
 }
-.roomcode { font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: .12em; color: var(--bronze-text); }
+.roomcode { font-family: 'Oswald', sans-serif; font-weight: 700; letter-spacing: .12em; color: var(--bronze-text); }
 .roomstatus { color: var(--ink-faint); font-style: italic; }
 .roomdot { width: 8px; height: 8px; border-radius: 50%; background: #6a6; box-shadow: 0 0 6px #6a6; display: inline-block; }
 .roomdot.off { background: #a55; box-shadow: 0 0 6px #a55; }
@@ -325,7 +343,7 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
   font-size: 13px;
   border: 1.5px solid var(--bdr);
@@ -419,7 +437,7 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   line-height: 1;
 }
 .vpval {
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
   font-size: 22px;
   color: var(--ink);
@@ -501,7 +519,7 @@ section.block { margin-top: 36px; }
 
 /* Roman numeral — styled as a carved stone marker */
 .section-num {
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: .12em;
@@ -614,7 +632,7 @@ section.block { margin-top: 36px; }
 .sidebtn.sel::before     { opacity: 1; }
 
 .sidebtn .nm {
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: .05em;
@@ -701,7 +719,7 @@ section.block { margin-top: 36px; }
 
 .rollrow { display: flex; align-items: center; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
 .rollresult {
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-size: 13px;
   color: var(--bronze-text);
   font-weight: 600;
@@ -785,7 +803,7 @@ section.block { margin-top: 36px; }
   justify-content: center;
   margin-bottom: 14px;
   color: var(--bronze-dim);
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-size: 26px;
   background: radial-gradient(circle, rgba(158,120,56,.08), transparent 70%);
   box-shadow: 0 0 24px rgba(158,120,56,.12), inset 0 0 20px rgba(0,0,0,.4);
@@ -794,7 +812,7 @@ section.block { margin-top: 36px; }
   text-shadow: 0 0 16px rgba(158,120,56,.5);
 }
 .back-label {
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: .22em;
@@ -844,7 +862,7 @@ section.block { margin-top: 36px; }
   background: var(--bronze-bg);
 }
 .cardname {
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
   font-size: 16px;
   text-align: center;
@@ -895,7 +913,7 @@ section.block { margin-top: 36px; }
   align-items: baseline;
 }
 .loglist .lr {
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
   color: var(--bronze-text);
   font-size: 10px;
@@ -938,7 +956,7 @@ section.block { margin-top: 36px; }
 .deckcount { font-size: 11.5px; color: var(--ink-faint); }
 
 .armyhead { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
-.armyhead .nm { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; color: var(--ink); }
+.armyhead .nm { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; color: var(--ink); }
 .armyhead .sub2 { font-size: 9.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .07em; }
 
 /* ── SECTION LABEL ───────────────────────────────────────── */
@@ -1035,7 +1053,7 @@ details.spoiler .spoilerbody {
 .abilitycard.used::before { background: var(--bdr); }
 
 .ab-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; margin-bottom: 7px; }
-.ab-name { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: .03em; }
+.ab-name { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: .03em; }
 
 .ab-timing {
   font-family: 'Inter', sans-serif;
@@ -1102,7 +1120,7 @@ details.spoiler .spoilerbody {
 }
 
 .unitcard h4 {
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-size: 15px;
   font-weight: 700;
   margin-bottom: 6px;
@@ -1148,7 +1166,7 @@ details.spoiler .spoilerbody {
   box-shadow: inset 0 1px 0 rgba(255,255,255,.03), var(--shd-sm);
 }
 .statbox .sv {
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
   font-size: 18px;
   color: var(--ink);
@@ -1183,30 +1201,30 @@ details.spoiler .spoilerbody {
   color: var(--ink-faint);
   flex-shrink: 0;
 }
-.hptrack {
+.hpbar {
   flex: 1;
-  display: flex;
-  gap: 2px;
-  height: 22px;
+  position: relative;
+  height: 14px;
   min-width: 0;
-}
-.hpseg {
-  flex: 1;
-  min-width: 4px;
+  border-radius: 7px;
   background: var(--void);
   border: 1px solid var(--bdr);
-  border-radius: 2px;
-  transition: background var(--t), border-color var(--t);
+  overflow: hidden;
 }
-.hpseg.filled {
-  background: linear-gradient(180deg, var(--blood-hi), var(--blood));
-  border-color: var(--blood-hi);
-  box-shadow: inset 0 1px 0 rgba(255,160,160,.15);
+.hpbar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--steel-hi), var(--steel));
+  transition: width var(--t);
 }
-/* Divider marking where an individual model's wounds end */
-.hpseg.bound { border-right: 2px solid var(--bronze-hi); margin-right: 1px; }
+/* Tick marking where an individual model's wounds end */
+.hpbar .modeltick {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1.5px;
+  background: rgba(0,0,0,.45);
+}
 .hpval {
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
   font-size: 15px;
   color: var(--ink);
@@ -1326,7 +1344,7 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
 }
 
 .hc-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.hc-name { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: .03em; }
+.hc-name { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: .03em; }
 .hc-mark {
   font-family: 'Inter', sans-serif;
   font-size: 9px;
@@ -1375,7 +1393,7 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
   align-items: center;
   justify-content: center;
   color: var(--bronze-dim);
-  font-family: 'Cinzel', serif;
+  font-family: 'Oswald', sans-serif;
   font-size: 18px;
   box-shadow: var(--shd-sm);
 }
@@ -1447,7 +1465,7 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--bronze-dim), transparent);
 }
-.modal-head span { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; color: var(--bronze-text); }
+.modal-head span { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 700; color: var(--bronze-text); }
 .modal-head button { min-height: 36px; padding: 0 12px; font-size: 12px; }
 .modal-body { padding: 14px 16px; overflow-y: auto; flex: 1; }
 
@@ -1468,7 +1486,7 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
   width: 3px;
   background: linear-gradient(180deg, var(--bronze-hi), var(--bronze-dim));
 }
-.modal-opt .mo-name { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.modal-opt .mo-name { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
 .modal-opt .mo-body { font-size: 13px; color: var(--ink-mid); margin: 6px 0 10px; line-height: 1.55; }
 .modal-opt button { width: 100%; }
 
@@ -1524,15 +1542,14 @@ details.spoiler summary:focus-visible {
   <div class="modepicker-grid" id="modePickerGrid">
     <div class="modecard active" onclick="chooseMode('sand_bone')">
       <div class="modecard-name">Sand &amp; Bone</div>
-      <div class="modecard-desc">Realm of Death — армии, карты твистов, тактики и очки победы.</div>
     </div>
     <div class="modecard disabled">
+      <div class="modetag">Скоро</div>
       <div class="modecard-name">Режим 2</div>
-      <div class="modecard-desc">Скоро</div>
     </div>
     <div class="modecard disabled">
+      <div class="modetag">Скоро</div>
       <div class="modecard-name">Режим 3</div>
-      <div class="modecard-desc">Скоро</div>
     </div>
   </div>
   <div class="modepicker-selected" id="modePickerSelected" style="display:none;">
@@ -2070,12 +2087,11 @@ function toggleReinfUsed(p,unitKey,idx){
 function renderHpTracker(p,unit,idx){
   const max=unitMaxHP(unit);
   const cur=getUnitHP(p,unit,idx);
-  const perModel=unit.health||1;
-  let segs='';
-  for(let i=0;i<max;i++){
-    const filled=i<cur;
-    const isBoundary=(i+1)%perModel===0 && i!==max-1;
-    segs+=`<div class="hpseg${filled?' filled':''}${isBoundary?' bound':''}"></div>`;
+  const models=unit.models||1;
+  const pct=max>0?(cur/max*100):0;
+  let ticks='';
+  for(let m=1;m<models;m++){
+    ticks+=`<div class="modeltick" style="left:${(m/models*100)}%"></div>`;
   }
   const phaseBtns=PHASES.map(([k,label])=>{
     const on=isPhaseActivated(p,unit.key,idx,k);
@@ -2084,7 +2100,7 @@ function renderHpTracker(p,unit,idx){
   return `<div class="hpwrap">
     <div class="hprow">
       <span class="hplabel">HP</span>
-      <div class="hptrack">${segs}</div>
+      <div class="hpbar"><div class="fill" style="width:${pct}%"></div>${ticks}</div>
       <span class="hpval${cur===0?' dead':''}">${cur}/${max}</span>
     </div>
     <div class="hpbtns">
