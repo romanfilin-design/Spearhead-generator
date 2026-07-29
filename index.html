@@ -294,13 +294,20 @@ body { padding-bottom: 58px; }
 .roundchip span.on { background: var(--bronze-src); border-color: var(--bronze-src); color: #1a1305; }
 .roundchip span.done { border-color: var(--ember-dim); color: var(--ember-text); }
 
-/* Round step arrows — reuses mockup's .roundctl circular control */
+/* Round step arrows — reuses mockup's .roundctl circular control.
+   Sized up from the mockup's literal 28px: PRODUCT.md sets a 44px touch
+   target floor for this dim-room/one-handed tool, and these steppers
+   (especially HP) are the single most-repeated tap in a real game. */
 .roundctl { display: flex; gap: 6px; margin-left: 4px; }
 .roundctl button {
-  width: 28px; height: 28px; min-height: 0; padding: 0;
+  width: 32px; height: 32px; min-height: 0; padding: 0;
   border-radius: 50%; border: 1px solid var(--line); background: #211c14; color: var(--fg);
   font-size: 14px; display: flex; align-items: center; justify-content: center;
 }
+/* HP +/- specifically: highest-frequency tap in the app, gets the full
+   44px floor even though the shared .roundctl base stays more compact
+   for the less-frequent VP/round steppers. */
+.hprow2 .roundctl button { width: 40px; height: 40px; font-size: 17px; }
 
 /* VP — literal mockup .vpchip, split per player + roundctl steppers
    for the +/- interactivity the mockup's read-only chip doesn't need. */
