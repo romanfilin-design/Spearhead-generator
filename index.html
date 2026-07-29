@@ -17,33 +17,40 @@
 
 /* ── TOKENS ─────────────────────────────────────────────── */
 :root {
-  /* Backgrounds — near-black ember char, not cold blue */
-  --void:      #060504;
-  --bg:        #0c0b08;
-  --surf-1:    #14110c;
+  /* ── Literal mockup tokens (design-concepts/v2/layout-2c-ember-red.html) ── */
+  --void:   #0C0B0A;
+  --panel:  #17140F;
+  --bronze-src: #C25538;
+  --bronze-hi-src: #EC8A5E;
+  --fg:     #E7E1D3;
+  --fg-dim: #847A66;
+  --line:   #2C271C;
+  --danger: #4A5560;
+
+  /* ── Aliases — production's naming used across ability/army/room
+     components the mockup doesn't cover, all pointing at the tokens above
+     so the whole file stays on the mockup's literal palette. ── */
+  --bg:        var(--void);
+  --surf-1:    var(--panel);
   --surf-2:    #1c1712;
   --surf-3:    #241e17;
   --surf-4:    #2e251a;
 
-  /* Text — warm bone tones, high contrast on dark */
-  --ink:       #e7e1d3;
+  --ink:       var(--fg);
   --ink-mid:   #a79a85;
-  --ink-faint: #6b6152;
+  --ink-faint: var(--fg-dim);
 
-  /* Borders — ember-tinted */
-  --bdr:       rgba(194, 85, 56, 0.16);
-  --bdr-mid:   rgba(194, 85, 56, 0.32);
-  --bdr-hi:    rgba(236, 138, 94, 0.6);
-  --bdr-focus: #ec8a5e;
+  --bdr:       var(--line);
+  --bdr-mid:   var(--line);
+  --bdr-hi:    var(--bronze-hi-src);
+  --bdr-focus: var(--bronze-hi-src);
 
-  /* Ember — single unified accent (drives CTA/active/highlights) */
-  --ember:      #c25538;
-  --ember-hi:   #ec8a5e;
+  --ember:      var(--bronze-src);
+  --ember-hi:   var(--bronze-hi-src);
   --ember-dim:  #7a2e20;
   --ember-bg:   rgba(194,85,56,.14);
   --ember-text: #e8946a;
 
-  /* Legacy names kept so every existing rule repaints automatically */
   --blood:      var(--ember);
   --blood-hi:   var(--ember-hi);
   --blood-glow: rgba(194,85,56,.4);
@@ -55,13 +62,12 @@
   --bronze-bg:  var(--ember-bg);
   --bronze-text: var(--ember-text);
 
-  /* Steel — cool contrast reserved for HP/damage + alert badges */
-  --steel:      #4a5560;
+  --steel:      var(--danger);
   --steel-hi:   #6b7885;
   --steel-bg:   rgba(74,85,96,.20);
   --steel-text: #9aa7b2;
 
-  /* Side accent colours */
+  /* Side accent colours (not present in mockup — extension) */
   --ossia:      #6248a0;
   --ossia-bg:   rgba(98,72,160,.15);
   --dolorum:    #3a6840;
@@ -70,23 +76,23 @@
   --hashut-bg:  rgba(138,92,38,.15);
   --slaves:     #882030;
   --slaves-bg:  rgba(136,32,48,.15);
-  --army-accent:    #c25538;
+  --army-accent:    var(--bronze-src);
   --army-accent-bg: rgba(194,85,56,.14);
 
-  /* Shadows */
+  /* Shadows (extension — mockup uses ad-hoc rgba(0,0,0,.x) per rule) */
   --shd-sm:  0 2px 8px  rgba(0,0,0,.75);
   --shd:     0 4px 20px rgba(0,0,0,.80);
-  --shd-lg:  0 8px 40px rgba(0,0,0,.90);
+  --shd-lg:  0 20px 40px rgba(0,0,0,.6);
   --shd-in:  inset 0 0 28px rgba(0,0,0,.45);
 
-  /* Radius — flatter, angular ember-plate feel */
+  /* Radius — mockup's literal values: 6px (poster/card), 8px (iconbtn), 20px (pill) */
   --r-xs: 2px;
   --r-sm: 4px;
   --r:    6px;
   --r-lg: 8px;
   --r-xl: 14px;
 
-  /* Motion */
+  /* Motion (extension) */
   --ease:    cubic-bezier(.25,.46,.45,.94);
   --ease-o:  cubic-bezier(.16,1,.3,1);
   --t:       .18s;
@@ -241,8 +247,8 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   background: var(--surf-2);
   border: 1px solid var(--bdr);
 }
-.poster.p2 { z-index: 2; top: 12px; left: 8px; right: -8px; opacity: .55; transform: scale(.96); }
-.poster.p3 { z-index: 1; top: 22px; left: 16px; right: -16px; opacity: .3; transform: scale(.92); }
+.poster.p2 { z-index: 2; top: 14px; left: 10px; right: -10px; opacity: .55; transform: scale(.96); }
+.poster.p3 { z-index: 1; top: 26px; left: 20px; right: -20px; opacity: .3; transform: scale(.92); }
 .poster .pname { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 20px; text-transform: uppercase; color: var(--ink); }
 .poster .plock { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
 .dots { display: flex; gap: 6px; justify-content: center; margin: 0 0 14px; }
@@ -284,13 +290,18 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 }
 
 /* ── STICKY BAR ─────────────────────────────────────────── */
-.roombar { max-width: 680px; margin: 0 auto; padding: 4px 14px 0; }
-.roomrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; justify-content: center; font-size: 12px; }
-.roomlabel { color: var(--ink-faint); }
+/* Room controls — literal mockup .bottomsheet/.roomrow. The mockup shows
+   this only on the mode-select screen; production keeps it reachable from
+   the Подготовка tab too, since room status/leave must stay available for
+   the whole session, not just before picking a mode (mockup doesn't model
+   that persistence — extension per the "screens outside the mockup" rule). */
+.bottomsheet { background: var(--panel); border-top: 1px solid var(--line); padding: 16px 0 22px; max-width: 680px; margin: 0 auto; }
+.bottomsheet .lbl { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 10px; }
+.roomrow { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .roomrow input[type="text"] {
-  background: var(--void); border: 1px solid var(--bdr-mid); border-radius: 20px;
-  color: var(--ink); padding: 6px 12px; font-size: 12px; font-family: 'Oswald', sans-serif;
-  text-align: center; min-height: 34px;
+  flex: 0 0 70px; width: 70px; background: var(--void); border: 1px solid var(--line);
+  border-radius: 20px; color: var(--fg); font-family: 'Oswald', sans-serif;
+  padding: 0 4px; text-transform: uppercase; text-align: center; min-height: 34px;
 }
 .roomcode { font-family: 'Oswald', sans-serif; font-weight: 700; letter-spacing: .12em; color: var(--bronze-text); }
 .roomstatus { color: var(--ink-faint); font-style: italic; }
@@ -300,22 +311,22 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 /* ── TAB NAVIGATION ─────────────────────────────────────── */
 .tabpanel { display: none; }
 .tabpanel.active { display: block; }
+/* Literal mockup .tabbar / .tab, fixed to the viewport bottom since the
+   real app is a full page, not a single phone-frame mock. */
 .tabbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
-  display: flex; background: var(--surf-1); border-top: 1px solid var(--bdr);
-  box-shadow: 0 -4px 20px rgba(0,0,0,.5);
+  display: flex; border-top: 1px solid var(--line); background: var(--panel);
+  flex-shrink: 0;
 }
-.tabbtn {
-  flex: 1; min-height: 0; padding: 9px 4px 10px; background: none; border: none; border-radius: 0;
-  display: flex; flex-direction: column; align-items: center; gap: 3px;
-  font-family: 'Oswald', sans-serif; font-size: 9.5px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: .04em; color: var(--ink-faint);
-  cursor: pointer; transition: color var(--t);
+.tab {
+  flex: 1; min-height: 0; padding: 10px 4px 12px; background: none; border: none; border-radius: 0;
+  text-align: center; cursor: pointer;
 }
-.tabbtn:hover { filter: none; }
-.tabbtn svg { width: 19px; height: 19px; stroke: var(--ink-faint); fill: none; stroke-width: 1.6; transition: stroke var(--t); }
-.tabbtn.active { color: var(--ember-hi); }
-.tabbtn.active svg { stroke: var(--ember-hi); }
+.tab:hover { filter: none; }
+.tab svg { width: 18px; height: 18px; stroke: var(--fg-dim); fill: none; stroke-width: 1.6; }
+.tab.active svg { stroke: var(--bronze-hi-src); }
+.tab .tl { font-family: 'Oswald', sans-serif; font-size: 8.5px; text-transform: uppercase; color: var(--fg-dim); margin-top: 3px; display: block; }
+.tab.active .tl { color: var(--bronze-hi-src); }
 body { padding-bottom: 58px; }
 
 .stickybar {
@@ -357,120 +368,39 @@ body { padding-bottom: 58px; }
   .vprow { justify-content: center; }
 }
 
-/* Round track — compact chip row, matches mockup's .roundchip */
-.roundtrack {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.roundnode {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Oswald', sans-serif;
-  font-weight: 700;
-  font-size: 10.5px;
+/* Round track — literal mockup .roundchip (from herotopbar), used as a
+   standalone global bar since the app needs it visible on every tab,
+   not just overlaid on one hero image like the mockup demo. */
+.roundchip { display: flex; gap: 5px; align-items: center; }
+.roundchip span {
+  width: 20px; height: 20px; border-radius: 50%;
   border: 1px solid rgba(231,225,211,.4);
-  color: var(--ink-faint);
-  background: transparent;
-  transition: border-color var(--t), background var(--t), color var(--t);
-  cursor: default;
-  user-select: none;
+  font-family: 'Oswald', sans-serif; font-size: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--fg-dim);
 }
-.roundnode.active {
-  border-color: var(--ember);
-  color: #2a1305;
-  background: var(--ember);
-}
-.roundnode.done {
-  border-color: var(--ember-dim);
-  color: var(--ember-text);
-  background: var(--ember-bg);
+.roundchip span.on { background: var(--bronze-src); border-color: var(--bronze-src); color: #1a1305; }
+.roundchip span.done { border-color: var(--ember-dim); color: var(--ember-text); }
+
+/* Round step arrows — reuses mockup's .roundctl circular control */
+.roundctl { display: flex; gap: 6px; margin-left: 4px; }
+.roundctl button {
+  width: 28px; height: 28px; min-height: 0; padding: 0;
+  border-radius: 50%; border: 1px solid var(--line); background: #211c14; color: var(--fg);
+  font-size: 14px; display: flex; align-items: center; justify-content: center;
 }
 
-.roundline { width: 6px; height: 1px; background: var(--bdr); flex-shrink: 0; }
-
-.roundbtns { display: flex; gap: 4px; margin-left: 6px; }
-.roundbtns button {
-  width: 24px;
-  height: 24px;
-  min-height: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  line-height: 1;
-  border-radius: 50%;
-  background: var(--surf-2);
-  border: 1px solid var(--bdr-mid);
-}
-
-/* VP — single compact chip, matches mockup's .vpchip */
+/* VP — literal mockup .vpchip, split per player + roundctl steppers
+   for the +/- interactivity the mockup's read-only chip doesn't need. */
 .vprow { display: flex; align-items: center; gap: 6px; }
-
-.vpbox {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  background: rgba(0,0,0,.35);
-  border-radius: 14px;
-  padding: 2px 3px 2px 9px;
+.vpchip {
+  font-family: 'Oswald', sans-serif; font-size: 12px;
+  background: rgba(0,0,0,.4); padding: 3px 4px 3px 10px; border-radius: 12px;
+  display: flex; align-items: center; gap: 6px;
 }
-
-.vpbtn {
-  min-width: 22px;
-  min-height: 22px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--surf-2);
-  border: 1px solid var(--bdr-mid);
-  color: var(--ink-mid);
-  font-size: 14px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 400;
-  cursor: pointer;
-  transition: background var(--t), color var(--t);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-.vpbtn:hover  { background: var(--ember-bg); color: var(--ember-text); }
-.vpbtn:active { background: var(--ember); color: #2a1305; }
-
-.vp-inner {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  padding: 0 6px;
-  min-width: 34px;
-  justify-content: center;
-}
-.vpname {
-  font-family: 'Oswald', sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  line-height: 1;
-}
-.vpval {
-  font-family: 'Oswald', sans-serif;
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--ink);
-  line-height: 1;
-}
+.vpchip .roundctl button { width: 22px; height: 22px; font-size: 12px; }
+.vpname { color: var(--fg-dim); text-transform: uppercase; font-size: 10px; letter-spacing: .04em; }
+.vpval { font-weight: 700; color: var(--fg); }
 
 .underdogtag {
   font-family: 'Oswald', sans-serif;
@@ -488,17 +418,19 @@ body { padding-bottom: 58px; }
 }
 
 /* ── BUTTONS — pill-shaped, matches Command Deck mockup ───── */
+/* Literal mockup .pillbtn, applied to the element so every button in the
+   app (not just a hand-picked subset) gets it without a class on each one. */
 button {
   font-family: 'Oswald', sans-serif;
   font-weight: 600;
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: .04em;
   cursor: pointer;
   border-radius: 20px;
   border: none;
-  background: var(--surf-3);
-  color: var(--ink);
+  background: var(--line);
+  color: var(--fg);
   /* skill checklist: min touch target */
   min-height: 44px;
   padding: 0 18px;
@@ -516,12 +448,10 @@ button:active { transform: scale(.97); }
 
 /* Primary — ember gradient, dark text (matches .pillbtn.solid) */
 button.primary {
-  background: linear-gradient(175deg, var(--ember-hi) 0%, var(--ember) 100%);
-  color: #2a1305;
-  box-shadow: 0 2px 14px rgba(194,85,56,.4), inset 0 1px 0 rgba(255,200,160,.2);
-  font-weight: 700;
+  background: linear-gradient(175deg, var(--bronze-hi-src), var(--bronze-src));
+  color: #1a1305;
 }
-button.primary:hover  { filter: brightness(1.1); box-shadow: 0 4px 20px rgba(194,85,56,.55); }
+button.primary:hover  { filter: brightness(1.1); }
 button.primary:active { filter: brightness(.92); transform: scale(.97); }
 
 /* Ghost — outlined variant, kept for tertiary/destructive actions */
@@ -753,201 +683,49 @@ section.block { margin-top: 36px; }
 }
 
 /* ── TWIST CARD ──────────────────────────────────────────── */
-.twistarea { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-start; }
-.twistdraw { flex: 1; min-width: 240px; }
-.twistlog  { flex: 1; min-width: 190px; }
-
-/* 3D flip card */
-.cardstage {
-  perspective: 1400px;
-  min-height: 210px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 14px;
-}
-.flipcard {
-  width: 100%;
-  max-width: 380px;
-  min-height: 190px;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform .70s cubic-bezier(.25,.8,.25,1);
-}
-.flipcard.flipped { transform: rotateY(180deg); }
-
-.face {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+/* Twist — briefing panel, matches mockup screen 3 */
+.briefing {
+  padding: 22px 4px;
+  background: linear-gradient(200deg, var(--surf-3), var(--void) 65%);
   border-radius: var(--r-lg);
-  border: 1px solid var(--bdr-mid);
-  display: flex;
-  flex-direction: column;
-}
-
-/* Card back — grimoire cover */
-.face.back {
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 24px 20px;
-  background:
-    radial-gradient(ellipse 70% 50% at 50% 30%, rgba(158,120,56,.07), transparent 70%),
-    repeating-linear-gradient(135deg, rgba(158,120,56,.04) 0px 10px, transparent 10px 20px),
-    repeating-linear-gradient(45deg,  rgba(158,120,56,.03) 0px 10px, transparent 10px 20px),
-    var(--surf-2);
-  border-color: var(--bdr-hi);
-  box-shadow: inset 0 0 40px rgba(0,0,0,.5), var(--shd);
-}
-
-/* Inner border frame on card back */
-.face.back::before {
-  content: '';
-  position: absolute;
-  inset: 6px;
-  border: 1px solid var(--bdr-mid);
-  border-radius: calc(var(--r-lg) - 4px);
-  pointer-events: none;
-}
-.face.back::after {
-  content: '';
-  position: absolute;
-  inset: 10px;
-  border: 1px solid rgba(158,120,56,.15);
-  border-radius: calc(var(--r-lg) - 8px);
-  pointer-events: none;
-}
-
-.back-seal {
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  border: 2px solid var(--bronze-dim);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   margin-bottom: 14px;
-  color: var(--bronze-dim);
+}
+.briefing .tag2 {
   font-family: 'Oswald', sans-serif;
-  font-size: 26px;
-  background: radial-gradient(circle, rgba(158,120,56,.08), transparent 70%);
-  box-shadow: 0 0 24px rgba(158,120,56,.12), inset 0 0 20px rgba(0,0,0,.4);
-  position: relative;
-  z-index: 1;
-  text-shadow: 0 0 16px rgba(158,120,56,.5);
-}
-.back-label {
-  font-family: 'Oswald', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  position: relative;
-  z-index: 1;
-}
-
-/* Card front — revealed twist */
-.face.front {
-  transform: rotateY(180deg);
-  overflow-y: auto;
-  padding: 18px;
-  background: var(--surf-1);
-  border-color: var(--bronze-dim);
-  box-shadow: var(--shd);
-  /* Native scrollbar is hidden below — its overlay thumb otherwise
-     paints on top of the card text and looks like a stray gold line. */
-  scrollbar-width: none;
-}
-.face.front::-webkit-scrollbar { display: none; }
-
-.face.front::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 10%; right: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--bronze-dim), transparent);
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.cardseal {
-  align-self: center;
-  font-family: 'Inter', sans-serif;
-  font-size: 8.5px;
-  font-weight: 700;
-  letter-spacing: .20em;
-  text-transform: uppercase;
-  color: var(--bronze-text);
-  border: 1px solid var(--bronze-dim);
-  border-radius: 2px;
-  padding: 3px 12px;
-  margin-bottom: 12px;
-  background: var(--bronze-bg);
-}
-.cardname {
-  font-family: 'Oswald', sans-serif;
-  font-weight: 700;
-  font-size: 16px;
-  text-align: center;
-  margin-bottom: 10px;
-  color: var(--ink);
-  letter-spacing: .04em;
-}
-.cardeffect { font-size: 13.5px; color: var(--ink-mid); line-height: 1.6; }
-.cardeffect b { color: var(--ink); font-weight: 600; }
-.cardeffect .opt { margin: 8px 0 0; padding-left: 16px; }
-.cardeffect .opt li { margin-bottom: 5px; }
-.cardeffect .note {
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--ink-faint);
-  font-style: italic;
-  border-left: 2px solid var(--bdr);
-  padding-left: 8px;
-}
-
-.twistbtnrow { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-
-/* Twist log */
-.logheader {
-  font-family: 'Inter', sans-serif;
-  font-size: 9px;
-  font-weight: 700;
+  font-size: 10px;
   letter-spacing: .16em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--ember-hi);
   margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
-.logheader::after { content: ''; flex: 1; height: 1px; background: var(--bdr); }
-
-.loglist { list-style: none; display: flex; flex-direction: column; gap: 5px; max-height: 210px; overflow-y: auto; }
-.loglist li {
-  background: var(--surf-2);
-  border: 1px solid var(--bdr);
-  border-radius: var(--r-sm);
-  padding: 7px 10px;
-  font-size: 12.5px;
-  color: var(--ink-mid);
-  display: flex;
-  gap: 8px;
-  align-items: baseline;
-}
-.loglist .lr {
+.briefing h2 {
   font-family: 'Oswald', sans-serif;
   font-weight: 700;
-  color: var(--bronze-text);
-  font-size: 10px;
-  flex-shrink: 0;
-  letter-spacing: .06em;
+  font-size: 24px;
+  text-transform: uppercase;
+  margin: 0 0 14px;
+  color: var(--ink);
 }
-.loglist .empty { color: var(--ink-faint); font-style: italic; border: 1px dashed var(--bdr); background: transparent; }
+.briefing .cardeffect { font-size: 13.5px; line-height: 1.65; color: var(--ink-mid); margin: 0 0 4px; }
+.briefing .cardeffect b { color: var(--ink); font-weight: 600; }
+.briefing .opt { margin: 8px 0 0; padding-left: 16px; font-size: 13.5px; color: var(--ink-mid); line-height: 1.6; }
+.briefing .opt li { margin-bottom: 5px; }
+.briefing .cardeffect .note {
+  margin-top: 10px; font-size: 12px; color: var(--ink-faint); font-style: italic;
+  border-left: 2px solid var(--bdr); padding-left: 8px;
+}
+.briefing .empty2 { font-size: 13.5px; color: var(--ink-faint); font-style: italic; }
+
+.twistbtnrow { display: flex; gap: 8px; margin-top: 18px; }
+
+/* Twist log — matches mockup's flat .log rows */
+.loglist { list-style: none; margin-top: 6px; }
+.loglist li {
+  padding: 7px 0; font-size: 12px; color: var(--ink-faint);
+  border-bottom: 1px solid var(--bdr); display: flex; justify-content: space-between; gap: 8px;
+}
+.loglist .lr { font-family: 'Oswald', sans-serif; font-weight: 700; color: var(--ember-text); font-size: 10px; flex-shrink: 0; letter-spacing: .06em; }
+.loglist .empty { color: var(--ink-faint); font-style: italic; border-bottom: none; }
 
 /* ── ARMY PICKER (horizontal scroll on mobile) ───────────── */
 .armypicker-wrap {
@@ -1000,49 +778,32 @@ section.block { margin-top: 36px; }
 }
 .section-label::after { content: ''; flex: 1; height: 1px; background: var(--bdr); }
 
-/* ── DETAILS / SPOILER ───────────────────────────────────── */
-details.spoiler {
-  background: var(--surf-1);
-  border: 1px solid var(--bdr);
-  border-radius: var(--r-sm);
-  margin: 8px 0;
-  overflow: hidden;
+/* ── ACCORDION — literal mockup .accordion/.acc-head/.acc-body ──── */
+details.accordion {
+  border-top: 1px solid var(--line);
+  margin: 0;
 }
-details.spoiler summary {
+details.accordion summary.acc-head {
   cursor: pointer;
   list-style: none;
-  padding: 10px 12px;
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--bronze-dim);
-  text-transform: uppercase;
-  letter-spacing: .10em;
-  user-select: none;
+  padding: 13px 2px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 6px;
-  transition: color var(--t), background var(--t);
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: var(--fg-dim);
+  user-select: none;
   min-height: 40px;
 }
-details.spoiler summary::-webkit-details-marker { display: none; }
-details.spoiler summary::before {
-  content: '▸';
-  font-size: 9px;
-  color: var(--blood);
-  transition: transform var(--t);
-  flex-shrink: 0;
-}
-details.spoiler[open] summary::before { transform: rotate(90deg); }
-details.spoiler summary:hover { color: var(--bronze-text); background: var(--surf-2); }
-details.spoiler .spoilerbody.plain { font-style: normal; }
-details.spoiler .spoilerbody {
-  padding: 4px 13px 14px;
-  font-size: 13px;
-  color: var(--ink-mid);
-  font-style: italic;
-  line-height: 1.65;
-  border-top: 1px solid var(--bdr);
-}
+details.accordion summary.acc-head::-webkit-details-marker { display: none; }
+details.accordion .chev { font-size: 10px; transition: transform var(--t); }
+details.accordion[open] .chev { transform: rotate(180deg); }
+.acc-body { padding: 0 2px 16px; font-size: 12.5px; line-height: 1.6; color: var(--ink-mid); }
+.acc-body.plain { font-style: normal; }
 
 /* ── UNIT ROSTER ─────────────────────────────────────────── */
 .unitroster { list-style: none; padding: 0; margin: 0 0 10px; font-size: 13px; color: var(--ink-mid); }
@@ -1160,42 +921,36 @@ details.spoiler .spoilerbody {
   letter-spacing: .03em;
 }
 
-/* Unit head — hero image banner (unit.image set) or plain heading (no art yet) */
+/* Unit head — literal mockup .herowrap/.herobottom/.buffpill (unit.image
+   set) or a plain heading fallback for units still missing art. */
 .unitheadplain { margin: 0 0 8px; }
-.unithero {
+.herowrap {
   position: relative;
-  height: 200px;
+  height: 300px;
+  flex-shrink: 0;
   margin: -14px -14px 12px -16px;
   background-size: cover;
   background-position: center;
-  display: flex;
-  align-items: flex-end;
 }
-.unithero-scrim {
-  position: absolute; inset: 0;
-  background: linear-gradient(0deg, rgba(0,0,0,.88) 0%, rgba(0,0,0,.2) 55%, transparent 80%);
+.herobottom {
+  position: absolute; bottom: 0; left: 0; right: 0; padding: 16px;
+  background: linear-gradient(0deg, rgba(0,0,0,.85), transparent);
 }
-.unithero-bottom {
-  position: relative;
-  z-index: 1;
-  padding: 14px 16px 12px;
-  width: 100%;
+.herobottom .unitname {
+  font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 22px; text-transform: uppercase; color: var(--fg);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
-.unithero-name {
-  font-family: 'Oswald', sans-serif;
-  font-weight: 700;
-  font-size: 17px;
-  color: var(--ink);
-  text-transform: uppercase;
-  letter-spacing: .03em;
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  text-shadow: 0 2px 6px rgba(0,0,0,.8);
+.herobottom .kwrow { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.herobottom .kwchip {
+  font-size: 9px; letter-spacing: .04em; text-transform: uppercase;
+  border: 1px solid rgba(231,225,211,.35); padding: 2px 8px; border-radius: 10px; color: var(--fg);
 }
-.unithero .kwrow { margin-bottom: 0; }
+.buffpill {
+  position: absolute; top: 16px; right: 16px; background: var(--danger); color: #fff;
+  font-family: 'Oswald', sans-serif; font-size: 9.5px; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 12px; max-width: 60%; text-align: right; line-height: 1.3;
+}
+.buffpill + .buffpill { top: 46px; }
 
 .tag {
   font-family: 'Inter', sans-serif;
@@ -1211,115 +966,36 @@ details.spoiler .spoilerbody {
   background: var(--ember-bg);
 }
 
-/* Stat strip — 4-col embossed boxes */
-.statstrip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0 12px; }
-.statbox {
-  text-align: center;
-  background: var(--surf-1);
-  border: 1px solid var(--bdr);
-  border-radius: var(--r-sm);
-  padding: 8px 4px 6px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.03), var(--shd-sm);
-}
-.statbox .sv {
-  font-family: 'Oswald', sans-serif;
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--ink);
-  line-height: 1;
-  text-shadow: 0 0 10px rgba(217,202,176,.15);
-}
-.statbox .sl {
-  font-family: 'Inter', sans-serif;
-  font-size: 8px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  color: var(--ink-faint);
-  margin-top: 3px;
-}
+/* Stat overlay — literal mockup .statoverlay (flat, no boxed cells) */
+.statoverlay { display: flex; justify-content: space-around; padding: 14px 10px; background: var(--panel); border-bottom: 1px solid var(--line); }
+.statoverlay .st { text-align: center; }
+.statoverlay .v { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 17px; color: var(--fg); }
+.statoverlay .l { font-size: 8px; letter-spacing: .05em; color: var(--fg-dim); text-transform: uppercase; }
 
-/* ── HP TRACKER + ACTIVATION ─────────────────────────────── */
-.hpwrap {
-  background: var(--surf-1);
-  border: 1px solid var(--bdr);
-  border-radius: var(--r);
-  padding: 10px 12px 12px;
-  margin: 0 0 12px;
-}
-.hprow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.hplabel {
-  font-family: 'Inter', sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  color: var(--ink-faint);
-  flex-shrink: 0;
-}
+/* ── HP TRACKER — literal mockup .scrollmid > .hprow2 ─────── */
+.scrollmid { padding: 0 0 4px; }
+.hprow2 { display: flex; align-items: center; gap: 10px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .hpbar {
-  flex: 1;
-  position: relative;
-  height: 14px;
-  min-width: 0;
-  border-radius: 7px;
-  background: var(--void);
-  border: 1px solid var(--bdr);
-  overflow: hidden;
+  flex: 1; height: 10px; border-radius: 5px; background: var(--line);
+  overflow: hidden; position: relative;
 }
-.hpbar .fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--steel-hi), var(--steel));
-  transition: width var(--t);
-}
-/* Tick marking where an individual model's wounds end */
-.hpbar .modeltick {
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 1.5px;
-  background: rgba(0,0,0,.45);
-}
-.hpval {
-  font-family: 'Oswald', sans-serif;
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--ink);
-  flex-shrink: 0;
-  min-width: 46px;
-  text-align: right;
-}
-.hpval.dead { color: var(--ink-faint); }
+.hpbar .fill { height: 100%; background: var(--danger); transition: width var(--t); }
+.hpbar .modeltick { position: absolute; top: 0; bottom: 0; width: 1.5px; background: rgba(0,0,0,.4); }
+.hpval2 { font-family: 'Oswald', sans-serif; font-size: 13px; color: var(--fg); flex-shrink: 0; }
+.hpval2.dead { color: var(--fg-dim); }
+.hpbtn.dmg:hover  { border-color: var(--blood-hi); color: var(--blood-text); filter: none; }
+.hpbtn.heal:hover { border-color: var(--dolorum);  color: #6aaa70;          filter: none; }
 
-.hpbtns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.hpbtn {
-  width: 40px;
-  height: 40px;
-  min-height: 0;
-  padding: 0;
-  font-size: 18px;
-  font-weight: 700;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--surf-2);
-  border: 1px solid var(--bdr-mid);
+/* Literal mockup .iconrow / .iconbtn */
+.iconrow { display: flex; gap: 8px; padding: 12px 16px; background: var(--panel); }
+.iconbtn {
+  flex: 1; min-height: 0; aspect-ratio: 1.6; border-radius: 8px; border: 1px solid var(--line);
+  background: #211c14; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; font-family: 'Oswald', sans-serif; font-size: 9px; text-transform: uppercase; color: var(--fg-dim);
+  cursor: pointer;
 }
-.hpbtn.dmg:hover  { border-color: var(--blood-hi); color: var(--blood-text); background: var(--blood-bg); filter: none; }
-.hpbtn.heal:hover { border-color: var(--dolorum);  color: #6aaa70;          background: var(--dolorum-bg); filter: none; }
-
-.phaserow { display: flex; gap: 6px; margin-top: 8px; }
-.phasebtn {
-  flex: 1; min-height: 0; aspect-ratio: 1.5; padding: 4px 2px; font-size: 8.5px;
-  text-transform: uppercase; letter-spacing: .03em; text-align: center;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  border-radius: var(--r-lg); border: 1px solid var(--bdr); background: var(--surf-2);
-  color: var(--ink-faint); cursor: pointer; transition: background var(--t), color var(--t), border-color var(--t);
-}
-.phasebtn .num { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 700; }
-.phasebtn.on {
-  background: linear-gradient(175deg, var(--ember-hi) 0%, var(--ember) 100%);
-  color: #2a1305; border-color: var(--ember-hi);
-  box-shadow: 0 2px 10px rgba(194,85,56,.35), inset 0 1px 0 rgba(255,200,160,.2);
-}
+.iconbtn .num { font-size: 15px; font-weight: 700; }
+.iconbtn.on { background: linear-gradient(175deg, var(--bronze-hi-src), var(--bronze-src)); color: #1a1305; border-color: var(--bronze-hi-src); }
 
 /* Keywords */
 .kwrow { margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
@@ -1348,18 +1024,18 @@ details.spoiler .spoilerbody {
   margin: 6px 0 10px;
   border-radius: var(--r-sm);
 }
-table.wtable { width: 100%; min-width: 460px; border-collapse: collapse; font-size: 11.5px; }
-table.wtable th, table.wtable td { border: 1px solid var(--bdr); padding: 5px 6px; text-align: left; white-space: nowrap; }
+table.wtable { width: 100%; min-width: 460px; border-collapse: collapse; font-size: 11px; }
+table.wtable th, table.wtable td { border: none; border-bottom: 1px solid var(--bdr); padding: 5px 4px; text-align: left; white-space: nowrap; }
 table.wtable th {
-  background: var(--surf-1);
-  color: var(--bronze-text);
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 9px;
+  background: none;
+  color: var(--ink-faint);
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 8px;
   text-transform: uppercase;
-  letter-spacing: .07em;
+  letter-spacing: .05em;
 }
-table.wtable td { color: var(--ink-mid); background: var(--void); }
+table.wtable td { color: var(--ink-mid); background: none; }
 .term-clickable { color: var(--bronze-text); text-decoration: underline dotted; text-underline-offset: 2px; cursor: pointer; }
 .term-clickable:hover, .term-clickable:focus { color: var(--ink); }
 table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; min-width: 120px; }
@@ -1432,24 +1108,19 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
 }
 .lbl::after { content: ':'; }
 
-/* Hidden hand — card backs */
-.hiddenhand { display: flex; gap: 10px; justify-content: center; padding: 18px 0; }
-.cardback-mini {
-  width: 54px;
-  height: 78px;
-  border-radius: var(--r-sm);
-  border: 1.5px solid var(--bdr-mid);
-  background:
-    repeating-linear-gradient(135deg, rgba(158,120,56,.06) 0 8px, transparent 8px 16px),
-    var(--surf-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--bronze-dim);
-  font-family: 'Oswald', sans-serif;
-  font-size: 18px;
-  box-shadow: var(--shd-sm);
+/* Hidden hand — literal mockup .handfan / .fanwrap / .fancard */
+.handfan { padding: 18px 0 0; }
+.handfan .hlbl { font-family: 'Oswald', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 10px; }
+.fanwrap { display: flex; justify-content: center; height: 110px; position: relative; margin-bottom: 14px; }
+.fancard {
+  position: absolute; width: 78px; height: 104px; border-radius: 6px;
+  background: #211c14; border: 1px solid var(--line); top: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Oswald', sans-serif; font-size: 20px; color: var(--line);
 }
+.fancard.c1 { transform: rotate(-10deg) translateX(-58px); z-index: 1; }
+.fancard.c2 { transform: rotate(0deg); z-index: 3; background: linear-gradient(200deg, #3A1610, #140807); border-color: var(--bronze-src); }
+.fancard.c3 { transform: rotate(10deg) translateX(58px); z-index: 1; }
 
 .playerbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
 
@@ -1574,7 +1245,7 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
 button:focus-visible,
 .sidebtn:focus-visible,
 .handcard:focus-visible,
-details.spoiler summary:focus-visible {
+details.accordion summary.acc-head:focus-visible {
   outline: 2px solid var(--bdr-focus);
   outline-offset: 2px;
 }
@@ -1618,23 +1289,23 @@ details.spoiler summary:focus-visible {
 <!-- ═══ STICKY BAR ════════════════════════════════════════════════ -->
 <div class="stickybar">
   <div class="stickyrow">
-    <div class="roundtrack ui" id="roundtrack"></div>
+    <div class="roundchip" id="roundtrack"></div>
     <div class="vprow">
-      <div class="vpbox">
-        <button class="vpbtn" onclick="changeVP('p1',-1)" aria-label="Уменьшить очки Игрока 1">−</button>
-        <div class="vp-inner">
-          <span class="vpname">И1</span>
-          <span class="vpval" id="vp-p1">0</span>
+      <div class="vpchip">
+        <span class="vpname">И1</span>
+        <span class="vpval" id="vp-p1">0</span>
+        <div class="roundctl">
+          <button onclick="changeVP('p1',-1)" aria-label="Уменьшить очки Игрока 1">−</button>
+          <button onclick="changeVP('p1',1)" aria-label="Увеличить очки Игрока 1">+</button>
         </div>
-        <button class="vpbtn" onclick="changeVP('p1',1)" aria-label="Увеличить очки Игрока 1">+</button>
       </div>
-      <div class="vpbox">
-        <button class="vpbtn" onclick="changeVP('p2',-1)" aria-label="Уменьшить очки Игрока 2">−</button>
-        <div class="vp-inner">
-          <span class="vpname">И2</span>
-          <span class="vpval" id="vp-p2">0</span>
+      <div class="vpchip">
+        <span class="vpname">И2</span>
+        <span class="vpval" id="vp-p2">0</span>
+        <div class="roundctl">
+          <button onclick="changeVP('p2',-1)" aria-label="Уменьшить очки Игрока 2">−</button>
+          <button onclick="changeVP('p2',1)" aria-label="Увеличить очки Игрока 2">+</button>
         </div>
-        <button class="vpbtn" onclick="changeVP('p2',1)" aria-label="Увеличить очки Игрока 2">+</button>
       </div>
       <span class="underdogtag" id="underdogtag">ничья</span>
     </div>
@@ -1647,16 +1318,15 @@ details.spoiler summary:focus-visible {
 <div class="tabpanel" id="tab-prep">
 
 <!-- ═══ КОМНАТА (онлайн-синк раунда/очков/твиста + войска соперника) ══ -->
-<div class="roombar">
+<div class="bottomsheet">
+  <div class="lbl">Комната</div>
   <div class="roomrow" id="roomRowIdle">
-    <span class="roomlabel">Комната:</span>
-    <button class="ghost small" onclick="uiCreateRoom()">Создать</button>
-    <input type="text" id="roomCodeInput" placeholder="код" maxlength="5" style="width:70px;text-transform:uppercase;">
-    <button class="ghost small" onclick="uiJoinRoom()">Войти</button>
+    <button class="primary" onclick="uiCreateRoom()">Создать</button>
+    <input type="text" id="roomCodeInput" placeholder="КОД" maxlength="5">
+    <button onclick="uiJoinRoom()">Войти</button>
     <span class="roomstatus" id="roomStatus"></span>
   </div>
   <div class="roomrow" id="roomRowActive" style="display:none;">
-    <span class="roomlabel">Комната:</span>
     <span class="roomcode" id="roomCodeDisplay"></span>
     <span class="roomdot" id="roomDot"></span>
     <span class="roomstatus" id="roomStatusActive"></span>
@@ -1722,26 +1392,14 @@ details.spoiler summary:focus-visible {
     <p class="blockdesc">Общая открытая колода — одна карта в начале <b>каждого</b> раунда, действует для обоих игроков.</p>
 
     <div class="card">
-      <div class="twistarea">
-        <div class="twistdraw">
-          <div class="cardstage">
-            <div class="flipcard" id="twistFlip">
-              <div class="face back">
-                <div class="back-seal">✦</div>
-                <div class="back-label">Twist · <span id="twistSideLabel">Ossia</span></div>
-              </div>
-              <div class="face front" id="twistFront"></div>
-            </div>
-          </div>
-          <div class="twistbtnrow">
-            <button class="primary" onclick="drawTwist()">Тянуть карту</button>
-            <button class="ghost small" onclick="reshuffleTwist()">↻ Перетасовать</button>
-          </div>
+      <div class="briefing">
+        <div class="tag2">Twist · <span id="twistSideLabel">Ossia</span></div>
+        <div id="twistFront"><p class="empty2">Ещё не тянули — нажмите «Тянуть карту».</p></div>
+        <div class="twistbtnrow">
+          <button class="primary" onclick="drawTwist()">Тянуть карту</button>
+          <button class="ghost small" onclick="reshuffleTwist()">↻ Перетасовать</button>
         </div>
-        <div class="twistlog">
-          <div class="logheader">История</div>
-          <ul class="loglist" id="twistLog"><li class="empty">Карты ещё не тянули</li></ul>
-        </div>
+        <ul class="loglist" id="twistLog"><li class="empty">Карты ещё не тянули</li></ul>
       </div>
     </div>
   </section>
@@ -1816,19 +1474,19 @@ details.spoiler summary:focus-visible {
 
 <!-- ═══ TAB BAR ═══════════════════════════════════════════════════ -->
 <div class="tabbar">
-  <button class="tabbtn" data-tab="prep" onclick="switchTab('prep')">
+  <button class="tab" data-tab="prep" onclick="switchTab('prep')">
     <svg viewBox="0 0 24 24"><path d="M4 21V9l8-6 8 6v12h-5v-7H9v7z"/></svg>
     <span class="tl">Подготовка</span>
   </button>
-  <button class="tabbtn" data-tab="twist" onclick="switchTab('twist')">
+  <button class="tab" data-tab="twist" onclick="switchTab('twist')">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg>
     <span class="tl">Твист</span>
   </button>
-  <button class="tabbtn" data-tab="army" onclick="switchTab('army')">
+  <button class="tab" data-tab="army" onclick="switchTab('army')">
     <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 10h16"/></svg>
     <span class="tl">Армия</span>
   </button>
-  <button class="tabbtn" data-tab="hand" onclick="switchTab('hand')">
+  <button class="tab" data-tab="hand" onclick="switchTab('hand')">
     <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
     <span class="tl">Тактики</span>
   </button>
@@ -1975,22 +1633,21 @@ function renderRoundTrack(){
   const el=document.getElementById('roundtrack');
   el.innerHTML='';
   for(let i=1;i<=4;i++){
-    const node=document.createElement('div');
-    node.className='roundnode'+(i===state.round?' active':'')+(i<state.round?' done':'');
+    const node=document.createElement('span');
+    node.className=(i===state.round?'on':'')+(i<state.round?' done':'');
     node.textContent=i;
     el.appendChild(node);
-    if(i<4){const line=document.createElement('div');line.className='roundline';el.appendChild(line);}
   }
   const prev=document.createElement('button');
-  prev.className='small ghost';prev.textContent='‹';
+  prev.textContent='‹';
   prev.onclick=()=>{if(state.round>1){state.round--;renderRoundTrack();}};
   const next=document.createElement('button');
-  next.className='small ghost';next.textContent='›';
+  next.textContent='›';
   next.onclick=()=>{if(state.round<4){state.round++;renderRoundTrack();toast('Раунд '+state.round+' — потяните твист и доберите тактики');}else{toast('Это последний, 4-й раунд');}};
-  const roundbtns=document.createElement('div');
-  roundbtns.className='roundbtns';
-  roundbtns.appendChild(prev);roundbtns.appendChild(next);
-  el.appendChild(roundbtns);
+  const roundctl=document.createElement('div');
+  roundctl.className='roundctl';
+  roundctl.appendChild(prev);roundctl.appendChild(next);
+  el.appendChild(roundctl);
 }
 
 /* ── VP ───────────────────────────────────────────────────── */
@@ -2025,8 +1682,7 @@ function reshuffleTwist(){
   state.twistDeck=shuffled(TWISTS[state.side].length);
   state.twistLog=[];
   renderTwistLog();
-  const flip=document.getElementById('twistFlip');
-  flip.classList.remove('flipped');
+  document.getElementById('twistFront').innerHTML='<p class="empty2">Ещё не тянули — нажмите «Тянуть карту».</p>';
   toast('Колода «'+(state.side==='ossia'?'Ossia':'Dolorum')+'» перетасована');
 }
 
@@ -2035,15 +1691,9 @@ function drawTwist(){
   const idx=state.twistDeck.pop();
   const card=TWISTS[state.side][idx];
   const front=document.getElementById('twistFront');
-  let html=`<div class="cardseal">${state.side==='ossia'?'Ossia':'Dolorum'} Twist</div>
-            <div class="cardname">${card.name}</div>
-            <div class="cardeffect">${card.effect}</div>`;
+  let html=`<h2>${card.name}</h2><div class="cardeffect">${card.effect}</div>`;
   if(card.opts){html+='<ul class="opt">'+card.opts.map(o=>`<li>${o}</li>`).join('')+'</ul>';}
   front.innerHTML=html;
-  const flip=document.getElementById('twistFlip');
-  flip.classList.remove('flipped');
-  void flip.offsetWidth;
-  flip.classList.add('flipped');
   state.twistLog.unshift({round:state.round,name:card.name});
   renderTwistLog();
 }
@@ -2184,6 +1834,14 @@ function toggleReinfUsed(p,unitKey,idx){
   renderArmyContent(p);
 }
 
+function renderPhaseButtons(p,unit,idx){
+  const phaseBtns=PHASES.map(([k,label,letter])=>{
+    const on=isPhaseActivated(p,unit.key,idx,k);
+    return `<div class="iconbtn ${on?'on':''}" onclick="togglePhaseActivated('${p}','${unit.key}',${idx||0},'${k}')"><span class="num">${letter}</span>${label}</div>`;
+  }).join('');
+  return `<div class="iconrow">${phaseBtns}</div>`;
+}
+
 function renderHpTracker(p,unit,idx){
   const max=unitMaxHP(unit);
   const cur=getUnitHP(p,unit,idx);
@@ -2193,21 +1851,14 @@ function renderHpTracker(p,unit,idx){
   for(let m=1;m<models;m++){
     ticks+=`<div class="modeltick" style="left:${(m/models*100)}%"></div>`;
   }
-  const phaseBtns=PHASES.map(([k,label,letter])=>{
-    const on=isPhaseActivated(p,unit.key,idx,k);
-    return `<button class="phasebtn ${on?'on':''}" onclick="togglePhaseActivated('${p}','${unit.key}',${idx||0},'${k}')"><span class="num">${letter}</span>${label}</button>`;
-  }).join('');
-  return `<div class="hpwrap">
-    <div class="hprow">
-      <span class="hplabel">HP</span>
-      <div class="hpbar"><div class="fill" style="width:${pct}%"></div>${ticks}</div>
-      <span class="hpval${cur===0?' dead':''}">${cur}/${max}</span>
-    </div>
-    <div class="hpbtns">
+  return `<div class="hprow2">
+    <span class="hpval2">HP</span>
+    <div class="hpbar"><div class="fill" style="width:${pct}%"></div>${ticks}</div>
+    <span class="hpval2${cur===0?' dead':''}">${cur}/${max}</span>
+    <div class="roundctl">
       <button class="hpbtn dmg" onclick="changeUnitHP('${p}','${unit.key}',${idx||0},-1)" aria-label="Урон юниту ${unit.name}">−</button>
       <button class="hpbtn heal" onclick="changeUnitHP('${p}','${unit.key}',${idx||0},1)" aria-label="Восстановить хп юниту ${unit.name}">+</button>
     </div>
-    <div class="phaserow">${phaseBtns}</div>
   </div>`;
 }
 
@@ -2320,9 +1971,9 @@ function findAbilityByIdInArmy(army,id){
   for(const u of army.units){found=inList(u.abilities);if(found)return found;}
   return null;
 }
-function targetBadgesFor(p,unitKey,idx){
+function targetBadgeNames(p,unitKey,idx){
   const ast=armyState[p];
-  if(!ast.targets)return'';
+  if(!ast.targets)return[];
   const army=ARMIES[ast.armyKey];
   const badges=[];
   Object.keys(ast.targets).forEach(abilityId=>{
@@ -2332,6 +1983,15 @@ function targetBadgesFor(p,unitKey,idx){
       if(ability)badges.push(ability.name);
     }
   });
+  return badges;
+}
+/* Overlaid on .herowrap — literal mockup .buffpill */
+function buffPillsFor(p,unitKey,idx){
+  return targetBadgeNames(p,unitKey,idx).map(n=>`<div class="buffpill">▲ ${n}</div>`).join('');
+}
+/* Flex-list fallback for units without art (no image to overlay on) */
+function targetBadgesFor(p,unitKey,idx){
+  const badges=targetBadgeNames(p,unitKey,idx);
   if(!badges.length)return'';
   return `<div class="targetbadges">${badges.map(n=>`<span class="targetbadge">🔺 ${n}</span>`).join('')}</div>`;
 }
@@ -2386,11 +2046,11 @@ function renderChoiceEmpty(p,kind,label){
 
 function renderUnitCard(p,scope,unit,idx,count){
   idx=idx||0;
-  const statHtml=`<div class="statstrip">
-    <div class="statbox"><div class="sv">${unit.move}</div><div class="sl">Move</div></div>
-    <div class="statbox"><div class="sv">${unit.health}</div><div class="sl">Health</div></div>
-    <div class="statbox"><div class="sv">${unit.save}</div><div class="sl">Save</div></div>
-    <div class="statbox"><div class="sv">${unit.control}</div><div class="sl">Control</div></div>
+  const statHtml=`<div class="statoverlay">
+    <div class="st"><div class="v">${unit.move}</div><div class="l">Move</div></div>
+    <div class="st"><div class="v">${unit.health}</div><div class="l">Health</div></div>
+    <div class="st"><div class="v">${unit.save}</div><div class="l">Save</div></div>
+    <div class="st"><div class="v">${unit.control}</div><div class="l">Control</div></div>
   </div>`;
   const kwHtml=`<div class="kwrow">${(unit.keywords||[]).map(k=>`<span class="kwchip">${k}</span>`).join('')}</div>`;
   const weaponTable=(title,list)=>{
@@ -2405,14 +2065,14 @@ function renderUnitCard(p,scope,unit,idx,count){
   const squadTag=count>1?` <span class="tag">отряд ${idx+1}/${count}</span>`:'';
   const nameLine=`${unit.name}${unit.isGeneral?' <span class="tag">генерал</span>':''}${squadTag}`;
   const headHtml=unit.image
-    ?`<div class="unithero" style="background-image:url('${unit.image}')">
-        <div class="unithero-scrim"></div>
-        <div class="unithero-bottom">
-          <div class="unithero-name">${nameLine}</div>
+    ?`<div class="herowrap" style="background-image:url('${unit.image}')">
+        ${buffPillsFor(p,unit.key,idx)}
+        <div class="herobottom">
+          <div class="unitname">${nameLine}</div>
           ${kwHtml}
         </div>
       </div>`
-    :`<div class="unitheadplain"><h4>${nameLine}</h4>${kwHtml}</div>`;
+    :`<div class="unitheadplain"><h4>${nameLine}</h4>${kwHtml}${targetBadgesFor(p,unit.key,idx)}</div>`;
   const isReinf=(unit.keywords||[]).includes('Reinforcements');
   const reinfUsed=isReinf&&isReinfUsed(p,unit.key,idx);
   const reinfHtml=isReinf?`<div class="reinfrow">
@@ -2420,17 +2080,19 @@ function renderUnitCard(p,scope,unit,idx,count){
       ${reinfUsed?'<span class="usedtag">Call for Reinforcements использован</span>':''}
     </div>`:'';
   const weaponsHtml=weaponTable('Ranged',unit.ranged)+weaponTable('Melee',unit.melee);
-  const weaponsAcc=weaponsHtml?`<details class="spoiler" open><summary>Оружие</summary><div class="spoilerbody plain">${weaponsHtml}</div></details>`:'';
-  const abilitiesAcc=abilitiesHtml?`<details class="spoiler" open><summary>Способности</summary><div class="spoilerbody plain">${abilitiesHtml}</div></details>`:'';
+  const weaponsAcc=weaponsHtml?`<details class="accordion" open><summary class="acc-head"><span>Оружие</span><span class="chev">▾</span></summary><div class="acc-body plain">${weaponsHtml}</div></details>`:'';
+  const abilitiesAcc=abilitiesHtml?`<details class="accordion" open><summary class="acc-head"><span>Способности</span><span class="chev">▾</span></summary><div class="acc-body plain">${abilitiesHtml}</div></details>`:'';
   return`<div class="unitcard">
     ${headHtml}
-    ${targetBadgesFor(p,unit.key,idx)}
     ${statHtml}
-    ${renderHpTracker(p,unit,idx)}
-    ${reinfHtml}
-    ${weaponsAcc}
-    ${abilitiesAcc}
-    <details class="spoiler"><summary>Лор юнита</summary><div class="spoilerbody">${unit.lore||''}</div></details>
+    ${renderPhaseButtons(p,unit,idx)}
+    <div class="scrollmid">
+      ${renderHpTracker(p,unit,idx)}
+      ${reinfHtml}
+      ${weaponsAcc}
+      ${abilitiesAcc}
+      <details class="accordion"><summary class="acc-head"><span>Лор юнита</span><span class="chev">▾</span></summary><div class="acc-body">${unit.lore||''}</div></details>
+    </div>
   </div>`;
 }
 
@@ -2453,7 +2115,7 @@ function renderArmyContent(p){
     <li><b>Генерал:</b> ${army.general}</li>
     ${(army.unitList||[]).map(u=>`<li>${u}</li>`).join('')}
   </ul>`;
-  if(army.lore){html+=`<details class="spoiler"><summary>Лор армии</summary><div class="spoilerbody">${army.lore}</div></details>`;}
+  if(army.lore){html+=`<details class="accordion"><summary class="acc-head"><span>Лор армии</span><span class="chev">▾</span></summary><div class="acc-body">${army.lore}</div></details>`;}
   html+=`<div class="section-label">Боевая черта (всегда активна)</div>`;
   html+=renderAbilityCard(p,'trait',army.battleTrait);
   html+=`<div class="section-label">Способность отряда</div>`;
@@ -2535,11 +2197,12 @@ function renderHand(p){
   const zone=document.getElementById('handzone-'+p);
   document.getElementById('deckcount-'+p).textContent=st.started?('колода: '+st.deck.length+' · в руке: '+st.hand.length):'колода: —';
   if(!st.started){
-    zone.innerHTML='<div class="hiddenhand"><div class="cardback-mini">?</div><div class="cardback-mini">?</div><div class="cardback-mini">?</div></div>';
+    zone.innerHTML='<div class="fanwrap"><div class="fancard c1">?</div><div class="fancard c2">?</div><div class="fancard c3">?</div></div>';
     return;
   }
   if(!st.revealed){
-    zone.innerHTML='<div class="hiddenhand">'+st.hand.map(()=>'<div class="cardback-mini">✦</div>').join('')+'</div>';
+    const cls=['c1','c2','c3'];
+    zone.innerHTML='<div class="fanwrap">'+st.hand.map((c,i)=>`<div class="fancard ${cls[i]||'c2'}">✦</div>`).join('')+'</div>';
     return;
   }
   zone.innerHTML='<div class="handgrid">'+st.hand.map((c,i)=>{
@@ -2701,12 +2364,12 @@ function renderOppUnitSummary(unit,idx,count){
   const activated=isActivated('opp',unit.key,idx);
   const squadTag=count>1?` · отряд ${idx+1}/${count}`:'';
   return `<div class="unitcard" style="pointer-events:none;">
-    <h4>${unit.name}${squadTag}</h4>
-    <div class="hpwrap"><div class="hprow">
-      <span class="hplabel">HP</span>
-      <span class="hpval${cur===0?' dead':''}">${cur}/${max}</span>
-      <span class="ab-timing" style="margin-left:auto;">${activated?'Активирован':'Не активирован'}</span>
-    </div></div>
+    <div class="unitheadplain"><h4>${unit.name}${squadTag}</h4></div>
+    <div class="hprow2">
+      <span class="hpval2">HP</span>
+      <span class="hpval2${cur===0?' dead':''}">${cur}/${max}</span>
+      <span class="tag" style="margin-left:auto;">${activated?'Активирован':'Не активирован'}</span>
+    </div>
   </div>`;
 }
 
@@ -2731,7 +2394,7 @@ function changeMode(){
 /* ── TAB NAVIGATION ───────────────────────────────────────── */
 function switchTab(name){
   document.querySelectorAll('.tabpanel').forEach(el=>el.classList.toggle('active',el.id==='tab-'+name));
-  document.querySelectorAll('.tabbtn').forEach(el=>el.classList.toggle('active',el.dataset.tab===name));
+  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===name));
 }
 
 /* ── INIT ─────────────────────────────────────────────────── */
