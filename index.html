@@ -6,7 +6,7 @@
 <title>Sand &amp; Bone — Генератор сражений</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 
 /* ════════════════════════════════════════════════════════
@@ -232,7 +232,7 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 .tab:hover { filter: none; }
 .tab svg { width: 18px; height: 18px; stroke: var(--fg-dim); fill: none; stroke-width: 1.6; }
 .tab.active svg { stroke: var(--bronze-hi-src); }
-.tab .tl { font-family: 'Oswald', sans-serif; font-size: 8.5px; text-transform: uppercase; color: var(--fg-dim); margin-top: 3px; display: block; }
+.tab .tl { font-family: 'Oswald', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--fg-dim); margin-top: 3px; display: block; }
 .tab.active .tl { color: var(--bronze-hi-src); }
 body { padding-bottom: 58px; }
 
@@ -316,7 +316,7 @@ body { padding-bottom: 58px; }
 
 .underdogtag {
   font-family: 'Oswald', sans-serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: .06em;
   color: var(--ember-text);
@@ -549,7 +549,7 @@ section.block { margin-top: 36px; }
 }
 .infocard h3 {
   font-family: 'Inter', sans-serif;
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .14em;
@@ -571,7 +571,7 @@ section.block { margin-top: 36px; }
 .flag {
   display: inline-block;
   font-family: 'Inter', sans-serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   border: 1px solid var(--bronze-dim);
   color: var(--bronze-text);
@@ -618,7 +618,17 @@ section.block { margin-top: 36px; }
   margin: 0 0 14px;
   color: var(--ink);
 }
-.briefing .cardeffect { font-size: 13.5px; line-height: 1.65; color: var(--ink-mid); margin: 0 0 4px; }
+/* Shared body-copy role — one voice for ability/hand/modal/twist prose
+   instead of four near-identical 13/13.5px declarations that drifted
+   apart with no real distinction between them. */
+.ab-body, .hc-body, .mo-body, .briefing .cardeffect {
+  font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 400;
+  line-height: 1.65; color: var(--ink-mid);
+}
+/* Reading-measure cap only where text runs directly in the open panel with
+   no bordered card of its own — capping .ab-body/.hc-body/.mo-body the same
+   way left dead empty space inside their card borders instead. */
+.briefing .cardeffect { margin: 0 0 4px; max-width: 52ch; }
 .briefing .cardeffect b { color: var(--ink); font-weight: 600; }
 .briefing .opt { margin: 8px 0 0; padding-left: 16px; font-size: 13.5px; color: var(--ink-mid); line-height: 1.6; }
 .briefing .opt li { margin-bottom: 5px; }
@@ -669,16 +679,16 @@ section.block { margin-top: 36px; }
 
 /* ── ARMY / PLAYER CONTENT ───────────────────────────────── */
 .playerhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.playerhead-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-faint); }
+.playerhead-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-faint); }
 .deckcount { font-size: 11.5px; color: var(--ink-faint); }
 
 .armyhead { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .armyhead .nm { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; color: var(--ink); }
-.armyhead .sub2 { font-size: 9.5px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .07em; }
+.armyhead .sub2 { font-size: 10px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .07em; }
 
 /* ── SECTION LABEL ───────────────────────────────────────── */
 .section-label {
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .16em;
@@ -758,7 +768,7 @@ details.accordion[open] .chev { transform: rotate(180deg); }
 
 .ab-timing {
   font-family: 'Inter', sans-serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .06em;
@@ -771,11 +781,10 @@ details.accordion[open] .chev { transform: rotate(180deg); }
   background: var(--bronze-bg);
 }
 
-.ab-body { font-size: 13px; color: var(--ink-mid); line-height: 1.55; }
 
 .lbl2 {
   font-family: 'Inter', sans-serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .06em;
@@ -860,19 +869,19 @@ details.accordion[open] .chev { transform: rotate(180deg); }
 }
 .herobottom .kwrow { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
 .herobottom .kwchip {
-  font-size: 9px; letter-spacing: .04em; text-transform: uppercase;
+  font-size: 10px; letter-spacing: .04em; text-transform: uppercase;
   border: 1px solid rgba(231,225,211,.35); padding: 2px 8px; border-radius: 10px; color: var(--fg);
 }
 .buffpill {
   position: absolute; top: 52px; right: 16px; background: var(--danger); color: #fff;
-  font-family: 'Oswald', sans-serif; font-size: 9.5px; text-transform: uppercase;
+  font-family: 'Oswald', sans-serif; font-size: 10px; text-transform: uppercase;
   padding: 4px 9px; border-radius: 12px; max-width: 60%; text-align: right; line-height: 1.3;
 }
 .buffpill + .buffpill { top: 82px; }
 
 .tag {
   font-family: 'Inter', sans-serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .06em;
@@ -888,7 +897,7 @@ details.accordion[open] .chev { transform: rotate(180deg); }
 .statoverlay { display: flex; justify-content: space-around; padding: 14px 10px; background: var(--panel); border-bottom: 1px solid var(--line); }
 .statoverlay .st { text-align: center; }
 .statoverlay .v { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 17px; color: var(--fg); }
-.statoverlay .l { font-size: 8px; letter-spacing: .05em; color: var(--fg-dim); text-transform: uppercase; }
+.statoverlay .l { font-size: 10px; letter-spacing: .05em; color: var(--fg-dim); text-transform: uppercase; }
 
 /* ── HP TRACKER — literal mockup .scrollmid > .hprow2 ─────── */
 .scrollmid { padding: 0 0 4px; }
@@ -915,7 +924,7 @@ details.accordion[open] .chev { transform: rotate(180deg); }
 .iconbtn {
   flex: 1; min-height: 0; aspect-ratio: 1.6; border-radius: 8px; border: 1px solid var(--line);
   background: #211c14; display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 2px; font-family: 'Oswald', sans-serif; font-size: 9px; text-transform: uppercase; color: var(--fg-dim);
+  gap: 2px; font-family: 'Oswald', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--fg-dim);
   cursor: pointer;
 }
 .iconbtn .num { font-size: 15px; font-weight: 700; }
@@ -931,7 +940,7 @@ details.accordion[open] .chev { transform: rotate(180deg); }
 }
 .kwchip {
   font-family: 'Inter', sans-serif;
-  font-size: 9.5px;
+  font-size: 10px;
   font-weight: 500;
   color: var(--ink-faint);
   border: 1px solid var(--bdr);
@@ -955,7 +964,7 @@ table.wtable th {
   color: var(--ink-faint);
   font-family: 'Oswald', sans-serif;
   font-weight: 600;
-  font-size: 8px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: .05em;
 }
@@ -968,7 +977,7 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
    available width, and let cell text wrap instead of forcing overflow. */
 @media (max-width: 480px) {
   .wtable-wrap { overflow-x: hidden; }
-  table.wtable { min-width: 0; table-layout: fixed; font-size: 9px; }
+  table.wtable { min-width: 0; table-layout: fixed; font-size: 10px; }
   table.wtable th, table.wtable td { padding: 3px 2px; white-space: normal; overflow-wrap: break-word; }
   table.wtable .wname { min-width: 0; }
 }
@@ -1000,7 +1009,7 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
 .hc-name { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: .03em; }
 .hc-mark {
   font-family: 'Inter', sans-serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--blood-text);
   opacity: 0;
@@ -1015,7 +1024,7 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
 }
 .handcard.marked .hc-mark { opacity: 1; }
 
-.hc-body { font-size: 13px; color: var(--ink-mid); margin-top: 10px; display: none; line-height: 1.6; border-top: 1px solid var(--bdr); padding-top: 10px; }
+.hc-body { margin-top: 10px; display: none; border-top: 1px solid var(--bdr); padding-top: 10px; }
 .handcard.open .hc-body { display: block; }
 
 .hc-tac  { margin-bottom: 7px; }
@@ -1023,7 +1032,7 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
 
 .lbl {
   font-family: 'Inter', sans-serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .08em;
@@ -1139,7 +1148,7 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
   background: linear-gradient(180deg, var(--bronze-hi), var(--bronze-dim));
 }
 .modal-opt .mo-name { font-family: 'Oswald', sans-serif; font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
-.modal-opt .mo-body { font-size: 13px; color: var(--ink-mid); margin: 6px 0 10px; line-height: 1.55; }
+.modal-opt .mo-body { margin: 6px 0 10px; }
 .modal-opt button { width: 100%; }
 
 /* ── TOAST ───────────────────────────────────────────────── */
