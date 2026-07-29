@@ -200,34 +200,6 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   filter: drop-shadow(0 4px 24px rgba(158,120,56,.25));
 }
 
-.hero h1 {
-  font-size: clamp(32px, 9vw, 52px);
-  font-weight: 900;
-  letter-spacing: .10em;
-  color: var(--ink);
-  text-shadow:
-    0 0 60px rgba(158,120,56,.30),
-    0 2px 4px rgba(0,0,0,.8);
-  margin-bottom: 0;
-  position: relative;
-}
-
-/* Title side ornaments */
-.hero-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  margin-bottom: 10px;
-}
-.hero-title-row .h-orn {
-  flex: 1;
-  max-width: 50px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--bronze-dim));
-}
-.hero-title-row .h-orn.right { background: linear-gradient(90deg, var(--bronze-dim), transparent); }
-
 /* ── MODE PICKER — poster stack, matches mockup screen 1 ──── */
 .modepicker { max-width: 360px; margin: 0 auto; padding: 0 14px 20px; }
 .s1-top { padding: 0 0 12px; }
@@ -374,6 +346,11 @@ body { padding-bottom: 58px; }
 /* Round track — literal mockup .roundchip (from herotopbar), used as a
    standalone global bar since the app needs it visible on every tab,
    not just overlaid on one hero image like the mockup demo. */
+/* Static chip strip for tabs with no herowrap to host the overlay version */
+.tabchips {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 0 4px;
+}
 .roundchip { display: flex; gap: 5px; align-items: center; }
 .roundchip span {
   width: 20px; height: 20px; border-radius: 50%;
@@ -988,12 +965,18 @@ details.accordion[open] .chev { transform: rotate(180deg); }
   flex: 1; height: 10px; border-radius: 5px; background: var(--line);
   overflow: hidden; position: relative;
 }
-.hpbar .fill { height: 100%; background: var(--danger); transition: width var(--t); }
+.hpbar .fill { height: 100%; background: var(--danger); transition: width var(--t), background var(--t); }
+.hpbar .fill.warn { background: #c2853a; }
+.hpbar .fill.crit { background: #a4372a; }
 .hpbar .modeltick { position: absolute; top: 0; bottom: 0; width: 1.5px; background: rgba(0,0,0,.4); }
 .hpval2 { font-family: 'Oswald', sans-serif; font-size: 13px; color: var(--fg); flex-shrink: 0; }
 .hpval2.dead { color: var(--fg-dim); }
-.hpbtn.dmg:hover  { border-color: var(--blood-hi); color: var(--blood-text); filter: none; }
-.hpbtn.heal:hover { border-color: var(--dolorum);  color: #6aaa70;          filter: none; }
+/* Distinct resting-state colors — hover alone never fires on touch, and a
+   misread damage/heal tap silently corrupts HP with no undo otherwise. */
+.hpbtn.dmg  { border-color: var(--blood-hi); color: var(--blood-text); background: var(--blood-bg); }
+.hpbtn.heal { border-color: var(--dolorum);  color: #6aaa70;          background: var(--dolorum-bg); }
+.hpbtn.dmg:hover  { filter: brightness(1.25); }
+.hpbtn.heal:hover { filter: brightness(1.25); }
 
 /* Literal mockup .iconrow / .iconbtn */
 .iconrow { display: flex; gap: 8px; padding: 12px 16px; background: var(--panel); }
@@ -1142,11 +1125,15 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
   position: relative;
 }
 
-/* ── IMPORT PANEL ────────────────────────────────────────── */
-.importpanel {
-  margin-top: 14px;
+/* ── IMPORT PANEL — dev/backup tool, not a player action, demoted
+   out of the primary flow (moved below army content, styled as a
+   quiet text link instead of a full-width pill). ──────────────── */
+.importpanel { margin-top: 18px; padding-top: 10px; border-top: 1px solid var(--line); text-align: right; }
+.importpanel button {
+  background: none; border: none; min-height: 0; padding: 4px 0;
+  font-size: 10px; color: var(--fg-dim); text-transform: none; letter-spacing: 0;
 }
-.importpanel button { width: 100%; }
+.importpanel button:hover { color: var(--fg); filter: none; }
 
 /* ── MODAL ───────────────────────────────────────────────── */
 .modal-overlay {
@@ -1226,29 +1213,37 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
 /* ── TOAST ───────────────────────────────────────────────── */
 .toast {
   position: fixed;
-  bottom: 24px;
+  bottom: 78px;
   left: 50%;
   transform: translateX(-50%) translateY(16px);
   background: var(--surf-3);
   border: 1px solid var(--bdr-hi);
   color: var(--ink);
-  padding: 10px 20px;
-  border-radius: 3px;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
+  padding: 8px 8px 8px 20px;
+  border-radius: 20px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
   font-weight: 600;
   opacity: 0;
   pointer-events: none;
   transition: opacity .22s var(--ease), transform .22s var(--ease-o);
   z-index: 9999;
-  box-shadow: var(--shd-lg), inset 0 1px 0 rgba(190,140,60,.1);
+  box-shadow: var(--shd-lg);
   white-space: nowrap;
   max-width: calc(100vw - 32px);
   text-overflow: ellipsis;
   overflow: hidden;
   letter-spacing: .02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+.toast .toast-undo {
+  font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase;
+  color: #1a1305; background: linear-gradient(175deg, var(--bronze-hi-src), var(--bronze-src));
+  border-radius: 14px; padding: 5px 12px; cursor: pointer; flex-shrink: 0;
+}
 
 /* ── SKILL CHECKLIST: focus states ──────────────────────── */
 button:focus-visible,
@@ -1388,6 +1383,13 @@ details.accordion summary.acc-head:focus-visible {
 
 <div class="tabpanel" id="tab-twist">
 
+  <!-- Round/VP stays visible on every tab, not just Army/Подготовка —
+       broadcast via refreshHeroChips() same as the other instances. -->
+  <div class="tabchips">
+    <div class="roundchip" data-roundchip></div>
+    <div class="vpchip" data-vpchip></div>
+  </div>
+
   <!-- II. КАРТА ТВИСТА -->
   <section class="block">
     <div class="section-header">
@@ -1428,11 +1430,11 @@ details.accordion summary.acc-head:focus-visible {
         <div id="armypicker-p1"></div>
       </div>
 
+      <div id="armycontent-p1"></div>
+
       <div class="importpanel">
         <button class="ghost small" onclick="downloadArmiesBackup()">⬇ Выгрузить armies.json</button>
       </div>
-
-      <div id="armycontent-p1"></div>
     </div>
   </section>
 
@@ -1450,6 +1452,11 @@ details.accordion summary.acc-head:focus-visible {
 </div><!-- /tab-army -->
 
 <div class="tabpanel" id="tab-hand">
+
+  <div class="tabchips">
+    <div class="roundchip" data-roundchip></div>
+    <div class="vpchip" data-vpchip></div>
+  </div>
 
   <!-- V. ТАКТИКИ -->
   <section class="block">
@@ -1626,12 +1633,20 @@ function shuffled(n){
   return arr;
 }
 
-function toast(msg){
+function toast(msg,undoFn){
   const t=document.getElementById('toast');
-  t.textContent=msg;
+  t.innerHTML='';
+  t.appendChild(document.createTextNode(msg));
+  if(undoFn){
+    const btn=document.createElement('span');
+    btn.className='toast-undo';
+    btn.textContent='Отменить';
+    btn.onclick=()=>{ t.classList.remove('show'); clearTimeout(t._h); undoFn(); };
+    t.appendChild(btn);
+  }
   t.classList.add('show');
   clearTimeout(t._h);
-  t._h=setTimeout(()=>t.classList.remove('show'),2000);
+  t._h=setTimeout(()=>t.classList.remove('show'),undoFn?4500:2000);
 }
 
 /* ── ROUND / VP — literal mockup .roundchip + .vpchip, repeated once per
@@ -1662,12 +1677,17 @@ function changeRound(d){
 
 /* ── VP ───────────────────────────────────────────────────── */
 function changeVP(p,d){
+  const prev=state.vp[p];
   state.vp[p]=Math.max(0,state.vp[p]+d);
   refreshHeroChips();
   const tag=document.getElementById('underdogtag');
-  if(!tag)return;
-  if(state.vp.p1===state.vp.p2){tag.textContent='ничья';}
-  else{const who=state.vp.p1<state.vp.p2?'И1 слабее':'И2 слабее';tag.textContent=who;}
+  if(tag){
+    if(state.vp.p1===state.vp.p2){tag.textContent='ничья';}
+    else{const who=state.vp.p1<state.vp.p2?'И1 слабее':'И2 слабее';tag.textContent=who;}
+  }
+  if(state.vp[p]!==prev){
+    toast(`${p==='p1'?'И1':'И2'}: ${prev} → ${state.vp[p]} ПВ`,()=>{ state.vp[p]=prev; refreshHeroChips(); if(tag){if(state.vp.p1===state.vp.p2){tag.textContent='ничья';}else{tag.textContent=state.vp.p1<state.vp.p2?'И1 слабее':'И2 слабее';}} });
+  }
 }
 
 /* ── SIDE ─────────────────────────────────────────────────── */
@@ -1811,8 +1831,13 @@ function changeUnitHP(p,unitKey,idx,delta){
   const unit=army.units.find(u=>u.key===unitKey);
   const max=unitMaxHP(unit);
   const cur=getUnitHP(p,unit,idx);
-  armyState[p].hp[hpFullId(p,unitKey,idx)]=Math.max(0,Math.min(max,cur+delta));
+  const next=Math.max(0,Math.min(max,cur+delta));
+  const id=hpFullId(p,unitKey,idx);
+  armyState[p].hp[id]=next;
   renderArmyContent(p);
+  if(next!==cur){
+    toast(`${unit.name}: ${cur} → ${next} HP`,()=>{ armyState[p].hp[id]=cur; renderArmyContent(p); });
+  }
 }
 const PHASES=[['mv','Move','M'],['sh','Shoot','S'],['ch','Charge','C'],['cb','Combat','X']];
 function getPhaseState(p,unitKey,idx){
@@ -1858,13 +1883,14 @@ function renderHpTracker(p,unit,idx){
   const cur=getUnitHP(p,unit,idx);
   const models=unit.models||1;
   const pct=max>0?(cur/max*100):0;
+  const fillCls=pct<=25?'crit':(pct<=50?'warn':'');
   let ticks='';
   for(let m=1;m<models;m++){
     ticks+=`<div class="modeltick" style="left:${(m/models*100)}%"></div>`;
   }
   return `<div class="hprow2">
     <span class="hpval2">HP</span>
-    <div class="hpbar"><div class="fill" style="width:${pct}%"></div>${ticks}</div>
+    <div class="hpbar"><div class="fill ${fillCls}" style="width:${pct}%"></div>${ticks}</div>
     <span class="hpval2${cur===0?' dead':''}">${cur}/${max}</span>
     <div class="roundctl">
       <button class="hpbtn dmg" onclick="changeUnitHP('${p}','${unit.key}',${idx||0},-1)" aria-label="Урон юниту ${unit.name}">−</button>
@@ -2200,6 +2226,8 @@ function toggleOpen(el){el.classList.toggle('open');}
 function discardAndDraw(p){
   const st=state.players[p];
   if(!st.started){toast('Сначала начните колоду');return;}
+  const prevHand=st.hand.map(c=>({idx:c.idx,marked:c.marked}));
+  const prevDeck=st.deck.slice();
   const kept=st.hand.filter(c=>!c.marked);
   let discarded=st.hand.length-kept.length;
   st.hand=kept;
@@ -2211,7 +2239,13 @@ function discardAndDraw(p){
     st.hand.push({idx:st.deck.pop(),marked:false});
   }
   renderHand(p);
-  toast('Игрок '+(p==='p1'?'1':'2')+': сброшено '+discarded+', рука пополнена до '+st.hand.length);
+  if(discarded>0){
+    toast('Игрок '+(p==='p1'?'1':'2')+': сброшено '+discarded+', рука пополнена до '+st.hand.length,()=>{
+      st.hand=prevHand; st.deck=prevDeck; renderHand(p);
+    });
+  }else{
+    toast('Игрок '+(p==='p1'?'1':'2')+': сброшено '+discarded+', рука пополнена до '+st.hand.length);
+  }
 }
 
 function renderHand(p){
