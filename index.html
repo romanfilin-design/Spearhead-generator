@@ -230,6 +230,9 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 
 /* ── MODE PICKER — poster stack, matches mockup screen 1 ──── */
 .modepicker { max-width: 360px; margin: 0 auto; padding: 0 14px 20px; }
+.s1-top { padding: 0 0 12px; }
+.s1-top .kicker { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: .2em; color: var(--fg-dim); text-transform: uppercase; }
+.s1-top h1 { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 26px; text-transform: uppercase; margin: 6px 0 0; color: var(--fg); }
 .posterstack { position: relative; height: 190px; margin: 0 0 14px; }
 .poster {
   position: absolute; inset: 0; border-radius: var(--r-lg); padding: 18px;
@@ -932,6 +935,12 @@ details.accordion[open] .chev { transform: rotate(180deg); }
   background-size: cover;
   background-position: center;
 }
+/* Literal mockup .herotopbar — round/VP overlaid on every unit's hero image */
+.herotopbar {
+  position: absolute; top: 0; left: 0; right: 0; padding: 14px 16px;
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;
+  background: linear-gradient(180deg, rgba(0,0,0,.55), transparent);
+}
 .herobottom {
   position: absolute; bottom: 0; left: 0; right: 0; padding: 16px;
   background: linear-gradient(0deg, rgba(0,0,0,.85), transparent);
@@ -946,11 +955,11 @@ details.accordion[open] .chev { transform: rotate(180deg); }
   border: 1px solid rgba(231,225,211,.35); padding: 2px 8px; border-radius: 10px; color: var(--fg);
 }
 .buffpill {
-  position: absolute; top: 16px; right: 16px; background: var(--danger); color: #fff;
+  position: absolute; top: 52px; right: 16px; background: var(--danger); color: #fff;
   font-family: 'Oswald', sans-serif; font-size: 9.5px; text-transform: uppercase;
   padding: 4px 9px; border-radius: 12px; max-width: 60%; text-align: right; line-height: 1.3;
 }
-.buffpill + .buffpill { top: 46px; }
+.buffpill + .buffpill { top: 82px; }
 
 .tag {
   font-family: 'Inter', sans-serif;
@@ -1264,6 +1273,10 @@ details.accordion summary.acc-head:focus-visible {
 <!-- ═══ ВЫБОР РЕЖИМА ══════════════════════════════════════════════ -->
 <div class="modepicker" id="modePicker">
   <div id="modePickerGrid">
+    <div class="s1-top">
+      <div class="kicker">Warhammer Age of Sigmar · Spearhead</div>
+      <h1>Выбор режима</h1>
+    </div>
     <div class="posterstack">
       <div class="poster p1" onclick="chooseMode('sand_bone')">
         <div class="pname">Sand &amp; Bone</div>
@@ -1286,36 +1299,29 @@ details.accordion summary.acc-head:focus-visible {
 
 <div id="appBody" style="display:none;">
 
-<!-- ═══ STICKY BAR ════════════════════════════════════════════════ -->
-<div class="stickybar">
-  <div class="stickyrow">
-    <div class="roundchip" id="roundtrack"></div>
-    <div class="vprow">
-      <div class="vpchip">
-        <span class="vpname">И1</span>
-        <span class="vpval" id="vp-p1">0</span>
-        <div class="roundctl">
-          <button onclick="changeVP('p1',-1)" aria-label="Уменьшить очки Игрока 1">−</button>
-          <button onclick="changeVP('p1',1)" aria-label="Увеличить очки Игрока 1">+</button>
-        </div>
-      </div>
-      <div class="vpchip">
-        <span class="vpname">И2</span>
-        <span class="vpval" id="vp-p2">0</span>
-        <div class="roundctl">
-          <button onclick="changeVP('p2',-1)" aria-label="Уменьшить очки Игрока 2">−</button>
-          <button onclick="changeVP('p2',1)" aria-label="Увеличить очки Игрока 2">+</button>
-        </div>
-      </div>
-      <span class="underdogtag" id="underdogtag">ничья</span>
-    </div>
-  </div>
-</div>
-
 <!-- ═══ CONTENT ═══════════════════════════════════════════════════ -->
 <div class="wrap">
 
 <div class="tabpanel" id="tab-prep">
+
+<!-- Round/VP editing controls — the mockup's roundchip/vpchip are pure
+     display, repeated on every unit's herotopbar; the actual +/- controls
+     aren't part of the mockup at all, so they live here once. -->
+<div class="bottomsheet" style="border-top:none;">
+  <div class="lbl">Раунд и очки</div>
+  <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+    <div class="roundchip" data-roundchip></div>
+    <div class="roundctl"><button onclick="changeRound(-1)">‹</button><button onclick="changeRound(1)">›</button></div>
+    <div class="vpchip" data-vpchip></div>
+    <div class="roundctl">
+      <button onclick="changeVP('p1',-1)" aria-label="Уменьшить очки Игрока 1">И1−</button>
+      <button onclick="changeVP('p1',1)" aria-label="Увеличить очки Игрока 1">И1+</button>
+      <button onclick="changeVP('p2',-1)" aria-label="Уменьшить очки Игрока 2">И2−</button>
+      <button onclick="changeVP('p2',1)" aria-label="Увеличить очки Игрока 2">И2+</button>
+    </div>
+    <span class="underdogtag" id="underdogtag">ничья</span>
+  </div>
+</div>
 
 <!-- ═══ КОМНАТА (онлайн-синк раунда/очков/твиста + войска соперника) ══ -->
 <div class="bottomsheet">
@@ -1628,33 +1634,38 @@ function toast(msg){
   t._h=setTimeout(()=>t.classList.remove('show'),2000);
 }
 
-/* ── ROUND TRACK ──────────────────────────────────────────── */
-function renderRoundTrack(){
-  const el=document.getElementById('roundtrack');
-  el.innerHTML='';
+/* ── ROUND / VP — literal mockup .roundchip + .vpchip, repeated once per
+   unit's herotopbar (per user's choice). Pure string builders + a broadcast
+   refresh, since the chip markup is duplicated across every unit card
+   instead of living at one unique id. ──────────────────────────────── */
+function roundChipInner(){
+  let html='';
   for(let i=1;i<=4;i++){
-    const node=document.createElement('span');
-    node.className=(i===state.round?'on':'')+(i<state.round?' done':'');
-    node.textContent=i;
-    el.appendChild(node);
+    html+=`<span class="${i===state.round?'on':''}${i<state.round?' done':''}">${i}</span>`;
   }
-  const prev=document.createElement('button');
-  prev.textContent='‹';
-  prev.onclick=()=>{if(state.round>1){state.round--;renderRoundTrack();}};
-  const next=document.createElement('button');
-  next.textContent='›';
-  next.onclick=()=>{if(state.round<4){state.round++;renderRoundTrack();toast('Раунд '+state.round+' — потяните твист и доберите тактики');}else{toast('Это последний, 4-й раунд');}};
-  const roundctl=document.createElement('div');
-  roundctl.className='roundctl';
-  roundctl.appendChild(prev);roundctl.appendChild(next);
-  el.appendChild(roundctl);
+  return html;
+}
+function vpChipInner(){
+  return `И1 ${state.vp.p1} — И2 ${state.vp.p2}`;
+}
+function refreshHeroChips(){
+  document.querySelectorAll('[data-roundchip]').forEach(el=>el.innerHTML=roundChipInner());
+  document.querySelectorAll('[data-vpchip]').forEach(el=>el.textContent=vpChipInner());
+}
+function renderRoundTrack(){ refreshHeroChips(); }
+
+function changeRound(d){
+  if(d<0&&state.round>1){state.round--;refreshHeroChips();}
+  else if(d>0&&state.round<4){state.round++;refreshHeroChips();toast('Раунд '+state.round+' — потяните твист и доберите тактики');}
+  else if(d>0){toast('Это последний, 4-й раунд');}
 }
 
 /* ── VP ───────────────────────────────────────────────────── */
 function changeVP(p,d){
   state.vp[p]=Math.max(0,state.vp[p]+d);
-  document.getElementById('vp-'+p).textContent=state.vp[p];
+  refreshHeroChips();
   const tag=document.getElementById('underdogtag');
+  if(!tag)return;
   if(state.vp.p1===state.vp.p2){tag.textContent='ничья';}
   else{const who=state.vp.p1<state.vp.p2?'И1 слабее':'И2 слабее';tag.textContent=who;}
 }
@@ -2064,15 +2075,26 @@ function renderUnitCard(p,scope,unit,idx,count){
   const abilitiesHtml=(unit.abilities||[]).map(a=>renderAbilityCard(p,scope+'_'+unit.key+'_'+idx,a)).join('');
   const squadTag=count>1?` <span class="tag">отряд ${idx+1}/${count}</span>`:'';
   const nameLine=`${unit.name}${unit.isGeneral?' <span class="tag">генерал</span>':''}${squadTag}`;
+  const heroTopBar=`<div class="herotopbar">
+      <div class="roundchip" data-roundchip>${roundChipInner()}</div>
+      <div class="vpchip" data-vpchip>${vpChipInner()}</div>
+    </div>`;
   const headHtml=unit.image
     ?`<div class="herowrap" style="background-image:url('${unit.image}')">
+        ${heroTopBar}
         ${buffPillsFor(p,unit.key,idx)}
         <div class="herobottom">
           <div class="unitname">${nameLine}</div>
           ${kwHtml}
         </div>
       </div>`
-    :`<div class="unitheadplain"><h4>${nameLine}</h4>${kwHtml}${targetBadgesFor(p,unit.key,idx)}</div>`;
+    :`<div class="unitheadplain">
+        <div class="herotopbar" style="position:static;background:none;padding:0 0 8px;">
+          <div class="roundchip" data-roundchip>${roundChipInner()}</div>
+          <div class="vpchip" data-vpchip>${vpChipInner()}</div>
+        </div>
+        <h4>${nameLine}</h4>${kwHtml}${targetBadgesFor(p,unit.key,idx)}
+      </div>`;
   const isReinf=(unit.keywords||[]).includes('Reinforcements');
   const reinfUsed=isReinf&&isReinfUsed(p,unit.key,idx);
   const reinfHtml=isReinf?`<div class="reinfrow">
@@ -2325,9 +2347,7 @@ function onRemoteShared(data){
   if(data.side)state.side=data.side;
   if(data.twistDeck)state.twistDeck=data.twistDeck;
   if(data.twistLog)state.twistLog=data.twistLog;
-  renderRoundTrack();
-  document.getElementById('vp-p1').textContent=state.vp.p1;
-  document.getElementById('vp-p2').textContent=state.vp.p2;
+  refreshHeroChips();
   document.getElementById('btn-ossia').classList.toggle('sel',state.side==='ossia');
   document.getElementById('btn-dolorum').classList.toggle('sel',state.side==='dolorum');
   document.getElementById('twistSideLabel').textContent=state.side==='ossia'?'Ossia':'Dolorum';
