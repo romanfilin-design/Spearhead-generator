@@ -161,47 +161,8 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   .flipcard { transition: none !important; }
 }
 
-/* ── HERO ───────────────────────────────────────────────── */
-.hero {
-  position: relative;
-  text-align: center;
-  padding: 40px 20px 30px;
-  border-bottom: 1px solid var(--bdr);
-  overflow: hidden;
-  z-index: 2;
-}
-
-/* Vignette top gradient */
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(98,72,160,.08) 0%, transparent 70%),
-    linear-gradient(0deg, rgba(0,0,0,.3) 0%, transparent 40%);
-  pointer-events: none;
-}
-
-/* Worn border at bottom */
-.hero::after {
-  content: '';
-  position: absolute;
-  bottom: -1px; left: 10%; right: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--bronze-dim), var(--bronze), var(--bronze-dim), transparent);
-}
-
-.hero-logo {
-  display: block;
-  margin: 0 auto 14px;
-  max-width: min(420px, 88%);
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 4px 24px rgba(158,120,56,.25));
-}
-
 /* ── MODE PICKER — poster stack, matches mockup screen 1 ──── */
-.modepicker { max-width: 360px; margin: 0 auto; padding: 0 14px 20px; }
+.modepicker { max-width: 360px; margin: 0 auto; padding: 32px 14px 20px; }
 .s1-top { padding: 0 0 12px; }
 .s1-top .kicker { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: .2em; color: var(--fg-dim); text-transform: uppercase; }
 .s1-top h1 { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 26px; text-transform: uppercase; margin: 6px 0 0; color: var(--fg); }
@@ -234,35 +195,6 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 }
 .modelabel { color: var(--ink-faint); }
 .modename { font-family: 'Oswald', sans-serif; font-weight: 700; color: var(--ember-text); }
-
-.hero-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin: 10px 0 14px;
-  color: var(--bronze-dim);
-  font-size: 11px;
-  letter-spacing: .15em;
-}
-.hero-divider::before,
-.hero-divider::after {
-  content: '';
-  flex: 1;
-  max-width: 80px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--bdr-mid));
-}
-.hero-divider::after { background: linear-gradient(90deg, var(--bdr-mid), transparent); }
-
-.hero-sub {
-  color: var(--ink-mid);
-  font-size: 14px;
-  font-style: italic;
-  max-width: 440px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
 
 /* ── STICKY BAR ─────────────────────────────────────────── */
 /* Room controls — literal mockup .bottomsheet/.roomrow. The mockup shows
@@ -1259,12 +1191,6 @@ details.accordion summary.acc-head:focus-visible {
 <body>
 
 <!-- ═══ HERO ══════════════════════════════════════════════════════ -->
-<header class="hero">
-  <img class="hero-logo" src="assets/logo/spearhead.png" alt="Warhammer Age of Sigmar · Spearhead">
-  <div class="hero-divider">✦</div>
-  <p class="hero-sub">Генератор сражений: армии, карты твистов, тактики и очки победы.</p>
-</header>
-
 <!-- ═══ ВЫБОР РЕЖИМА ══════════════════════════════════════════════ -->
 <div class="modepicker" id="modePicker">
   <div id="modePickerGrid">
