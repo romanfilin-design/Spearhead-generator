@@ -289,6 +289,23 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 .roomdot { width: 8px; height: 8px; border-radius: 50%; background: #6a6; box-shadow: 0 0 6px #6a6; display: inline-block; }
 .roomdot.off { background: #a55; box-shadow: 0 0 6px #a55; }
 
+/* ── TAB NAVIGATION ─────────────────────────────────────── */
+.tabpanel { display: none; }
+.tabpanel.active { display: block; }
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  display: flex; background: var(--surf-1); border-top: 1px solid var(--bdr);
+  box-shadow: 0 -4px 20px rgba(0,0,0,.5);
+}
+.tabbtn {
+  flex: 1; padding: 10px 4px 12px; background: none; border: none;
+  font-family: 'Oswald', sans-serif; font-size: 10.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .04em; color: var(--ink-faint);
+  cursor: pointer; transition: color var(--t);
+}
+.tabbtn.active { color: var(--ember-hi); }
+body { padding-bottom: 58px; }
+
 .stickybar {
   position: sticky;
   top: 0;
@@ -1007,6 +1024,7 @@ details.spoiler summary::before {
 }
 details.spoiler[open] summary::before { transform: rotate(90deg); }
 details.spoiler summary:hover { color: var(--bronze-text); background: var(--surf-2); }
+details.spoiler .spoilerbody.plain { font-style: normal; }
 details.spoiler .spoilerbody {
   padding: 4px 13px 14px;
   font-size: 13px;
@@ -1132,27 +1150,55 @@ details.spoiler .spoilerbody {
   letter-spacing: .03em;
 }
 
-/* Unit portrait — optional, only rendered when unit.image is set */
-.unitportrait {
+/* Unit head — hero image banner (unit.image set) or plain heading (no art yet) */
+.unitheadplain { margin: 0 0 8px; }
+.unithero {
+  position: relative;
+  height: 200px;
+  margin: -14px -14px 12px -16px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+}
+.unithero-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,.88) 0%, rgba(0,0,0,.2) 55%, transparent 80%);
+}
+.unithero-bottom {
+  position: relative;
+  z-index: 1;
+  padding: 14px 16px 12px;
   width: 100%;
-  height: 176px;
-  border-radius: var(--r);
-  overflow: hidden;
-  margin: 8px 0 4px;
+}
+.unithero-name {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  margin-bottom: 6px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background:
-    radial-gradient(ellipse 80% 70% at 50% 62%, rgba(122,20,20,.12), transparent 70%),
-    var(--surf-1);
-  border: 1px solid var(--bdr);
-  box-shadow: var(--shd-sm);
+  gap: 8px;
+  flex-wrap: wrap;
+  text-shadow: 0 2px 6px rgba(0,0,0,.8);
 }
-.unitportrait img {
-  max-width: 92%;
-  max-height: 92%;
-  object-fit: contain;
-  filter: drop-shadow(0 6px 10px rgba(0,0,0,.55));
+.unithero .kwrow { margin-bottom: 0; }
+
+.tag {
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--ember-text);
+  border: 1px solid var(--ember-dim);
+  border-radius: var(--r-xs);
+  padding: 2px 7px;
+  white-space: nowrap;
+  background: var(--ember-bg);
 }
 
 /* Stat strip — 4-col embossed boxes */
@@ -1561,24 +1607,6 @@ details.spoiler summary:focus-visible {
 
 <div id="appBody" style="display:none;">
 
-<!-- ═══ КОМНАТА (онлайн-синк раунда/очков/твиста + войска соперника) ══ -->
-<div class="roombar">
-  <div class="roomrow" id="roomRowIdle">
-    <span class="roomlabel">Комната:</span>
-    <button class="ghost small" onclick="uiCreateRoom()">Создать</button>
-    <input type="text" id="roomCodeInput" placeholder="код" maxlength="5" style="width:70px;text-transform:uppercase;">
-    <button class="ghost small" onclick="uiJoinRoom()">Войти</button>
-    <span class="roomstatus" id="roomStatus"></span>
-  </div>
-  <div class="roomrow" id="roomRowActive" style="display:none;">
-    <span class="roomlabel">Комната:</span>
-    <span class="roomcode" id="roomCodeDisplay"></span>
-    <span class="roomdot" id="roomDot"></span>
-    <span class="roomstatus" id="roomStatusActive"></span>
-    <button class="ghost small" onclick="uiLeaveRoom()">Выйти</button>
-  </div>
-</div>
-
 <!-- ═══ STICKY BAR ════════════════════════════════════════════════ -->
 <div class="stickybar">
   <div class="stickyrow">
@@ -1607,6 +1635,26 @@ details.spoiler summary:focus-visible {
 
 <!-- ═══ CONTENT ═══════════════════════════════════════════════════ -->
 <div class="wrap">
+
+<div class="tabpanel" id="tab-prep">
+
+<!-- ═══ КОМНАТА (онлайн-синк раунда/очков/твиста + войска соперника) ══ -->
+<div class="roombar">
+  <div class="roomrow" id="roomRowIdle">
+    <span class="roomlabel">Комната:</span>
+    <button class="ghost small" onclick="uiCreateRoom()">Создать</button>
+    <input type="text" id="roomCodeInput" placeholder="код" maxlength="5" style="width:70px;text-transform:uppercase;">
+    <button class="ghost small" onclick="uiJoinRoom()">Войти</button>
+    <span class="roomstatus" id="roomStatus"></span>
+  </div>
+  <div class="roomrow" id="roomRowActive" style="display:none;">
+    <span class="roomlabel">Комната:</span>
+    <span class="roomcode" id="roomCodeDisplay"></span>
+    <span class="roomdot" id="roomDot"></span>
+    <span class="roomstatus" id="roomStatusActive"></span>
+    <button class="ghost small" onclick="uiLeaveRoom()">Выйти</button>
+  </div>
+</div>
 
   <!-- I. ПОДГОТОВКА -->
   <section class="block">
@@ -1652,6 +1700,10 @@ details.spoiler summary:focus-visible {
     </div>
   </section>
 
+</div><!-- /tab-prep -->
+
+<div class="tabpanel" id="tab-twist">
+
   <!-- II. КАРТА ТВИСТА -->
   <section class="block">
     <div class="section-header">
@@ -1686,6 +1738,10 @@ details.spoiler summary:focus-visible {
     </div>
   </section>
 
+</div><!-- /tab-twist -->
+
+<div class="tabpanel" id="tab-army">
+
   <!-- III. МОЯ АРМИЯ -->
   <section class="block">
     <div class="section-header">
@@ -1693,7 +1749,7 @@ details.spoiler summary:focus-visible {
       <h2>Моя армия</h2>
       <div class="section-rule"></div>
     </div>
-    <p class="blockdesc">Выберите армию — появятся юниты, способности и улучшения. Карты тактик — ваша скрытая рука.</p>
+    <p class="blockdesc">Выберите армию — появятся юниты, способности и улучшения.</p>
 
     <div class="card">
       <div class="armypicker-wrap">
@@ -1705,19 +1761,6 @@ details.spoiler summary:focus-visible {
       </div>
 
       <div id="armycontent-p1"></div>
-
-      <hr class="divider">
-
-      <div class="playerhead">
-        <span class="playerhead-label">Рука карт тактик</span>
-        <span class="deckcount" id="deckcount-p1">колода: —</span>
-      </div>
-      <div id="handzone-p1"></div>
-      <div class="playerbtns">
-        <button class="primary small" onclick="startHand('p1')">Начать / перетасовать</button>
-        <button class="small" onclick="toggleReveal('p1')" id="revealbtn-p1">Показать руку</button>
-        <button class="ghost small" onclick="discardAndDraw('p1')">Сбросить → добрать</button>
-      </div>
     </div>
   </section>
 
@@ -1732,7 +1775,44 @@ details.spoiler summary:focus-visible {
     <div class="card" id="oppContent"></div>
   </section>
 
+</div><!-- /tab-army -->
+
+<div class="tabpanel" id="tab-hand">
+
+  <!-- V. ТАКТИКИ -->
+  <section class="block">
+    <div class="section-header">
+      <span class="section-num">V</span>
+      <h2>Тактики</h2>
+      <div class="section-rule"></div>
+    </div>
+    <p class="blockdesc">Карты тактик — ваша скрытая рука.</p>
+
+    <div class="card">
+      <div class="playerhead">
+        <span class="playerhead-label">Рука карт тактик</span>
+        <span class="deckcount" id="deckcount-p1">колода: —</span>
+      </div>
+      <div id="handzone-p1"></div>
+      <div class="playerbtns">
+        <button class="primary small" onclick="startHand('p1')">Начать / перетасовать</button>
+        <button class="small" onclick="toggleReveal('p1')" id="revealbtn-p1">Показать руку</button>
+        <button class="ghost small" onclick="discardAndDraw('p1')">Сбросить → добрать</button>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /tab-hand -->
+
 </div><!-- /wrap -->
+
+<!-- ═══ TAB BAR ═══════════════════════════════════════════════════ -->
+<div class="tabbar">
+  <button class="tabbtn" data-tab="prep" onclick="switchTab('prep')">Подготовка</button>
+  <button class="tabbtn" data-tab="twist" onclick="switchTab('twist')">Твист</button>
+  <button class="tabbtn" data-tab="army" onclick="switchTab('army')">Армия</button>
+  <button class="tabbtn" data-tab="hand" onclick="switchTab('hand')">Тактики</button>
+</div>
 
 </div><!-- /appBody -->
 
@@ -2302,25 +2382,34 @@ function renderUnitCard(p,scope,unit,idx,count){
     </table></div>`;
   };
   const abilitiesHtml=(unit.abilities||[]).map(a=>renderAbilityCard(p,scope+'_'+unit.key+'_'+idx,a)).join('');
-  const portraitHtml=unit.image?`<div class="unitportrait"><img src="${unit.image}" alt="${unit.name}" loading="lazy"></div>`:'';
-  const squadTag=count>1?` <span class="ab-timing" style="margin-left:4px;">отряд ${idx+1}/${count}</span>`:'';
+  const squadTag=count>1?` <span class="tag">отряд ${idx+1}/${count}</span>`:'';
+  const nameLine=`${unit.name}${unit.isGeneral?' <span class="tag">генерал</span>':''}${squadTag}`;
+  const headHtml=unit.image
+    ?`<div class="unithero" style="background-image:url('${unit.image}')">
+        <div class="unithero-scrim"></div>
+        <div class="unithero-bottom">
+          <div class="unithero-name">${nameLine}</div>
+          ${kwHtml}
+        </div>
+      </div>`
+    :`<div class="unitheadplain"><h4>${nameLine}</h4>${kwHtml}</div>`;
   const isReinf=(unit.keywords||[]).includes('Reinforcements');
   const reinfUsed=isReinf&&isReinfUsed(p,unit.key,idx);
   const reinfHtml=isReinf?`<div class="reinfrow">
       <button class="tiny ${reinfUsed?'ghost':'primary'}" onclick="toggleReinfUsed('${p}','${unit.key}',${idx||0})">${reinfUsed?'↺ Сбросить':'Отметить Reinforcements'}</button>
       ${reinfUsed?'<span class="usedtag">Call for Reinforcements использован</span>':''}
     </div>`:'';
+  const weaponsHtml=weaponTable('Ranged',unit.ranged)+weaponTable('Melee',unit.melee);
+  const weaponsAcc=weaponsHtml?`<details class="spoiler" open><summary>Оружие</summary><div class="spoilerbody plain">${weaponsHtml}</div></details>`:'';
+  const abilitiesAcc=abilitiesHtml?`<details class="spoiler" open><summary>Способности</summary><div class="spoilerbody plain">${abilitiesHtml}</div></details>`:'';
   return`<div class="unitcard">
-    <h4>${unit.name}${unit.isGeneral?' <span class="ab-timing" style="margin-left:4px;">генерал</span>':''}${squadTag}</h4>
-    ${kwHtml}
+    ${headHtml}
     ${targetBadgesFor(p,unit.key,idx)}
-    ${portraitHtml}
     ${statHtml}
     ${renderHpTracker(p,unit,idx)}
     ${reinfHtml}
-    ${weaponTable('Ranged',unit.ranged)}
-    ${weaponTable('Melee',unit.melee)}
-    ${abilitiesHtml}
+    ${weaponsAcc}
+    ${abilitiesAcc}
     <details class="spoiler"><summary>Лор юнита</summary><div class="spoilerbody">${unit.lore||''}</div></details>
   </div>`;
 }
@@ -2619,6 +2708,12 @@ function changeMode(){
   document.getElementById('appBody').style.display='none';
 }
 
+/* ── TAB NAVIGATION ───────────────────────────────────────── */
+function switchTab(name){
+  document.querySelectorAll('.tabpanel').forEach(el=>el.classList.toggle('active',el.id==='tab-'+name));
+  document.querySelectorAll('.tabbtn').forEach(el=>el.classList.toggle('active',el.dataset.tab===name));
+}
+
 /* ── INIT ─────────────────────────────────────────────────── */
 async function initApp(){
   selectSide('ossia');
@@ -2627,6 +2722,7 @@ async function initApp(){
   renderArmyPicker('p1');
   renderArmyContent('p1');
   renderHand('p1');
+  switchTab('army');
 }
 initApp();
 </script>
