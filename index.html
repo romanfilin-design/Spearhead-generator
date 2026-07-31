@@ -23,7 +23,7 @@
   --bronze-src: #C25538;
   --bronze-hi-src: #EC8A5E;
   --fg:     #E7E1D3;
-  --fg-dim: #847A66;
+  --fg-dim: #9C917C;
   --line:   #2C271C;
   --danger: #4A5560;
 
@@ -86,7 +86,7 @@
   --shd-in:  inset 0 0 28px rgba(0,0,0,.45);
 
   /* Added post-redesign — tokenized so they don't drift from the palette */
-  --on-ember:   #1a1305;
+  --on-ember:   #000000;
   --hp-warn:    #c2853a;
   --hp-crit:    #a4372a;
   --ossia-hi:   #a07fc8;
@@ -225,7 +225,7 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   padding: 16px 18px 18px; margin: 14px 0 20px;
   box-shadow: var(--shd), var(--shd-in);
 }
-.bottomsheet .lbl { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 12px; text-align: center; }
+.bottomsheet .lbl { font-family: 'Oswald', sans-serif; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 12px; text-align: center; }
 .roomrow { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; }
 .roomrow input[type="text"] {
   flex: 0 0 70px; width: 70px; background: var(--void); border: 1px solid var(--line);
@@ -259,7 +259,7 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 .tab:hover { filter: none; }
 .tab svg { width: 18px; height: 18px; stroke: var(--fg-dim); fill: none; stroke-width: 1.6; }
 .tab.active svg { stroke: var(--bronze-hi-src); }
-.tab .tl { font-family: 'Oswald', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--fg-dim); margin-top: 3px; display: block; }
+.tab .tl { font-family: 'Oswald', sans-serif; font-size: 12px; text-transform: uppercase; color: var(--fg-dim); margin-top: 3px; display: block; }
 .tab.active .tl { color: var(--bronze-hi-src); }
 
 .stickybar {
@@ -315,7 +315,7 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   flex-shrink: 0;
 }
 .armybar-round span, .armybar-vp .armybar-vpval { font-size: 12px; color: var(--fg); min-width: 14px; text-align: center; }
-.armybar-vp .armybar-vplabel { font-size: 9px; color: var(--fg-dim); padding: 0 2px 0 4px; }
+.armybar-vp .armybar-vplabel { font-size: 11px; color: var(--fg-dim); padding: 0 2px 0 4px; }
 .armybar button {
   width: 20px; height: 20px; min-height: 0; padding: 0; border-radius: 50%;
   border: 1px solid var(--line); background: var(--panel-alt); color: var(--fg); font-size: 11px;
@@ -349,12 +349,12 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 /* VP — literal mockup .vpchip, split per player + roundctl steppers
    for the +/- interactivity the mockup's read-only chip doesn't need. */
 .vprow { display: flex; align-items: center; gap: 6px; }
-.vpname { color: var(--fg-dim); text-transform: uppercase; font-size: 10px; letter-spacing: .04em; }
+.vpname { color: var(--fg-dim); text-transform: uppercase; font-size: 11px; letter-spacing: .04em; }
 .vpval { font-weight: 700; color: var(--fg); }
 
 .underdogtag {
   font-family: 'Oswald', sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: .06em;
   color: var(--ember-text);
@@ -410,7 +410,7 @@ button.ghost:hover { border-color: var(--bdr-hi); color: var(--ember-hi); backgr
 
 /* Small — min-height reduced but still ~40/34px for safe area */
 button.small { min-height: 40px; padding: 0 14px; font-size: 11px; }
-button.tiny  { min-height: 40px; padding: 0 12px; font-size: 10px; }
+button.tiny  { min-height: 40px; padding: 0 12px; font-size: 11px; }
 
 button:disabled { opacity: .3; cursor: not-allowed; transform: none !important; filter: none !important; }
 
@@ -427,16 +427,15 @@ section.block { margin-top: 36px; }
 /* Roman numeral — styled as a carved stone marker */
 .section-num {
   font-family: 'Oswald', sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: .12em;
-  color: var(--blood);
+  color: var(--blood-text);
   background: var(--blood-bg);
   border: 1px solid rgba(122,24,24,.4);
   border-radius: var(--r-xs);
   padding: 3px 8px;
   flex-shrink: 0;
-  text-shadow: 0 0 8px var(--blood-glow);
 }
 
 .section-header h2 {
@@ -462,6 +461,17 @@ section.block { margin-top: 36px; }
   line-height: 1.6;
 }
 .blockdesc b { color: var(--ink); font-weight: 600; }
+
+.handnotice {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-faint);
+  background: var(--surf-1);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r-lg);
+  padding: 12px 14px;
+  margin: 0 0 16px;
+}
 
 /* ── BASE CARD ───────────────────────────────────────────── */
 .card {
@@ -676,6 +686,26 @@ section.block { margin-top: 36px; }
 }
 .briefing .empty2 { font-size: 13.5px; color: var(--ink-faint); font-style: italic; }
 
+/* ── BATTLE REPORT — end-of-game reveal, borrows .briefing's gradient/
+   kicker/h2 grammar so the app's one peak-end moment reads as the same
+   world as the twist reveal instead of a separate "achievement" style. */
+.battlereport {
+  padding: 4px 2px 6px;
+  background: linear-gradient(200deg, var(--surf-3), var(--void) 65%);
+  border-radius: var(--r-lg);
+}
+.battlereport .tag2 { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--ember-hi); margin-bottom: 10px; }
+.battlereport h2 { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 24px; text-transform: uppercase; margin: 0 0 18px; color: var(--ink); }
+.br-score { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.br-side { flex: 1; text-align: center; padding: 14px 8px; border-radius: var(--r-lg); border: 1px solid var(--bdr); background: var(--surf-1); transition: border-color var(--t), background var(--t); }
+.br-side.br-win { border-color: var(--ember); background: var(--ember-bg); }
+.br-name { display: block; font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; transition: color var(--t); }
+.br-side.br-win .br-name { color: var(--ember-text); }
+.br-val { display: block; font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 32px; color: var(--ink); transition: color var(--t); }
+.br-side.br-win .br-val { color: var(--ember-text); }
+.br-vs { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--fg-dim); flex-shrink: 0; }
+.br-margin { font-size: 13.5px; color: var(--ink-mid); line-height: 1.6; }
+
 .twistbtnrow { display: flex; gap: 8px; margin-top: 18px; }
 
 /* Twist log — matches mockup's flat .log rows */
@@ -717,8 +747,8 @@ section.block { margin-top: 36px; }
 
 /* ── ARMY / PLAYER CONTENT ───────────────────────────────── */
 .playerhead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.playerhead-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-faint); }
-.deckcount { font-size: 11.5px; color: var(--ink-faint); }
+.playerhead-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--ink-faint); }
+.deckcount { font-size: 12px; color: var(--ink-faint); }
 
 .armyhead { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
 .armyhead .nm { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; color: var(--ink); }
@@ -825,7 +855,7 @@ details.accordion[open] .chev { transform: rotate(180deg); }
 
 .lbl2 {
   font-family: 'Inter', sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .06em;
@@ -956,7 +986,7 @@ details.accordion[open] .chev { transform: rotate(180deg); }
 .statoverlay { display: flex; justify-content: space-around; padding: 14px 10px; background: var(--panel); border-bottom: 1px solid var(--line); }
 .statoverlay .st { text-align: center; }
 .statoverlay .v { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 17px; color: var(--fg); }
-.statoverlay .l { font-size: 10px; letter-spacing: .05em; color: var(--fg-dim); text-transform: uppercase; }
+.statoverlay .l { font-size: 12px; letter-spacing: .05em; color: var(--fg-dim); text-transform: uppercase; }
 
 /* ── HP TRACKER — literal mockup .scrollmid > .hprow2 ─────── */
 .scrollmid { padding: 0 0 4px; }
@@ -1118,7 +1148,7 @@ table.wtable td.wname { color: var(--ink); font-weight: 600; white-space: normal
 
 .lbl {
   font-family: 'Inter', sans-serif;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .08em;
@@ -1178,7 +1208,14 @@ table.wtable td.wname { color: var(--ink); font-weight: 600; white-space: normal
 @media (min-height: 580px) {
   .modal-overlay { align-items: center; padding: 20px 14px; }
 }
-.modal-overlay.show { display: flex; }
+/* Every modal open was an instant display:none→flex snap — no transition
+   anywhere marked the state change. Re-plays on every open because the
+   .show class is fully removed on close, so the keyframes restart clean
+   each time rather than needing JS-driven reflow tricks. */
+@keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalRise { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.modal-overlay.show { display: flex; animation: modalFade .2s var(--ease-o); }
+.modal-overlay.show .modal-box { animation: modalRise .38s var(--ease-o); }
 
 .modal-box {
   background: var(--surf-2);
@@ -1577,6 +1614,8 @@ details.accordion summary.acc-head:focus-visible {
     </div>
     <p class="blockdesc">Карты тактик — ваша скрытая рука.</p>
 
+    <p class="handnotice" id="handNotice">Рука видна только на этом устройстве. Второй игрок отслеживает свою руку на своём телефоне — подключите его через «Комнату» на вкладке Подготовка.</p>
+
     <div class="card">
       <div class="playerhead">
         <span class="playerhead-label">Рука карт тактик</span>
@@ -1756,7 +1795,44 @@ function renderRoundTrack(){ refreshHeroChips(); }
 function changeRound(d){
   if(d<0&&state.round>1){state.round--;refreshHeroChips();}
   else if(d>0&&state.round<4){state.round++;refreshHeroChips();toast('Раунд '+state.round+' — потяните твист и доберите тактики');}
-  else if(d>0){toast('Это последний, 4-й раунд');}
+  else if(d>0){showBattleReport();}
+}
+
+/* Battle report — the one moment worth stopping for: the game has an
+   actual winner after 4 rounds and the app never said so. Reuses the
+   modal shell everything else already uses, but the .battlereport body
+   borrows the twist briefing's gradient/kicker/h2 grammar (the strongest
+   existing emotional beat in the app) so the peak-end moment reads as
+   the same world, not a bolted-on flourish. Triggered by pressing the
+   round stepper past round 4 — the exact tap a player already makes out
+   of habit when a game ends — never a separate button to remember. */
+function showBattleReport(){
+  const p1=state.vp.p1, p2=state.vp.p2;
+  const tie=p1===p2;
+  const p1wins=p1>p2;
+  const margin=Math.abs(p1-p2);
+  document.getElementById('modalTitle').textContent='Итог битвы';
+  document.getElementById('modalBody').innerHTML=`
+    <div class="battlereport">
+      <div class="tag2">4 раунда позади</div>
+      <h2>${tie?'Ничья':(p1wins?'Победа Игрока 1':'Победа Игрока 2')}</h2>
+      <div class="br-score">
+        <div class="br-side" id="brSideP1"><span class="br-name">Игрок 1</span><span class="br-val">${p1}</span></div>
+        <div class="br-vs">ПВ</div>
+        <div class="br-side" id="brSideP2"><span class="br-name">Игрок 2</span><span class="br-val">${p2}</span></div>
+      </div>
+      <p class="br-margin">${tie?'Очки сравнялись — обе стороны сражались до конца.':'Перевес: '+margin+' '+(margin===1?'очко':(margin<5?'очка':'очков'))+'.'}</p>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('show');
+  /* Verdict lands, then the winner gets marked — not both at once. The
+     panel's own rise animation is .38s; this waits for it to settle so
+     the win highlight reads as a second, deliberate beat (the report
+     confirming a winner) instead of noise inside the same motion. */
+  if(!tie){
+    setTimeout(()=>{
+      document.getElementById(p1wins?'brSideP1':'brSideP2')?.classList.add('br-win');
+    },420);
+  }
 }
 
 /* ── VP ───────────────────────────────────────────────────── */
@@ -2437,6 +2513,7 @@ function enterRoom(code,uid){
   document.getElementById('roomRowActive').style.display='flex';
   document.getElementById('roomCodeDisplay').textContent=code;
   document.getElementById('oppSection').style.display='';
+  document.getElementById('handNotice').style.display='none';
 
   roomState.unsubRoom=window.SBRoom.subscribeRoom(code,onRemoteShared);
   roomState.unsubOthers=window.SBRoom.subscribeOthers(code,uid,onRemoteOthers);
@@ -2454,6 +2531,7 @@ function uiLeaveRoom(){
   document.getElementById('roomRowIdle').style.display='flex';
   document.getElementById('roomRowActive').style.display='none';
   document.getElementById('oppSection').style.display='none';
+  document.getElementById('handNotice').style.display='';
   toast('Вы вышли из комнаты');
 }
 
