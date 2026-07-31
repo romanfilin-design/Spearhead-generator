@@ -868,7 +868,7 @@ details.accordion[open] .chev { transform: rotate(180deg); }
 .unitheadplain { margin: 0 0 8px; }
 .herowrap {
   position: relative;
-  height: 300px;
+  height: 400px;
   flex-shrink: 0;
   margin: -14px -14px 12px -16px;
   background-size: cover;
@@ -948,10 +948,13 @@ details.accordion[open] .chev { transform: rotate(180deg); }
 /* Literal mockup .iconrow / .iconbtn */
 .iconrow { display: flex; gap: 8px; padding: 12px 16px; background: var(--panel); }
 .iconbtn {
-  flex: 1; min-height: 44px; aspect-ratio: 1.6; border-radius: 8px; border: 1px solid var(--line);
+  /* height comes from padding, not aspect-ratio: a fixed ratio fights
+     flex-shrink on narrow screens and pushes the row wider than its
+     container instead of shrinking to fit (4 tiles overflowed at 375px). */
+  flex: 1; min-width: 0; min-height: 0; border-radius: 8px; border: 1px solid var(--line);
   background: var(--panel-alt); display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 2px; font-family: 'Oswald', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--fg-dim);
-  cursor: pointer; padding: 0;
+  cursor: pointer; padding: 12px 2px;
 }
 .iconbtn:hover { filter: none; }
 .iconbtn .num { font-size: 15px; font-weight: 700; }
@@ -1005,7 +1008,7 @@ table.wtable td { color: var(--ink-mid); background: none; }
   padding: 6px 4px; margin: -6px -4px; display: inline-block;
 }
 .term-clickable:hover, .term-clickable:focus { color: var(--ink); }
-table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; min-width: 120px; }
+table.wtable td.wname { color: var(--ink); font-weight: 600; white-space: normal; min-width: 120px; }
 /* On narrow phones: scale the table to fit instead of horizontal-scrolling it —
    drop the min-width floor, switch to fixed layout so columns share the
    available width, and let cell text wrap instead of forcing overflow. */
@@ -1013,7 +1016,15 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
   .wtable-wrap { overflow-x: hidden; }
   table.wtable { min-width: 0; table-layout: fixed; font-size: 10px; }
   table.wtable th, table.wtable td { padding: 3px 2px; white-space: normal; overflow-wrap: break-word; }
-  table.wtable .wname { min-width: 0; }
+  table.wtable td.wname { min-width: 0; }
+  /* Give the name/ability columns real room instead of splitting width
+     evenly across all columns — that's what forced letter-by-letter
+     wrapping on weapon names ("Daemo/nflame/Glaive"). */
+  table.wtable .wname    { width: 24%; }
+  table.wtable .wrange   { width: 10%; }
+  table.wtable .wstat    { width: 9%; }
+  table.wtable th.wstat  { font-size: 9px; letter-spacing: 0; padding-left: 1px; padding-right: 1px; }
+  table.wtable .wability { width: 16%; }
 }
 
 /* ── TACTICS HAND ────────────────────────────────────────── */
@@ -2028,7 +2039,7 @@ function renderAbilityCard(p,scope,ability){
   let foot='';
   if(ability.limited){
     foot=`<div class="ab-foot">
-      <button class="tiny ${used?'ghost':'primary'}" onclick="toggleUsed('${p}','${scope}','${ability.id}')">${used?'↺ Сбросить':'Отметить использованной'}</button>
+      <button class="tiny ${used?'ghost':'primary'}" onclick="toggleUsed('${p}','${scope}','${ability.id}')">${used?'↺ Сбросить':'Использовать'}</button>
       ${used?'<span class="usedtag">использовано</span>':''}
     </div>`;
   }
@@ -2063,8 +2074,8 @@ function renderUnitCard(p,scope,unit,idx,count){
     if(!list||!list.length)return'';
     const hasRange=!!list[0].range;
     return`<div class="wtable-wrap"><table class="wtable">
-      <tr><th>${title}</th>${hasRange?'<th>Range</th>':''}<th>Att</th><th>Hit</th><th>Wound</th><th>Rend</th><th>Dmg</th><th>Ability</th></tr>
-      ${list.map(w=>`<tr><td class="wname">${w.name}</td>${hasRange?`<td>${w.range}</td>`:''}<td>${w.attacks}</td><td>${w.hit}</td><td>${w.wound}</td><td>${w.rend!==undefined?w.rend:'—'}</td><td>${w.damage}</td><td>${renderAbilityCell(w.ability)}</td></tr>`).join('')}
+      <tr><th class="wname">${title}</th>${hasRange?'<th class="wrange">Range</th>':''}<th class="wstat">Att</th><th class="wstat">Hit</th><th class="wstat">Wound</th><th class="wstat">Rend</th><th class="wstat">Dmg</th><th class="wability">Ability</th></tr>
+      ${list.map(w=>`<tr><td class="wname">${w.name}</td>${hasRange?`<td class="wrange">${w.range}</td>`:''}<td class="wstat">${w.attacks}</td><td class="wstat">${w.hit}</td><td class="wstat">${w.wound}</td><td class="wstat">${w.rend!==undefined?w.rend:'—'}</td><td class="wstat">${w.damage}</td><td class="wability">${renderAbilityCell(w.ability)}</td></tr>`).join('')}
     </table></div>`;
   };
   const abilitiesHtml=(unit.abilities||[]).map(a=>renderAbilityCard(p,scope+'_'+unit.key+'_'+idx,a)).join('');
@@ -2093,7 +2104,7 @@ function renderUnitCard(p,scope,unit,idx,count){
   const isReinf=(unit.keywords||[]).includes('Reinforcements');
   const reinfUsed=isReinf&&isReinfUsed(p,unit.key,idx);
   const reinfHtml=isReinf?`<div class="reinfrow">
-      <button class="tiny ${reinfUsed?'ghost':'primary'}" onclick="toggleReinfUsed('${p}','${unit.key}',${idx||0})">${reinfUsed?'↺ Сбросить':'Отметить Reinforcements'}</button>
+      <button class="tiny ${reinfUsed?'ghost':'primary'}" onclick="toggleReinfUsed('${p}','${unit.key}',${idx||0})">${reinfUsed?'↺ Сбросить':'Reinforcement'}</button>
       ${reinfUsed?'<span class="usedtag">Call for Reinforcements использован</span>':''}
     </div>`:'';
   const weaponsHtml=weaponTable('Ranged',unit.ranged)+weaponTable('Melee',unit.melee);
