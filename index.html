@@ -235,8 +235,8 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 /* Literal mockup .tabbar / .tab, fixed to the viewport bottom since the
    real app is a full page, not a single phone-frame mock. */
 .tabbar {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
-  display: flex; border-top: 1px solid var(--line); background: var(--panel);
+  position: sticky; top: 0; left: 0; right: 0; z-index: 40;
+  display: flex; border-bottom: 1px solid var(--line); background: var(--panel);
   flex-shrink: 0;
 }
 .tab {
@@ -248,7 +248,6 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 .tab.active svg { stroke: var(--bronze-hi-src); }
 .tab .tl { font-family: 'Oswald', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--fg-dim); margin-top: 3px; display: block; }
 .tab.active .tl { color: var(--bronze-hi-src); }
-body { padding-bottom: 64px; }
 
 .stickybar {
   position: sticky;
@@ -296,6 +295,27 @@ body { padding-bottom: 64px; }
 .tabchips {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   padding: 10px 0 4px;
+}
+/* Compact round/VP/tie strip — top of the Армия tab. Sized to hold one
+   line at 320px+ instead of wrapping: small round steppers, no player
+   labels beyond a one-letter tag, minimal gaps. */
+.armybar {
+  display: flex; align-items: center; gap: 6px; padding: 8px 0 12px;
+  font-family: 'Oswald', sans-serif;
+}
+.armybar-round, .armybar-vp {
+  display: flex; align-items: center; gap: 3px;
+  background: rgba(0,0,0,.4); border-radius: 12px; padding: 2px 3px;
+}
+.armybar-round span, .armybar-vp .armybar-vpval { font-size: 12px; color: var(--fg); min-width: 14px; text-align: center; }
+.armybar-vp .armybar-vplabel { font-size: 9px; color: var(--fg-dim); padding: 0 2px 0 4px; }
+.armybar button {
+  width: 20px; height: 20px; min-height: 0; padding: 0; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--panel-alt); color: var(--fg); font-size: 11px;
+}
+.armybar .underdogtag { flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 3px 7px; }
+@media (max-width: 360px) {
+  .armybar-vp .armybar-vplabel { display: none; }
 }
 .roundchip { display: flex; gap: 5px; align-items: center; }
 .roundchip span {
@@ -874,12 +894,6 @@ details.accordion[open] .chev { transform: rotate(180deg); }
   background-size: cover;
   background-position: center;
 }
-/* Literal mockup .herotopbar — round/VP overlaid on every unit's hero image */
-.herotopbar {
-  position: absolute; top: 0; left: 0; right: 0; padding: 14px 16px;
-  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;
-  background: linear-gradient(180deg, rgba(0,0,0,.55), transparent);
-}
 .herobottom {
   position: absolute; bottom: 0; left: 0; right: 0; padding: 16px;
   background: linear-gradient(0deg, rgba(0,0,0,.85), transparent);
@@ -894,11 +908,11 @@ details.accordion[open] .chev { transform: rotate(180deg); }
   border: 1px solid rgba(231,225,211,.35); padding: 2px 8px; border-radius: 10px; color: var(--fg);
 }
 .buffpill {
-  position: absolute; top: 52px; right: 16px; background: var(--danger); color: #fff;
+  position: absolute; top: 16px; right: 16px; background: var(--danger); color: #fff;
   font-family: 'Oswald', sans-serif; font-size: 10px; text-transform: uppercase;
   padding: 4px 9px; border-radius: 12px; max-width: 60%; text-align: right; line-height: 1.3;
 }
-.buffpill + .buffpill { top: 82px; }
+.buffpill + .buffpill { top: 46px; }
 
 .tag {
   font-family: 'Inter', sans-serif;
@@ -1265,37 +1279,41 @@ details.accordion summary.acc-head:focus-visible {
     </div>
     <div class="dots"><span class="on"></span><span></span><span></span></div>
   </div>
-  <div class="modepicker-selected" id="modePickerSelected" style="display:none;">
-    <span class="modelabel">Режим:</span>
-    <span class="modename" id="modeNameDisplay"></span>
-    <button class="ghost small" onclick="changeMode()">Сменить</button>
   </div>
 </div>
 
 <div id="appBody" style="display:none;">
+
+<!-- ═══ TAB BAR — moved to the top ═══════════════════════════════ -->
+<div class="tabbar">
+  <button class="tab" data-tab="prep" onclick="switchTab('prep')">
+    <svg viewBox="0 0 24 24"><path d="M4 21V9l8-6 8 6v12h-5v-7H9v7z"/></svg>
+    <span class="tl">Подготовка</span>
+  </button>
+  <button class="tab" data-tab="twist" onclick="switchTab('twist')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg>
+    <span class="tl">Твист</span>
+  </button>
+  <button class="tab" data-tab="army" onclick="switchTab('army')">
+    <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 10h16"/></svg>
+    <span class="tl">Армия</span>
+  </button>
+  <button class="tab" data-tab="hand" onclick="switchTab('hand')">
+    <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    <span class="tl">Тактики</span>
+  </button>
+</div>
 
 <!-- ═══ CONTENT ═══════════════════════════════════════════════════ -->
 <div class="wrap">
 
 <div class="tabpanel" id="tab-prep">
 
-<!-- Round/VP editing controls — the mockup's roundchip/vpchip are pure
-     display, repeated on every unit's herotopbar; the actual +/- controls
-     aren't part of the mockup at all, so they live here once. -->
-<div class="bottomsheet" style="border-top:none;">
-  <div class="lbl">Раунд и очки</div>
-  <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-    <div class="roundchip" data-roundchip></div>
-    <div class="roundctl"><button onclick="changeRound(-1)">‹</button><button onclick="changeRound(1)">›</button></div>
-    <div class="vpchip" data-vpchip></div>
-    <div class="roundctl">
-      <button onclick="changeVP('p1',-1)" aria-label="Уменьшить очки Игрока 1">И1−</button>
-      <button onclick="changeVP('p1',1)" aria-label="Увеличить очки Игрока 1">И1+</button>
-      <button onclick="changeVP('p2',-1)" aria-label="Уменьшить очки Игрока 2">И2−</button>
-      <button onclick="changeVP('p2',1)" aria-label="Увеличить очки Игрока 2">И2+</button>
-    </div>
-    <span class="underdogtag" id="underdogtag">ничья</span>
-  </div>
+<!-- Mode selection only lives on the Подготовка tab now. -->
+<div class="modepicker-selected" id="modePickerSelected" style="display:none;">
+  <span class="modelabel">Режим:</span>
+  <span class="modename" id="modeNameDisplay"></span>
+  <button class="ghost small" onclick="changeMode()">Сменить</button>
 </div>
 
 <!-- ═══ КОМНАТА (онлайн-синк раунда/очков/твиста + войска соперника) ══ -->
@@ -1396,6 +1414,27 @@ details.accordion summary.acc-head:focus-visible {
 
 <div class="tabpanel" id="tab-army">
 
+<div class="armybar">
+  <div class="armybar-round">
+    <button onclick="changeRound(-1)" aria-label="Предыдущий раунд">‹</button>
+    <span data-roundnum>Р1</span>
+    <button onclick="changeRound(1)" aria-label="Следующий раунд">›</button>
+  </div>
+  <div class="armybar-vp">
+    <span class="armybar-vplabel">И1</span>
+    <button onclick="changeVP('p1',-1)" aria-label="Уменьшить очки Игрока 1">−</button>
+    <span class="armybar-vpval" data-vp="p1">0</span>
+    <button onclick="changeVP('p1',1)" aria-label="Увеличить очки Игрока 1">+</button>
+  </div>
+  <div class="armybar-vp">
+    <span class="armybar-vplabel">И2</span>
+    <button onclick="changeVP('p2',-1)" aria-label="Уменьшить очки Игрока 2">−</button>
+    <span class="armybar-vpval" data-vp="p2">0</span>
+    <button onclick="changeVP('p2',1)" aria-label="Увеличить очки Игрока 2">+</button>
+  </div>
+  <span class="underdogtag" id="underdogtag">ничья</span>
+</div>
+
   <!-- III. МОЯ АРМИЯ -->
   <section class="block">
     <div class="section-header">
@@ -1464,26 +1503,6 @@ details.accordion summary.acc-head:focus-visible {
 </div><!-- /tab-hand -->
 
 </div><!-- /wrap -->
-
-<!-- ═══ TAB BAR ═══════════════════════════════════════════════════ -->
-<div class="tabbar">
-  <button class="tab" data-tab="prep" onclick="switchTab('prep')">
-    <svg viewBox="0 0 24 24"><path d="M4 21V9l8-6 8 6v12h-5v-7H9v7z"/></svg>
-    <span class="tl">Подготовка</span>
-  </button>
-  <button class="tab" data-tab="twist" onclick="switchTab('twist')">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg>
-    <span class="tl">Твист</span>
-  </button>
-  <button class="tab" data-tab="army" onclick="switchTab('army')">
-    <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M4 10h16"/></svg>
-    <span class="tl">Армия</span>
-  </button>
-  <button class="tab" data-tab="hand" onclick="switchTab('hand')">
-    <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-    <span class="tl">Тактики</span>
-  </button>
-</div>
 
 </div><!-- /appBody -->
 
@@ -1646,6 +1665,9 @@ function vpChipInner(){
 function refreshHeroChips(){
   document.querySelectorAll('[data-roundchip]').forEach(el=>el.innerHTML=roundChipInner());
   document.querySelectorAll('[data-vpchip]').forEach(el=>el.textContent=vpChipInner());
+  document.querySelectorAll('[data-roundnum]').forEach(el=>el.textContent='Р'+state.round);
+  document.querySelectorAll('[data-vp="p1"]').forEach(el=>el.textContent=state.vp.p1);
+  document.querySelectorAll('[data-vp="p2"]').forEach(el=>el.textContent=state.vp.p2);
 }
 function renderRoundTrack(){ refreshHeroChips(); }
 
@@ -2074,20 +2096,15 @@ function renderUnitCard(p,scope,unit,idx,count){
     if(!list||!list.length)return'';
     const hasRange=!!list[0].range;
     return`<div class="wtable-wrap"><table class="wtable">
-      <tr><th class="wname">${title}</th>${hasRange?'<th class="wrange">Range</th>':''}<th class="wstat">Att</th><th class="wstat">Hit</th><th class="wstat">Wound</th><th class="wstat">Rend</th><th class="wstat">Dmg</th><th class="wability">Ability</th></tr>
+      <tr><th class="wname">${title}</th>${hasRange?'<th class="wrange">RNG</th>':''}<th class="wstat">Att</th><th class="wstat">Hit</th><th class="wstat">WND</th><th class="wstat">Rend</th><th class="wstat">Dmg</th><th class="wability">Ability</th></tr>
       ${list.map(w=>`<tr><td class="wname">${w.name}</td>${hasRange?`<td class="wrange">${w.range}</td>`:''}<td class="wstat">${w.attacks}</td><td class="wstat">${w.hit}</td><td class="wstat">${w.wound}</td><td class="wstat">${w.rend!==undefined?w.rend:'—'}</td><td class="wstat">${w.damage}</td><td class="wability">${renderAbilityCell(w.ability)}</td></tr>`).join('')}
     </table></div>`;
   };
   const abilitiesHtml=(unit.abilities||[]).map(a=>renderAbilityCard(p,scope+'_'+unit.key+'_'+idx,a)).join('');
   const squadTag=count>1?` <span class="tag">отряд ${idx+1}/${count}</span>`:'';
   const nameLine=`${unit.name}${unit.isGeneral?' <span class="tag">генерал</span>':''}${squadTag}`;
-  const heroTopBar=`<div class="herotopbar">
-      <div class="roundchip" data-roundchip>${roundChipInner()}</div>
-      <div class="vpchip" data-vpchip>${vpChipInner()}</div>
-    </div>`;
   const headHtml=unit.image
     ?`<div class="herowrap" style="background-image:url('${unit.image}')">
-        ${heroTopBar}
         ${buffPillsFor(p,unit.key,idx)}
         <div class="herobottom">
           <h3 class="unitname">${nameLine}</h3>
@@ -2095,10 +2112,6 @@ function renderUnitCard(p,scope,unit,idx,count){
         </div>
       </div>`
     :`<div class="unitheadplain">
-        <div class="herotopbar" style="position:static;background:none;padding:0 0 8px;">
-          <div class="roundchip" data-roundchip>${roundChipInner()}</div>
-          <div class="vpchip" data-vpchip>${vpChipInner()}</div>
-        </div>
         <h3>${nameLine}</h3>${kwHtml}${targetBadgesFor(p,unit.key,idx)}
       </div>`;
   const isReinf=(unit.keywords||[]).includes('Reinforcements');
