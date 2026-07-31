@@ -194,11 +194,10 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 }
 .poster.p2, .poster.p3 {
   cursor: not-allowed;
-  background: var(--surf-2);
   border: 1px solid var(--bdr);
 }
-.poster.p2 { z-index: 2; top: 14px; left: 10px; right: -10px; opacity: .55; transform: scale(.96); }
-.poster.p3 { z-index: 1; top: 26px; left: 20px; right: -20px; opacity: .3; transform: scale(.92); }
+.poster.p2 { z-index: 2; top: 14px; left: 10px; right: -10px; opacity: .85; transform: scale(.96); background: var(--surf-3); }
+.poster.p3 { z-index: 1; top: 26px; left: 20px; right: -20px; opacity: .6; transform: scale(.92); background: var(--surf-2); }
 .poster .pname { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 20px; text-transform: uppercase; color: var(--ink); }
 .poster .plock { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
 .dots { display: flex; gap: 6px; justify-content: center; margin: 0 0 14px; }
@@ -779,6 +778,9 @@ details.accordion[open] .chev { transform: rotate(180deg); }
 }
 .unitroster li::before { content: '—'; color: var(--bdr-hi); font-size: 10px; flex-shrink: 0; }
 .unitroster li:last-child { border-bottom: none; }
+.unitroster li.general { border-bottom-color: rgba(140,95,35,.25); }
+.unitroster li.general::before { content: '★'; color: var(--bronze-text); }
+.unitroster li.general b { color: var(--bronze-text); }
 .unitroster b { color: var(--ink); font-weight: 600; }
 
 /* ── ABILITY CARD ────────────────────────────────────────── */
@@ -1065,6 +1067,9 @@ table.wtable td.wname { color: var(--ink); font-weight: 600; white-space: normal
 }
 
 .hc-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.hc-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.hc-chev { font-size: 10px; color: var(--fg-dim); transition: transform var(--t); }
+.handcard.open .hc-chev { transform: rotate(180deg); }
 .hc-name { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: .03em; }
 .hc-mark {
   font-family: 'Inter', sans-serif;
@@ -1904,6 +1909,8 @@ function renderHpTracker(p,unit,idx){
 function resetTurnFlags(p){
   const ast=armyState[p];
   if(!ast.armyKey)return;
+  const prevUsed={...ast.used};
+  const prevActivated={...ast.activated};
   const army=ARMIES[ast.armyKey];
   const clearIfResets=(scope,ability)=>{
     if(ability.limited&&ability.resetsEachTurn){delete ast.used[abilityFullId(p,scope,ability.id)];}
@@ -1919,7 +1926,9 @@ function resetTurnFlags(p){
     }
   });
   renderArmyContent(p);
-  toast((p==='p1'?'Игрок 1':'Игрок 2')+': активации и отметки «раз за ход» сброшены');
+  toast((p==='p1'?'Игрок 1':'Игрок 2')+': активации и отметки «раз за ход» сброшены',()=>{
+    ast.used=prevUsed; ast.activated=prevActivated; renderArmyContent(p);
+  });
 }
 
 function renderArmyPicker(p){
@@ -1949,9 +1958,14 @@ function pickArmy(p,key){
 }
 
 function resetArmy(p){
+  const prev=armyState[p];
+  if(!prev.armyKey)return;
   armyState[p]={armyKey:null,regimentId:null,enhancementId:null,used:{},hp:{},activated:{}};
   renderArmyPicker(p);
   renderArmyContent(p);
+  toast((p==='p1'?'Игрок 1':'Игрок 2')+': армия сброшена',()=>{
+    armyState[p]=prev; renderArmyPicker(p); renderArmyContent(p);
+  });
 }
 
 function openChoiceModal(p,kind){
@@ -2153,7 +2167,7 @@ function renderArmyContent(p){
     <span class="armytag ${tagCls}" ${tagStyle}>${army.subtitle||''}</span>
   </div>`;
   html+=`<ul class="unitroster">
-    <li><b>Генерал:</b> ${army.general}</li>
+    <li class="general"><b>Генерал:</b> ${army.general}</li>
     ${(army.unitList||[]).map(u=>`<li>${u}</li>`).join('')}
   </ul>`;
   if(army.lore){html+=`<details class="accordion"><summary class="acc-head"><span>Лор армии</span><span class="chev">▾</span></summary><div class="acc-body">${army.lore}</div></details>`;}
@@ -2259,7 +2273,10 @@ function renderHand(p){
     return`<div class="handcard${c.marked?' marked':''}" onclick="toggleOpen(this)">
       <div class="hc-top">
         <span class="hc-name">${card.name}</span>
-        <span class="hc-mark">К СБРОСУ</span>
+        <span class="hc-right">
+          <span class="hc-mark">К СБРОСУ</span>
+          <span class="hc-chev">▾</span>
+        </span>
       </div>
       <div class="hc-body">
         <div class="hc-tac"><span class="lbl">Тактика</span>${card.tactic}</div>
@@ -2442,6 +2459,7 @@ function changeMode(){
 function switchTab(name){
   document.querySelectorAll('.tabpanel').forEach(el=>el.classList.toggle('active',el.id==='tab-'+name));
   document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===name));
+  window.scrollTo(0,0);
 }
 
 /* ── INIT ─────────────────────────────────────────────────── */
@@ -2452,7 +2470,7 @@ async function initApp(){
   renderArmyPicker('p1');
   renderArmyContent('p1');
   renderHand('p1');
-  switchTab('army');
+  switchTab('prep');
 }
 initApp();
 </script>
