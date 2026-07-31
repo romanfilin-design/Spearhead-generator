@@ -85,6 +85,16 @@
   --shd-lg:  0 20px 40px rgba(0,0,0,.6);
   --shd-in:  inset 0 0 28px rgba(0,0,0,.45);
 
+  /* Added post-redesign — tokenized so they don't drift from the palette */
+  --on-ember:   #1a1305;
+  --hp-warn:    #c2853a;
+  --hp-crit:    #a4372a;
+  --ossia-hi:   #a07fc8;
+  --dolorum-hi: #6aaa70;
+  --panel-alt:  #211c14;
+  --online:     #6a6;
+  --offline:    #a55;
+
   /* Radius — mockup's literal values: 6px (poster/card), 8px (iconbtn), 20px (pill) */
   --r-xs: 2px;
   --r-sm: 4px;
@@ -158,7 +168,6 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
-  .flipcard { transition: none !important; }
 }
 
 /* ── MODE PICKER — poster stack, matches mockup screen 1 ──── */
@@ -212,8 +221,8 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 }
 .roomcode { font-family: 'Oswald', sans-serif; font-weight: 700; letter-spacing: .12em; color: var(--bronze-text); }
 .roomstatus { color: var(--ink-faint); font-style: italic; }
-.roomdot { width: 8px; height: 8px; border-radius: 50%; background: #6a6; box-shadow: 0 0 6px #6a6; display: inline-block; }
-.roomdot.off { background: #a55; box-shadow: 0 0 6px #a55; }
+.roomdot { width: 8px; height: 8px; border-radius: 50%; background: var(--online); box-shadow: 0 0 6px var(--online); display: inline-block; }
+.roomdot.off { background: var(--offline); box-shadow: 0 0 6px var(--offline); }
 
 /* ── TAB NAVIGATION ─────────────────────────────────────── */
 .tabpanel { display: none; }
@@ -291,7 +300,7 @@ body { padding-bottom: 58px; }
   display: flex; align-items: center; justify-content: center;
   color: var(--fg-dim);
 }
-.roundchip span.on { background: var(--bronze-src); border-color: var(--bronze-src); color: #1a1305; }
+.roundchip span.on { background: var(--bronze-src); border-color: var(--bronze-src); color: var(--on-ember); }
 .roundchip span.done { border-color: var(--ember-dim); color: var(--ember-text); }
 
 /* Round step arrows — reuses mockup's .roundctl circular control.
@@ -301,7 +310,7 @@ body { padding-bottom: 58px; }
 .roundctl { display: flex; gap: 6px; margin-left: 4px; }
 .roundctl button {
   width: 32px; height: 32px; min-height: 0; padding: 0;
-  border-radius: 50%; border: 1px solid var(--line); background: #211c14; color: var(--fg);
+  border-radius: 50%; border: 1px solid var(--line); background: var(--panel-alt); color: var(--fg);
   font-size: 14px; display: flex; align-items: center; justify-content: center;
 }
 /* HP +/- specifically: highest-frequency tap in the app, gets the full
@@ -368,7 +377,7 @@ button:active { transform: scale(.97); }
 /* Primary — ember gradient, dark text (matches .pillbtn.solid) */
 button.primary {
   background: linear-gradient(175deg, var(--bronze-hi-src), var(--bronze-src));
-  color: #1a1305;
+  color: var(--on-ember);
 }
 button.primary:hover  { filter: brightness(1.1); }
 button.primary:active { filter: brightness(.92); transform: scale(.97); }
@@ -532,8 +541,8 @@ section.block { margin-top: 36px; }
 .sidebtn.slaves.sel  { border-color: var(--slaves);  background: var(--slaves-bg);  box-shadow: inset 0 0 20px rgba(136,32,48,.08); }
 .sidebtn.dynamic.sel { border-color: var(--army-accent); background: var(--army-accent-bg); }
 
-.sidebtn.ossia.sel   .nm { color: #a07fc8; }
-.sidebtn.dolorum.sel .nm { color: #6aaa70; }
+.sidebtn.ossia.sel   .nm { color: var(--ossia-hi); }
+.sidebtn.dolorum.sel .nm { color: var(--dolorum-hi); }
 .sidebtn.hashut.sel  .nm { color: var(--hashut); }
 .sidebtn.slaves.sel  .nm { color: var(--blood-text); }
 .sidebtn.dynamic.sel .nm { color: var(--bronze-text); }
@@ -914,28 +923,29 @@ details.accordion[open] .chev { transform: rotate(180deg); }
   overflow: hidden; position: relative;
 }
 .hpbar .fill { height: 100%; background: var(--danger); transition: width var(--t), background var(--t); }
-.hpbar .fill.warn { background: #c2853a; }
-.hpbar .fill.crit { background: #a4372a; }
+.hpbar .fill.warn { background: var(--hp-warn); }
+.hpbar .fill.crit { background: var(--hp-crit); }
 .hpbar .modeltick { position: absolute; top: 0; bottom: 0; width: 1.5px; background: rgba(0,0,0,.4); }
 .hpval2 { font-family: 'Oswald', sans-serif; font-size: 13px; color: var(--fg); flex-shrink: 0; }
 .hpval2.dead { color: var(--fg-dim); }
 /* Distinct resting-state colors — hover alone never fires on touch, and a
    misread damage/heal tap silently corrupts HP with no undo otherwise. */
 .hpbtn.dmg  { border-color: var(--blood-hi); color: var(--blood-text); background: var(--blood-bg); }
-.hpbtn.heal { border-color: var(--dolorum);  color: #6aaa70;          background: var(--dolorum-bg); }
+.hpbtn.heal { border-color: var(--dolorum);  color: var(--dolorum-hi);          background: var(--dolorum-bg); }
 .hpbtn.dmg:hover  { filter: brightness(1.25); }
 .hpbtn.heal:hover { filter: brightness(1.25); }
 
 /* Literal mockup .iconrow / .iconbtn */
 .iconrow { display: flex; gap: 8px; padding: 12px 16px; background: var(--panel); }
 .iconbtn {
-  flex: 1; min-height: 0; aspect-ratio: 1.6; border-radius: 8px; border: 1px solid var(--line);
-  background: #211c14; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex: 1; min-height: 44px; aspect-ratio: 1.6; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--panel-alt); display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 2px; font-family: 'Oswald', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--fg-dim);
-  cursor: pointer;
+  cursor: pointer; padding: 0;
 }
+.iconbtn:hover { filter: none; }
 .iconbtn .num { font-size: 15px; font-weight: 700; }
-.iconbtn.on { background: linear-gradient(175deg, var(--bronze-hi-src), var(--bronze-src)); color: #1a1305; border-color: var(--bronze-hi-src); }
+.iconbtn.on { background: linear-gradient(175deg, var(--bronze-hi-src), var(--bronze-src)); color: var(--on-ember); border-color: var(--bronze-hi-src); }
 
 /* Keywords */
 .kwrow { margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 4px; }
@@ -1054,7 +1064,7 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
 .fanwrap { display: flex; justify-content: center; height: 110px; position: relative; margin-bottom: 14px; }
 .fancard {
   position: absolute; width: 78px; height: 104px; border-radius: 6px;
-  background: #211c14; border: 1px solid var(--line); top: 0;
+  background: var(--panel-alt); border: 1px solid var(--line); top: 0;
   display: flex; align-items: center; justify-content: center;
   font-family: 'Oswald', sans-serif; font-size: 20px; color: var(--line);
 }
@@ -1189,7 +1199,7 @@ table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; 
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
 .toast .toast-undo {
   font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase;
-  color: #1a1305; background: linear-gradient(175deg, var(--bronze-hi-src), var(--bronze-src));
+  color: var(--on-ember); background: linear-gradient(175deg, var(--bronze-hi-src), var(--bronze-src));
   border-radius: 14px; padding: 5px 12px; cursor: pointer; flex-shrink: 0;
 }
 
@@ -1815,7 +1825,7 @@ function toggleReinfUsed(p,unitKey,idx){
 function renderPhaseButtons(p,unit,idx){
   const phaseBtns=PHASES.map(([k,label,letter])=>{
     const on=isPhaseActivated(p,unit.key,idx,k);
-    return `<div class="iconbtn ${on?'on':''}" onclick="togglePhaseActivated('${p}','${unit.key}',${idx||0},'${k}')"><span class="num">${letter}</span>${label}</div>`;
+    return `<button class="iconbtn ${on?'on':''}" aria-pressed="${on}" onclick="togglePhaseActivated('${p}','${unit.key}',${idx||0},'${k}')"><span class="num">${letter}</span>${label}</button>`;
   }).join('');
   return `<div class="iconrow">${phaseBtns}</div>`;
 }
@@ -2052,7 +2062,7 @@ function renderUnitCard(p,scope,unit,idx,count){
         ${heroTopBar}
         ${buffPillsFor(p,unit.key,idx)}
         <div class="herobottom">
-          <div class="unitname">${nameLine}</div>
+          <h3 class="unitname">${nameLine}</h3>
           ${kwHtml}
         </div>
       </div>`
@@ -2061,7 +2071,7 @@ function renderUnitCard(p,scope,unit,idx,count){
           <div class="roundchip" data-roundchip>${roundChipInner()}</div>
           <div class="vpchip" data-vpchip>${vpChipInner()}</div>
         </div>
-        <h4>${nameLine}</h4>${kwHtml}${targetBadgesFor(p,unit.key,idx)}
+        <h3>${nameLine}</h3>${kwHtml}${targetBadgesFor(p,unit.key,idx)}
       </div>`;
   const isReinf=(unit.keywords||[]).includes('Reinforcements');
   const reinfUsed=isReinf&&isReinfUsed(p,unit.key,idx);
@@ -2360,7 +2370,7 @@ function renderOppUnitSummary(unit,idx,count){
   const activated=isActivated('opp',unit.key,idx);
   const squadTag=count>1?` · отряд ${idx+1}/${count}`:'';
   return `<div class="unitcard" style="pointer-events:none;">
-    <div class="unitheadplain"><h4>${unit.name}${squadTag}</h4></div>
+    <div class="unitheadplain"><h3>${unit.name}${squadTag}</h3></div>
     <div class="hprow2">
       <span class="hpval2">HP</span>
       <span class="hpval2${cur===0?' dead':''}">${cur}/${max}</span>
