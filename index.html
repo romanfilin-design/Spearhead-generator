@@ -1013,6 +1013,18 @@ details.accordion[open] .chev { transform: rotate(180deg); }
 .hpbtn.dmg:hover  { filter: brightness(1.25); }
 .hpbtn.heal:hover { filter: brightness(1.25); }
 
+/* Floating damage/heal number — spawned in JS at the tapped button's
+   screen position, animated via WAAPI, removed on finish. Fixed
+   positioning + high z-index since it must survive the immediate
+   renderArmyContent DOM rebuild it floats above. */
+.dmgfloat {
+  position: fixed; z-index: 300; pointer-events: none;
+  font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 15px;
+  transform: translate(-50%,0);
+}
+.dmgfloat-dmg  { color: var(--blood-text); }
+.dmgfloat-heal { color: var(--dolorum-hi); }
+
 /* Literal mockup .iconrow / .iconbtn */
 .iconrow { display: flex; gap: 8px; padding: 12px 16px; background: var(--panel); }
 .iconbtn {
@@ -1993,18 +2005,79 @@ function getUnitHP(p,unit,idx){
   if(!(id in armyState[p].hp)){ armyState[p].hp[id]=unitMaxHP(unit); }
   return armyState[p].hp[id];
 }
-function changeUnitHP(p,unitKey,idx,delta){
+/* HP color per fill fraction — same thresholds as renderHpTracker's
+   fillCls, resolved to literal hex here because WAAPI interpolates
+   between two concrete values, not CSS classes. */
+function hpFillColor(pct){
+  if(pct<=25)return'#A4372A';
+  if(pct<=50)return'#C2853A';
+  return'#4A5560';
+}
+
+/* HP +/- is the single most-repeated tap in the app (one per wound, every
+   unit, every round) — it deserves real tactile feedback, not just a
+   toast. renderArmyContent rebuilds the whole player's markup on every
+   call, so the .fill/.hpval-cur nodes are brand new after each tap; the
+   plain CSS transition on .fill never actually plays against a freshly
+   inserted node. WAAPI sidesteps that: animate the fresh node explicitly
+   from the pre-tap values instead of relying on old-node continuity. */
+function changeUnitHP(ev,p,unitKey,idx,delta){
+  const btnRect=ev&&ev.currentTarget&&ev.currentTarget.getBoundingClientRect();
   const army=ARMIES[armyState[p].armyKey];
   const unit=army.units.find(u=>u.key===unitKey);
   const max=unitMaxHP(unit);
   const cur=getUnitHP(p,unit,idx);
   const next=Math.max(0,Math.min(max,cur+delta));
   const id=hpFullId(p,unitKey,idx);
+  if(next===cur){ if(btnRect)spawnDamageFloat(btnRect,delta,window.matchMedia('(prefers-reduced-motion: reduce)').matches); return; }
+  const fromPct=max>0?(cur/max*100):0, toPct=max>0?(next/max*100):0;
   armyState[p].hp[id]=next;
   renderArmyContent(p);
-  if(next!==cur){
-    toast(`${unit.name}: ${cur} → ${next} HP`,()=>{ armyState[p].hp[id]=cur; renderArmyContent(p); });
+  toast(`${unit.name}: ${cur} → ${next} HP`,()=>{ armyState[p].hp[id]=cur; renderArmyContent(p); });
+
+  const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const row=document.querySelector(`[data-hpid="${id}"]`);
+  if(row){
+    const fill=row.querySelector('.fill');
+    if(fill){
+      fill.animate(
+        [{transform:`scaleX(${fromPct/100})`,backgroundColor:hpFillColor(fromPct)},
+         {transform:`scaleX(${toPct/100})`,backgroundColor:hpFillColor(toPct)}],
+        {duration:reduceMotion?1:280,easing:'cubic-bezier(.25,.46,.45,.94)',fill:'forwards'}
+      );
+    }
+    const valEl=row.querySelector('.hpval-cur');
+    if(valEl&&!reduceMotion){
+      valEl.animate(
+        [{transform:'scale(1)'},{transform:'scale(1.32)'},{transform:'scale(1)'}],
+        {duration:320,easing:'cubic-bezier(.16,1,.3,1)'}
+      );
+    }
   }
+  if(btnRect)spawnDamageFloat(btnRect,delta,reduceMotion);
+}
+
+/* Floating damage/heal number — anchored to the tapped button's own
+   screen position, independent of the immediate renderArmyContent
+   rebuild, so it survives the DOM swap that would otherwise kill any
+   animation attached to the row itself. Skipped under reduced motion:
+   it's a decorative flourish layered on top of the state-carrying HP
+   change, not the change itself. */
+function spawnDamageFloat(rect,delta,reduceMotion){
+  if(reduceMotion)return;
+  const el=document.createElement('span');
+  el.className='dmgfloat'+(delta<0?' dmgfloat-dmg':' dmgfloat-heal');
+  el.textContent=(delta<0?'':'+')+delta;
+  el.style.left=(rect.left+rect.width/2)+'px';
+  el.style.top=rect.top+'px';
+  document.body.appendChild(el);
+  const anim=el.animate(
+    [{transform:'translate(-50%,0) scale(.8)',opacity:0},
+     {transform:'translate(-50%,-10px) scale(1.1)',opacity:1,offset:.25},
+     {transform:'translate(-50%,-38px) scale(1)',opacity:0}],
+    {duration:650,easing:'cubic-bezier(.16,1,.3,1)'}
+  );
+  anim.onfinish=()=>el.remove();
 }
 const PHASES=[['mv','Move','M'],['sh','Shoot','S'],['ch','Charge','C'],['cb','Combat','X']];
 function getPhaseState(p,unitKey,idx){
@@ -2055,13 +2128,13 @@ function renderHpTracker(p,unit,idx){
   for(let m=1;m<models;m++){
     ticks+=`<div class="modeltick" style="left:${(m/models*100)}%"></div>`;
   }
-  return `<div class="hprow2">
+  return `<div class="hprow2" data-hpid="${hpFullId(p,unit.key,idx)}">
     <span class="hpval2">HP</span>
     <div class="hpbar"><div class="fill ${fillCls}" style="transform:scaleX(${pct/100})"></div>${ticks}</div>
-    <span class="hpval2${cur===0?' dead':''}">${cur}/${max}</span>
+    <span class="hpval2 hpval-cur${cur===0?' dead':''}">${cur}/${max}</span>
     <div class="roundctl">
-      <button class="hpbtn dmg" onclick="changeUnitHP('${p}','${unit.key}',${idx||0},-1)" aria-label="Урон юниту ${unit.name}">−</button>
-      <button class="hpbtn heal" onclick="changeUnitHP('${p}','${unit.key}',${idx||0},1)" aria-label="Восстановить хп юниту ${unit.name}">+</button>
+      <button class="hpbtn dmg" onclick="changeUnitHP(event,'${p}','${unit.key}',${idx||0},-1)" aria-label="Урон юниту ${unit.name}">−</button>
+      <button class="hpbtn heal" onclick="changeUnitHP(event,'${p}','${unit.key}',${idx||0},1)" aria-label="Восстановить хп юниту ${unit.name}">+</button>
     </div>
   </div>`;
 }
