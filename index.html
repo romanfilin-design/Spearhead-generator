@@ -158,7 +158,7 @@ h1, h2, h3, h4, .disp {
 }
 
 /* ── UTILITY ────────────────────────────────────────────── */
-.wrap { max-width: 680px; margin: 0 auto; padding: 0 16px; position: relative; z-index: 2; }
+.wrap { max-width: 680px; margin: 0 auto; padding: 0 16px calc(70px + env(safe-area-inset-bottom)); position: relative; z-index: 2; }
 a { color: var(--bronze-text); }
 code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr); border-radius: var(--r-sm); padding: 1px 6px; }
 
@@ -216,9 +216,17 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
    the Подготовка tab too, since room status/leave must stay available for
    the whole session, not just before picking a mode (mockup doesn't model
    that persistence — extension per the "screens outside the mockup" rule). */
-.bottomsheet { background: var(--panel); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 16px 0 22px; max-width: 680px; margin: 0 auto 14px; }
-.bottomsheet .lbl { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 10px; }
-.roomrow { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+/* Styled as the same .card treatment as the sections below it (surf-1
+   panel, full padding, rounded border) instead of a full-bleed edge-to-edge
+   strip — kept the room controls from reading like a different, glued-
+   to-the-edge component next to "Подготовка". */
+.bottomsheet {
+  background: var(--surf-1); border: 1px solid var(--bdr); border-radius: var(--r-lg);
+  padding: 16px 18px 18px; margin: 14px 0 20px;
+  box-shadow: var(--shd), var(--shd-in);
+}
+.bottomsheet .lbl { font-family: 'Oswald', sans-serif; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 12px; text-align: center; }
+.roomrow { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; }
 .roomrow input[type="text"] {
   flex: 0 0 70px; width: 70px; background: var(--void); border: 1px solid var(--line);
   border-radius: 20px; color: var(--fg); font-family: 'Oswald', sans-serif;
@@ -235,9 +243,10 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 /* Literal mockup .tabbar / .tab, fixed to the viewport bottom since the
    real app is a full page, not a single phone-frame mock. */
 .tabbar {
-  position: sticky; top: 0; left: 0; right: 0; z-index: 40;
-  display: flex; border-bottom: 1px solid var(--line); background: var(--panel);
+  position: fixed; bottom: 0; left: 0; right: 0; top: auto; z-index: 40;
+  display: flex; border-top: 1px solid var(--line); border-bottom: none; background: var(--panel);
   flex-shrink: 0;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 /* Row of tab buttons stays inside the same 680px column as .wrap below it —
    without this the nav (full-bleed background) visually detaches from the
@@ -297,7 +306,7 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
    Sized to hold one line at 320px+ instead of wrapping: small round
    steppers, no player labels beyond a one-letter tag, minimal gaps. */
 .armybar {
-  display: flex; align-items: center; flex-wrap: wrap; gap: 6px 6px; padding: 8px 0 12px;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 6px; padding: 8px 0 12px;
   font-family: 'Oswald', sans-serif;
 }
 .armybar-round, .armybar-vp {
@@ -316,7 +325,12 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
    control) — it's the one allowed to give up its place on the line
    first. The round/VP labels stay legible at every width instead. */
 .armybar .underdogtag { flex-shrink: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 3px 7px; }
-.turnresetrow { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 12px; }
+/* flex:1 + min-width:0 keeps both buttons on one row at any width — the
+   button text wraps to a second line inside the pill instead of the pair
+   wrapping onto two separate rows, since the round/turn reset is a single
+   action pair, not a scannable list. */
+.turnresetrow { display: flex; gap: 8px; flex-wrap: nowrap; margin: 6px 0 12px; }
+.turnresetrow button { flex: 1; min-width: 0; white-space: normal; line-height: 1.25; padding-top: 6px; padding-bottom: 6px; }
 /* Round step arrows — reuses mockup's .roundctl circular control.
    Sized up from the mockup's literal 28px: PRODUCT.md sets a 44px touch
    target floor for this dim-room/one-handed tool, and these steppers
@@ -846,7 +860,10 @@ details.accordion[open] .chev { transform: rotate(180deg); }
   overflow: hidden;
   box-shadow: var(--shd-sm);
 }
-/* Left accent stripe on unit card */
+/* Left accent stripe on unit card — z-index above .herowrap so the hero
+   photo (which bleeds to the card edge via negative margin) doesn't
+   paint over it; every other card (ability, etc.) shows this stripe
+   uninterrupted, the portrait shouldn't be the one place it vanishes. */
 .unitcard::before {
   content: '';
   position: absolute;
@@ -854,25 +871,8 @@ details.accordion[open] .chev { transform: rotate(180deg); }
   width: 3px;
   background: linear-gradient(180deg, var(--blood-hi), var(--blood));
   border-radius: var(--r-lg) 0 0 var(--r-lg);
+  z-index: 1;
 }
-
-/* Compact always-visible header — name + expand toggle. Replaces the old
-   always-expanded hero+name overlay: with a 5-unit roster the old layout
-   forced a ~9000px scroll to reach whichever unit is mid-activation, the
-   single highest-frequency interaction in the app (/impeccable layout). */
-.unithead-compact {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
-  padding: 2px 0 10px; min-height: 32px;
-}
-.unitname-compact {
-  font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 16px;
-  text-transform: uppercase; color: var(--ink); letter-spacing: .03em;
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-}
-.uh-chev { font-size: 12px; color: var(--fg-dim); flex-shrink: 0; transition: transform var(--t); }
-.uh-chev.open { transform: rotate(180deg); }
-.unitcard-body { margin-top: 2px; }
 
 .unitcard h4 {
   font-family: 'Oswald', sans-serif;
@@ -890,7 +890,8 @@ details.accordion[open] .chev { transform: rotate(180deg); }
 /* Unit head — hero portrait shown whole (background-size:contain, not
    cover) inside the collapsible body; plain heading fallback for units
    still missing art. */
-.unitheadplain { margin: 0 0 8px; }
+.unitheadplain { margin: 0 0 8px; position: relative; display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.unitheadplain h3 { flex: 1; min-width: 0; }
 .herowrap {
   position: relative;
   height: 400px;
@@ -901,6 +902,41 @@ details.accordion[open] .chev { transform: rotate(180deg); }
   background-position: center;
   background-color: var(--void);
 }
+.herobottom {
+  position: absolute; bottom: 0; left: 0; right: 0; padding: 16px;
+  background: linear-gradient(0deg, rgba(0,0,0,.85), transparent);
+}
+.herobottom .unitname {
+  font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 22px; text-transform: uppercase; color: var(--fg);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.herobottom .kwrow { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.herobottom .kwchip {
+  font-size: 10px; letter-spacing: .04em; text-transform: uppercase;
+  border: 1px solid rgba(231,225,211,.35); padding: 2px 8px; border-radius: 10px; color: var(--fg);
+}
+.buffpill {
+  position: absolute; top: 16px; right: 16px; background: var(--danger); color: #fff;
+  font-family: 'Oswald', sans-serif; font-size: 10px; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 12px; max-width: 60%; text-align: right; line-height: 1.3;
+}
+.buffpill + .buffpill { top: 46px; }
+
+/* Collapse toggle — sits over the top-left corner of the portrait so the
+   card can shrink to header+HP+phases without a separate compact-header
+   row eating vertical space. */
+.cardtoggle-btn {
+  position: absolute; top: 16px; left: 16px; z-index: 2;
+  width: 40px; height: 40px; min-height: 0; padding: 0; border-radius: 50%;
+  border: 1px solid rgba(231,225,211,.35); background: rgba(0,0,0,.55);
+  color: var(--fg); display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+}
+.unitheadplain .cardtoggle-btn {
+  position: static; margin-left: auto; background: var(--surf-2); border-color: var(--bdr);
+}
+.cardtoggle-chev { font-size: 14px; transition: transform var(--t); }
+.cardtoggle-chev.open { transform: rotate(180deg); }
 
 .tag {
   font-family: 'Inter', sans-serif;
@@ -1814,11 +1850,14 @@ function armyAccent(army){
 let armyState={p1:{armyKey:null,regimentId:null,enhancementId:null,used:{},hp:{},activated:{}}};
 /* Unit-card expand/collapse — pure local UI state, not synced/persisted:
    every mutation re-renders the whole army panel, so this must live
-   outside armyState or it resets on every HP/phase tap. */
+   outside armyState or it resets on every HP/phase tap. Everything
+   starts open (absence of an entry == open — see isOpen in
+   renderUnitCard); only an explicit false means collapsed. */
 let unitCardOpen={};
 function toggleUnitCard(p,cardId){
   if(!unitCardOpen[p])unitCardOpen[p]={};
-  unitCardOpen[p][cardId]=!unitCardOpen[p][cardId];
+  const wasOpen=!(unitCardOpen[p][cardId]===false);
+  unitCardOpen[p][cardId]=!wasOpen;
   renderArmyContent(p);
 }
 
@@ -2088,6 +2127,10 @@ function targetBadgesFor(p,unitKey,idx){
   if(!badges.length)return'';
   return `<div class="targetbadges">${badges.map(n=>`<span class="targetbadge">🔺 ${n}</span>`).join('')}</div>`;
 }
+/* Overlaid on .herowrap — literal mockup .buffpill */
+function buffPillsFor(p,unitKey,idx){
+  return targetBadgeNames(p,unitKey,idx).map(n=>`<div class="buffpill">▲ ${n}</div>`).join('');
+}
 
 function renderAbilityCard(p,scope,ability){
   const used=ability.limited?isUsed(p,scope,ability.id):false;
@@ -2145,8 +2188,6 @@ function renderChoiceEmpty(p,kind,label){
 
 function renderUnitCard(p,scope,unit,idx,count){
   idx=idx||0;
-  const cardId=p+'__'+unit.key+'__'+idx;
-  const isOpen=!!(unitCardOpen[p]&&unitCardOpen[p][cardId]);
   const statHtml=`<div class="statoverlay">
     <div class="st"><div class="v">${unit.move}</div><div class="l">Move</div></div>
     <div class="st"><div class="v">${unit.health}</div><div class="l">Health</div></div>
@@ -2165,7 +2206,21 @@ function renderUnitCard(p,scope,unit,idx,count){
   const abilitiesHtml=(unit.abilities||[]).map(a=>renderAbilityCard(p,scope+'_'+unit.key+'_'+idx,a)).join('');
   const squadTag=count>1?` <span class="tag">отряд ${idx+1}/${count}</span>`:'';
   const nameLine=`${unit.name}${unit.isGeneral?' <span class="tag">генерал</span>':''}${squadTag}`;
-  const badgesHtml=targetBadgesFor(p,unit.key,idx);
+  const cardId=p+'__'+unit.key+'__'+idx;
+  const isOpen=!(unitCardOpen[p]&&unitCardOpen[p][cardId]===false);
+  const toggleBtn=`<button class="cardtoggle-btn" onclick="toggleUnitCard('${p}','${cardId}')" aria-label="${isOpen?'Свернуть юнита':'Развернуть юнита'}" aria-expanded="${isOpen}"><span class="cardtoggle-chev${isOpen?' open':''}">▾</span></button>`;
+  const headHtml=unit.image
+    ?`<div class="herowrap" style="background-image:url('${unit.image}')">
+        ${buffPillsFor(p,unit.key,idx)}
+        ${toggleBtn}
+        <div class="herobottom">
+          <h3 class="unitname">${nameLine}</h3>
+          ${kwHtml}
+        </div>
+      </div>`
+    :`<div class="unitheadplain">
+        <h3>${nameLine}</h3>${toggleBtn}${kwHtml}${targetBadgesFor(p,unit.key,idx)}
+      </div>`;
   const isReinf=(unit.keywords||[]).includes('Reinforcements');
   const reinfUsed=isReinf&&isReinfUsed(p,unit.key,idx);
   const reinfHtml=isReinf?`<div class="reinfrow">
@@ -2175,27 +2230,19 @@ function renderUnitCard(p,scope,unit,idx,count){
   const weaponsHtml=weaponTable('Ranged',unit.ranged)+weaponTable('Melee',unit.melee);
   const weaponsAcc=weaponsHtml?`<details class="accordion" open><summary class="acc-head"><span>Оружие</span><span class="chev">▾</span></summary><div class="acc-body plain">${weaponsHtml}</div></details>`:'';
   const abilitiesAcc=abilitiesHtml?`<details class="accordion" open><summary class="acc-head"><span>Способности</span><span class="chev">▾</span></summary><div class="acc-body plain">${abilitiesHtml}</div></details>`:'';
-  const heroHtml=unit.image?`<div class="herowrap" style="background-image:url('${unit.image}')"></div>`:'';
-  const bodyHtml=isOpen?`<div class="unitcard-body">
-      ${heroHtml}
-      ${statHtml}
-      ${kwHtml}
+  const detailHtml=isOpen?`
+    ${statHtml}
+    <div class="scrollmid">
       ${reinfHtml}
-      <div class="scrollmid">
-        ${weaponsAcc}
-        ${abilitiesAcc}
-        <details class="accordion"><summary class="acc-head"><span>Лор юнита</span><span class="chev">▾</span></summary><div class="acc-body">${unit.lore||''}</div></details>
-      </div>
+      ${weaponsAcc}
+      ${abilitiesAcc}
+      <details class="accordion"><summary class="acc-head"><span>Лор юнита</span><span class="chev">▾</span></summary><div class="acc-body">${unit.lore||''}</div></details>
     </div>`:'';
   return`<div class="unitcard">
-    <div class="unithead-compact" onclick="toggleUnitCard('${p}','${cardId}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleUnitCard('${p}','${cardId}');}" aria-expanded="${isOpen}">
-      <h3 class="unitname-compact">${nameLine}</h3>
-      <span class="uh-chev${isOpen?' open':''}">▾</span>
-    </div>
-    ${badgesHtml}
+    ${headHtml}
     ${renderPhaseButtons(p,unit,idx)}
     ${renderHpTracker(p,unit,idx)}
-    ${bodyHtml}
+    ${detailHtml}
   </div>`;
 }
 
