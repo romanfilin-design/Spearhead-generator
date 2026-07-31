@@ -166,8 +166,13 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--surf-3); border-radius: 5px; }
 
+/* Kill decorative motion, but not state-carrying transitions like the HP
+   bar's steel→amber→red escalation — that's a meaningful signal ("this
+   unit is dying"), not decoration, and reduced-motion users still need it. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  *, *::before, *::after { animation-duration: .01ms !important; }
+  *, *::before, *::after { transition-duration: .01ms !important; }
+  .hpbar .fill { transition-duration: .18s !important; }
 }
 
 /* ── MODE PICKER — poster stack, matches mockup screen 1 ──── */
@@ -235,7 +240,7 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   flex-shrink: 0;
 }
 .tab {
-  flex: 1; min-height: 0; padding: 10px 4px 12px; background: none; border: none; border-radius: 0;
+  flex: 1; min-height: 44px; padding: 10px 4px 12px; background: none; border: none; border-radius: 0;
   text-align: center; cursor: pointer;
 }
 .tab:hover { filter: none; }
@@ -243,7 +248,7 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 .tab.active svg { stroke: var(--bronze-hi-src); }
 .tab .tl { font-family: 'Oswald', sans-serif; font-size: 10px; text-transform: uppercase; color: var(--fg-dim); margin-top: 3px; display: block; }
 .tab.active .tl { color: var(--bronze-hi-src); }
-body { padding-bottom: 58px; }
+body { padding-bottom: 64px; }
 
 .stickybar {
   position: sticky;
@@ -388,7 +393,7 @@ button.ghost:hover { border-color: var(--bdr-hi); color: var(--ember-hi); backgr
 
 /* Small — min-height reduced but still ~40/34px for safe area */
 button.small { min-height: 40px; padding: 0 14px; font-size: 11px; }
-button.tiny  { min-height: 34px; padding: 0 12px; font-size: 10px; }
+button.tiny  { min-height: 40px; padding: 0 12px; font-size: 10px; }
 
 button:disabled { opacity: .3; cursor: not-allowed; transform: none !important; filter: none !important; }
 
@@ -986,7 +991,14 @@ table.wtable th {
   letter-spacing: .05em;
 }
 table.wtable td { color: var(--ink-mid); background: none; }
-.term-clickable { color: var(--bronze-text); text-decoration: underline dotted; text-underline-offset: 2px; cursor: pointer; }
+/* Enlarges the tap target without growing the visible text or the dense
+   table row height — a full 44px box isn't realistic in a data table
+   this tight, so this is a deliberate partial mitigation, not full
+   compliance with the app's own touch-target floor. */
+.term-clickable {
+  color: var(--bronze-text); text-decoration: underline dotted; text-underline-offset: 2px; cursor: pointer;
+  padding: 6px 4px; margin: -6px -4px; display: inline-block;
+}
 .term-clickable:hover, .term-clickable:focus { color: var(--ink); }
 table.wtable .wname { color: var(--ink); font-weight: 600; white-space: normal; min-width: 120px; }
 /* On narrow phones: scale the table to fit instead of horizontal-scrolling it —
