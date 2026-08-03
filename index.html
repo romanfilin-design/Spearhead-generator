@@ -169,9 +169,15 @@ h1, h2, h3, h4, .disp {
 /* ── UTILITY ────────────────────────────────────────────── */
 #appBody { height: 100%; }
 .wrap {
-  max-width: 680px; margin: 0 auto; padding: 0 16px calc(70px + env(safe-area-inset-bottom));
+  max-width: 680px; margin: 0 auto; padding: 0 16px 70px;
   position: relative; z-index: 2;
   height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+/* Matches .tabbar's own standalone-only safe-area padding above, so the
+   bottom scroll clearance still equals the tabbar's real rendered
+   height in both modes instead of over-reserving in a normal tab. */
+@media (display-mode: standalone) {
+  .wrap { padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
 }
 a { color: var(--bronze-text); }
 code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr); border-radius: var(--r-sm); padding: 1px 6px; }
@@ -264,7 +270,15 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   position: fixed; bottom: 0; left: 0; right: 0; top: auto; z-index: 40;
   display: flex; border-top: 1px solid var(--line); border-bottom: none; background: var(--panel);
   flex-shrink: 0;
-  padding-bottom: env(safe-area-inset-bottom);
+}
+/* The home-indicator safe-area only needs reserving when there's no
+   browser chrome to handle it — i.e. running standalone (Add to Home
+   Screen). Inside a normal Safari tab, Safari's own UI already occupies
+   that strip; adding the same padding again on top of it just doubles
+   the reservation and shows up as a dead dark band between the tabbar
+   and Safari's toolbar with nothing in it. */
+@media (display-mode: standalone) {
+  .tabbar { padding-bottom: env(safe-area-inset-bottom); }
 }
 /* Row of tab buttons stays inside the same 680px column as .wrap below it —
    without this the nav (full-bleed background) visually detaches from the
