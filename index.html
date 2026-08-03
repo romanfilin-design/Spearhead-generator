@@ -268,7 +268,7 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   text-align: center; cursor: pointer;
 }
 .tab:hover { filter: none; }
-.tab svg { width: 18px; height: 18px; stroke: var(--fg-dim); fill: none; stroke-width: 1.6; }
+.tab svg { width: 18px; height: 18px; stroke: var(--fg-dim); fill: none; stroke-width: 1.6; transform-origin: center; }
 .tab.active svg { stroke: var(--bronze-hi-src); }
 .tab .tl { font-family: 'Oswald', sans-serif; font-size: 12px; text-transform: uppercase; color: var(--fg-dim); margin-top: 3px; display: block; }
 .tab.active .tl { color: var(--bronze-hi-src); }
@@ -2714,12 +2714,34 @@ function changeMode(){
 
 /* ── TAB NAVIGATION ───────────────────────────────────────── */
 function switchTab(name){
+  const prevTab=document.querySelector('.tab.active');
   document.querySelectorAll('.tabpanel').forEach(el=>el.classList.toggle('active',el.id==='tab-'+name));
   document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.tab===name));
+  const nextTab=document.querySelector('.tab.active');
   /* html has global scroll-behavior:smooth (line 114) — an explicit
      behavior:'auto' here overrides it so a tab switch snaps instantly
      instead of animating past however far the previous tab was scrolled. */
   window.scrollTo({top:0,left:0,behavior:'auto'});
+  animateTabSwitch(prevTab,nextTab);
+}
+
+/* Tap-driven dock feel: the requested React Bits Dock magnifies icons by
+   mouse proximity, which has no equivalent on a touchscreen (no hover, no
+   mouseX) — this is the touch-native version of the same idea. The newly
+   active icon pops up, the one it replaces settles back down, both via
+   WAAPI so no continuity is needed across the class-toggle above. */
+function animateTabSwitch(prevTab,nextTab){
+  if(prevTab===nextTab)return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const easing='cubic-bezier(.16,1,.3,1)';
+  if(nextTab){
+    const svg=nextTab.querySelector('svg');
+    if(svg)svg.animate([{transform:'scale(1)'},{transform:'scale(1.28)'},{transform:'scale(1)'}],{duration:360,easing});
+  }
+  if(prevTab){
+    const svg=prevTab.querySelector('svg');
+    if(svg)svg.animate([{transform:'scale(1.28)'},{transform:'scale(1)'}],{duration:220,easing});
+  }
 }
 
 /* ── INIT ─────────────────────────────────────────────────── */
