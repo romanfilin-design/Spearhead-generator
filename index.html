@@ -247,6 +247,13 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
   display: flex; border-top: 1px solid var(--line); border-bottom: none; background: var(--panel);
   flex-shrink: 0;
   padding-bottom: env(safe-area-inset-bottom);
+  /* iOS Safari repaints a fixed-position element on its own timing when the
+     collapsible address/toolbar chrome shows or hides, and without a forced
+     compositing layer it can lag a frame behind — visible as a gap between
+     the bar and the true screen edge until the next scroll/paint. Promoting
+     it to its own GPU layer keeps it pinned through that toolbar animation. */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 /* Row of tab buttons stays inside the same 680px column as .wrap below it —
    without this the nav (full-bleed background) visually detaches from the
