@@ -188,7 +188,11 @@ code { font-size: .9em; background: var(--surf-2); border: 1px solid var(--bdr);
 }
 .poster.p1 {
   z-index: 3;
-  background: linear-gradient(200deg, var(--surf-4), var(--void) 70%);
+  /* Scrim gradient layered over the battle-art background — keeps the
+     bottom-anchored pname readable without hiding the art up top. */
+  background-image: linear-gradient(to top, rgba(6,4,3,.92) 0%, rgba(6,4,3,.25) 55%, rgba(6,4,3,.05) 100%), url('assets/textures/poster_sand_bone.webp');
+  background-size: cover;
+  background-position: center;
   border: 1px solid var(--ember);
   box-shadow: var(--shd-lg);
 }
@@ -1182,13 +1186,15 @@ table.wtable td.wname { color: var(--ink); font-weight: 600; white-space: normal
 .fanwrap { display: flex; justify-content: center; height: 110px; position: relative; margin-bottom: 14px; }
 .fancard {
   position: absolute; width: 78px; height: 104px; border-radius: 6px;
-  background: var(--panel-alt); border: 1px solid var(--line); top: 0;
+  background-image: url('assets/textures/cardback_twist.webp');
+  background-size: cover; background-position: center;
+  border: 1px solid var(--line); top: 0;
   display: flex; align-items: center; justify-content: center;
   font-family: 'Oswald', sans-serif; font-size: 20px; color: var(--line);
 }
-.fancard.c1 { transform: rotate(-10deg) translateX(-58px); z-index: 1; }
-.fancard.c2 { transform: rotate(0deg); z-index: 3; background: linear-gradient(200deg, #3A1610, #140807); border-color: var(--bronze-src); }
-.fancard.c3 { transform: rotate(10deg) translateX(58px); z-index: 1; }
+.fancard.c1 { transform: rotate(-10deg) translateX(-58px); z-index: 1; filter: brightness(.75); }
+.fancard.c2 { transform: rotate(0deg); z-index: 3; border-color: var(--bronze-src); box-shadow: var(--shd-sm); }
+.fancard.c3 { transform: rotate(10deg) translateX(58px); z-index: 1; filter: brightness(.75); }
 
 .playerbtns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
 
@@ -2507,12 +2513,12 @@ function renderHand(p){
   const zone=document.getElementById('handzone-'+p);
   document.getElementById('deckcount-'+p).textContent=st.started?('колода: '+st.deck.length+' · в руке: '+st.hand.length):'колода: —';
   if(!st.started){
-    zone.innerHTML='<div class="fanwrap"><div class="fancard c1">?</div><div class="fancard c2">?</div><div class="fancard c3">?</div></div>';
+    zone.innerHTML='<div class="fanwrap"><div class="fancard c1"></div><div class="fancard c2"></div><div class="fancard c3"></div></div>';
     return;
   }
   if(!st.revealed){
     const cls=['c1','c2','c3'];
-    zone.innerHTML='<div class="fanwrap">'+st.hand.map((c,i)=>`<div class="fancard ${cls[i]||'c2'}">✦</div>`).join('')+'</div>';
+    zone.innerHTML='<div class="fanwrap">'+st.hand.map((c,i)=>`<div class="fancard ${cls[i]||'c2'}"></div>`).join('')+'</div>';
     return;
   }
   zone.innerHTML='<div class="handgrid">'+st.hand.map((c,i)=>{
