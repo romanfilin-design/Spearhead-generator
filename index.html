@@ -2755,30 +2755,6 @@ async function initApp(){
   switchTab('prep');
 }
 initApp();
-
-/* iOS Safari's compact bottom toolbar can leave the layout viewport
-   momentarily taller than what's actually visible (most often right
-   after load, before the first scroll) — a plain position:fixed;bottom:0
-   element computes against that stale, too-tall viewport and ends up
-   floating above a visible gap of page background until something
-   forces a relayout. visualViewport reports the real visible rect, so
-   pin the tabbar's bottom offset to the gap directly instead of hoping
-   bottom:0 tracks it. No-op (falls back to the CSS bottom:0) where
-   visualViewport isn't supported. */
-(function(){
-  if(!window.visualViewport)return;
-  const tabbar=document.querySelector('.tabbar');
-  if(!tabbar)return;
-  function pin(){
-    const vv=window.visualViewport;
-    const gap=window.innerHeight-vv.height-vv.offsetTop;
-    tabbar.style.bottom=Math.max(0,Math.round(gap))+'px';
-  }
-  window.visualViewport.addEventListener('resize',pin);
-  window.visualViewport.addEventListener('scroll',pin);
-  window.addEventListener('load',pin);
-  pin();
-})();
 </script>
 </body>
 </html>
